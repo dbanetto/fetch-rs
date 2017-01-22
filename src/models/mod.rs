@@ -1,3 +1,3 @@
 mod series;
 
-pub use self::series::Series;
+pub use self::series::*;

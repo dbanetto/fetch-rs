@@ -4,7 +4,7 @@ CREATE TABLE series (
     start_date DATE,
     end_date DATE,
     episodes_total INTEGER,
-    episodes_current INTEGER NOT NULL CHECK (episodes_current >= 0),
+    episodes_current INTEGER NOT NULL CHECK (episodes_current >= 0) DEFAULT 0,
     info_link VARCHAR,
     CHECK (episodes_total >= episodes_current)
 );

@@ -1,5 +1,6 @@
 #![feature(plugin)]
 #![plugin(rocket_codegen)]
+#![feature(custom_derive)]
 
 #[macro_use] extern crate diesel_codegen;
 #[macro_use] extern crate diesel;
@@ -19,10 +20,11 @@ mod models;
 mod schema;
 mod db;
 
+use std::path::{PathBuf, Path};
 use models::*;
 use diesel::prelude::*;
-use diesel::Connection;
-use diesel::pg::PgConnection;
+use rocket::request::Form;
+use rocket::response::NamedFile;
 use rocket_contrib::JSON;
 use db::DB;
 
@@ -33,11 +35,25 @@ fn index(db: DB) -> JSON<Vec<Series>> {
     let conn = db.conn();
 
     let result = series.load::<Series>(conn)
-                       .expect("Error loading posts");
+        .expect("Error loading posts");
 
     JSON(result)
 }
 
+#[post("/new", data="<series>")]
+fn new_series(_db: DB, series: Form<SeriesForm>) -> JSON<SeriesForm> {
+    JSON(series.into_inner())
+}
+
+#[get("/<file..>")]
+fn static_files(file: PathBuf) -> Option<NamedFile> {
+    NamedFile::open(Path::new("public/").join(file)).ok()
+}
+
 fn main() {
-    rocket::ignite().mount("/", routes![index]).launch();
+    rocket::ignite()
+        .mount("/", routes![
+               index,
+               new_series,
+               static_files]).launch();
 }
