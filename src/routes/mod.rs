@@ -20,15 +20,17 @@ fn index(db: DB) -> JSON<Vec<Series>> {
     JSON(result)
 }
 
+use ::util::ApiResult;
+
 #[post("/new", data="<series>")]
-fn new_series(_db: DB, series: Form<SeriesForm>) -> Result<JSON<NewSeries>, JSON<String>> {
+fn new_series(_db: DB, series: Form<SeriesForm>) -> JSON<ApiResult<NewSeries, String>> {
     let new_series = NewSeries::from(series.into_inner());
 
-    if let Err(e) = new_series.validate() {
-        Err(JSON(format!("{}", e)))
+    ApiResult::json(if let Err(e) = new_series.validate() {
+        Err(format!("{}", e))
     } else {
-        Ok(JSON(new_series))
-    }
+        Ok(new_series)
+    })
 }
 
 #[get("/<file..>")]

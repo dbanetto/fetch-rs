@@ -19,6 +19,7 @@ extern crate chrono;
 mod models;
 mod schema;
 mod db;
+mod util;
 mod routes;
 mod error;
 
