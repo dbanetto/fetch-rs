@@ -1,4 +1,5 @@
 #![feature(plugin)]
+#![plugin(clippy)]
 #![plugin(rocket_codegen)]
 #![feature(custom_derive)]
 
