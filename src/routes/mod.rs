@@ -5,22 +5,26 @@ use models::*;
 use diesel::prelude::*;
 use rocket::request::Form;
 use rocket::response::NamedFile;
-use rocket_contrib::JSON;
+use rocket_contrib::{JSON, Template};
 use db::DB;
+use util::ApiResult;
+use std::collections::HashMap;
+use serde_json::to_value;
 
 #[get("/")]
-fn index(db: DB) -> JSON<Vec<Series>> {
+fn index(db: DB) -> Template {
     use ::schema::series::dsl::*;
 
     let conn = db.conn();
+    let mut context = HashMap::new();
 
-    let result = series.load::<Series>(conn)
-        .expect("Error loading posts");
+    let result = series.load::<Series>(conn).expect("Error loading posts");
 
-    JSON(result)
+    context.insert("series".to_owned(), to_value(result));
+
+    Template::render("index", &context)
 }
 
-use ::util::ApiResult;
 
 #[post("/new", data="<series>")]
 fn new_series(_db: DB, series: Form<SeriesForm>) -> JSON<ApiResult<NewSeries, String>> {

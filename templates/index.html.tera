@@ -1,0 +1,20 @@
+<html>
+  <head>
+    <title>Fetch</title>
+  </head>
+  <body>
+    {% for show in series %}
+        <h1>{{ show.title }}</h1>
+        <div>
+            <p>Started on {{ show.start_date }}</p>
+            {% if show.end_date is defined %}
+            <p>Ends on {{ show.end_date }}</p>
+            {% else %}
+            <p>Ends whenever</p>
+            {% endif %}
+            <p>There has been released {% if show.episodes_count is defined %}{{ show.episodes_count }}{% else %}?{% endif %}/{% if show.episodes_count is defined %}{{ show.episodes_total }}{% else %}?{% endif %}</p>
+            <a href="{{ show.info_link }}">info</a>
+        </div>
+    {% endfor %}
+  </body>
+</html>
