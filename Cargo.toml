@@ -4,31 +4,31 @@ name = "fetch-rocket"
 version = "0.1.0"
 
 [dependencies]
-clippy = "0.0.111"
-dotenv = "0.8.0"
-error-chain = "0.8.1"
+# clippy = "^0.0.111"
+dotenv = "^0.8.0"
+error-chain = "^0.8.1"
 lazy_static = "0.2.2"
 r2d2 = "0.7.1"
-r2d2-diesel = "0.9.0"
-rocket = "0.1.5"
-rocket_codegen = "0.1.5"
-serde = "0.8.23"
-serde_derive = "0.8.23"
-serde_json = "0.8.6"
+r2d2-diesel = "^0.10.0"
+rocket = "^0.1.6"
+rocket_codegen = "^0.1.6"
+serde = "^0.8"
+serde_derive = "^0.8"
+serde_json = "^0.8"
 
 [dependencies.chrono]
 features = ["serde"]
-version = "0.2.25"
+version = "^0.2.25"
 
 [dependencies.diesel]
 features = ["chrono"]
-version = "0.9.1"
+version = "^0.10.0"
 
 [dependencies.diesel_codegen]
 features = ["postgres"]
-version = "0.9.0"
+version = "^0.10.0"
 
 [dependencies.rocket_contrib]
 default_features = false
 features = ["json", "tera_templates"]
-version = "0.1.5"
+version = "^0.1.6"
