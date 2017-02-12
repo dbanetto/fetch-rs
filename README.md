@@ -10,7 +10,13 @@ Fetch web interface similar to [fetch-django](https://github.com/zyphrus/fetch-d
 
 ## Getting started
 
-`cargo run`
+```bash
+# assumes postgres is setup locally
+echo 'DATABASE_URL=postgres://localhost/fetch_dev' > .env
+cargo install diesel-cli
+diesel migration run
+cargo run
+```
 
 ## License
 
