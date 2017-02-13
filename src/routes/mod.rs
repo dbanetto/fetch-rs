@@ -10,6 +10,9 @@ use db::DB;
 use util::ApiResult;
 use std::collections::HashMap;
 use serde_json::to_value;
+use rocket::Route;
+
+mod api;
 
 #[get("/")]
 fn index(db: DB) -> Template {
@@ -24,7 +27,6 @@ fn index(db: DB) -> Template {
 
     Template::render("index", &context)
 }
-
 
 #[post("/new", data="<series>")]
 fn new_series(_db: DB, series: Form<SeriesForm>) -> JSON<ApiResult<NewSeries, String>> {
@@ -42,6 +44,12 @@ fn static_files(file: PathBuf) -> Option<NamedFile> {
     NamedFile::open(Path::new("public/").join(file)).ok()
 }
 
+fn routes() -> Vec<Route> {
+    routes![index, static_files]
+}
+
 pub fn mount(rocket: Rocket) -> Rocket {
-    rocket.mount("/", routes![index, new_series, static_files])
+    rocket.mount("/", routes())
+          .mount("/api/v1", api::routes())
+          .mount("/api/v1/series", api::series::routes())
 }
