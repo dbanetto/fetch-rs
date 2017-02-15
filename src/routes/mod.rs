@@ -45,11 +45,12 @@ fn static_files(file: PathBuf) -> Option<NamedFile> {
 }
 
 fn routes() -> Vec<Route> {
-    routes![index, static_files]
+    routes![index]
 }
 
 pub fn mount(rocket: Rocket) -> Rocket {
     rocket.mount("/", routes())
-          .mount("/api/v1", api::routes())
-          .mount("/api/v1/series", api::series::routes())
+        .mount("/api/v1", api::routes())
+        .mount("/api/v1/series", api::series::routes())
+        .mount("/", routes![static_files])
 }
