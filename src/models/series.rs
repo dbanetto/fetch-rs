@@ -1,8 +1,10 @@
 use ::schema::*;
 use ::error::*;
+use models::InfoUriForm;
 use chrono::NaiveDate;
 
-#[derive(Queryable, Serialize, Deserialize, Debug, Default)]
+#[derive(Queryable, Identifiable, Serialize, Deserialize, Debug, Default)]
+#[table_name="series"]
 pub struct Series {
     pub id: i32,
     pub title: String,
@@ -10,7 +12,6 @@ pub struct Series {
     pub end_date: Option<NaiveDate>,
     pub episodes_total: Option<i32>,
     pub episodes_current: i32,
-    pub info_link: Option<String>,
 }
 
 
@@ -22,17 +23,17 @@ pub struct NewSeries {
     pub end_date: Option<NaiveDate>,
     pub episodes_total: Option<i32>,
     pub episodes_current: i32,
-    pub info_link: Option<String>,
 }
 
-#[derive(FromForm, Serialize, Deserialize, Debug, Default)]
+
+#[derive(Serialize, Deserialize, Debug, Default)]
 pub struct SeriesForm {
     pub title: String,
     pub start_date: Option<String>,
     pub end_date: Option<String>,
     pub episodes_total: Option<i32>,
     pub episodes_current: i32,
-    pub info_link: Option<String>,
+    pub info_uris: Vec<InfoUriForm>,
 }
 
 impl NewSeries {
@@ -66,7 +67,6 @@ impl From<SeriesForm> for NewSeries {
             },
             episodes_total: form.episodes_total,
             episodes_current: form.episodes_current,
-            info_link: form.info_link,
         }
     }
 }

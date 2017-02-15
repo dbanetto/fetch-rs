@@ -28,17 +28,6 @@ fn index(db: DB) -> Template {
     Template::render("index", &context)
 }
 
-#[post("/new", data="<series>")]
-fn new_series(_db: DB, series: Form<SeriesForm>) -> JSON<ApiResult<NewSeries, String>> {
-    let new_series = NewSeries::from(series.into_inner());
-
-    ApiResult::json(if let Err(e) = new_series.validate() {
-        Err(format!("{}", e))
-    } else {
-        Ok(new_series)
-    })
-}
-
 #[get("/<file..>")]
 fn static_files(file: PathBuf) -> Option<NamedFile> {
     NamedFile::open(Path::new("public/").join(file)).ok()

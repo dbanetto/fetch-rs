@@ -42,8 +42,8 @@ pub mod series {
     }
 
     #[post("/new", data="<series_form>")]
-    fn new(db: DB, series_form: Form<SeriesForm>) -> JSON<ApiResult<Series, String>> {
-        let new_series = NewSeries::from(series_form.into_inner());
+    fn new(db: DB, series_form: JSON<SeriesForm>) -> JSON<ApiResult<Series, String>> {
+        let new_series = NewSeries::from(series_form.unwrap());
 
         let validate = new_series.validate();
 

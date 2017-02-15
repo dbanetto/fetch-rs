@@ -13,7 +13,6 @@
             <p>Ends whenever</p>
             {% endif %}
             <p>There has been released {% if show.episodes_count is defined %}{{ show.episodes_count }}{% else %}?{% endif %}/{% if show.episodes_count is defined %}{{ show.episodes_total }}{% else %}?{% endif %}</p>
-            <a href="{{ show.info_link }}">info</a>
         </div>
     {% endfor %}
   </body>
