@@ -3,7 +3,7 @@ use ::error::*;
 use models::InfoUriForm;
 use chrono::NaiveDate;
 
-#[derive(Queryable, Identifiable, Serialize, Deserialize, Debug, Default)]
+#[derive(Queryable, Associations, Identifiable, Serialize, Deserialize, Debug, Default)]
 #[table_name="series"]
 pub struct Series {
     pub id: i32,

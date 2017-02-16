@@ -3,7 +3,7 @@ use models::Series;
 
 #[derive(Identifiable, Queryable, Associations, Serialize, Deserialize, Debug, Default)]
 #[table_name="info_uri"]
-#[belongs_to(Series)]
+#[belongs_to(Series, foreign_key="series_id")]
 pub struct InfoUri {
     id: i32,
     series_id: i32,
