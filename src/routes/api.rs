@@ -42,12 +42,12 @@ pub mod series {
             .select(series::all_columns)
             .first(conn) {
             Ok(s) => s,
-            Err(e) => return ApiResult::err(e.description().to_owned()).json(),
+            Err(e) => return ApiResult::err_format(e).json(),
         };
 
         let info_uris: Vec<InfoUri> = match InfoUri::belonging_to(&series).load(conn) {
             Ok(i) => i,
-            Err(e) => return ApiResult::err(e.description().to_owned()).json(),
+            Err(e) => return ApiResult::err_format(e).json(),
         };
 
         let mut json = serde_json::to_value(series);
@@ -64,7 +64,7 @@ pub mod series {
         let (new_series, info_uris) = series_form.into_new();
 
         if let Err(e) = new_series.validate() {
-            return ApiResult::err(e.description().to_owned()).json();
+            return ApiResult::err_format(e).json();
         }
 
         let conn = db.conn();
@@ -73,7 +73,7 @@ pub mod series {
             .returning(series::all_columns)
             .get_result(conn) {
             Ok(s) => s,
-            Err(e) => return ApiResult::err(e.description().to_owned()).json(),
+            Err(e) => return ApiResult::err_format(e).json(),
         };
 
         let info_uris = info_uris.into_iter()
@@ -85,7 +85,7 @@ pub mod series {
             .returning(info_uri::all_columns)
             .get_results(conn) {
             Ok(uris) => uris,
-            Err(e) => return ApiResult::err(e.description().to_owned()).json(),
+            Err(e) => return ApiResult::err_format(e).json(),
         };
 
         let mut result = serde_json::to_value(new_series);

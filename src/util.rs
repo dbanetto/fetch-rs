@@ -1,9 +1,11 @@
 use serde::Serialize;
 use rocket_contrib::JSON;
+use std::fmt::Display;
 
 #[derive(Serialize)]
 pub struct ApiResult<T, E>
-where T: Serialize, E: Serialize
+    where T: Serialize,
+          E: Serialize
 {
     success: bool,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -12,11 +14,13 @@ where T: Serialize, E: Serialize
     error: Option<E>,
 }
 
-impl <T, E> ApiResult<T, E> 
-where T: Serialize, E: Serialize {
+impl<T, E> ApiResult<T, E>
+    where T: Serialize,
+          E: Serialize
+{
     pub fn new(data: Result<T, E>) -> Self {
         let (data, err) = match data {
-            Ok(x) => (Some(x), None),   
+            Ok(x) => (Some(x), None),
             Err(e) => (None, Some(e)),
         };
 
@@ -48,8 +52,22 @@ where T: Serialize, E: Serialize {
     }
 }
 
-impl <T, E> From<Result<T, E>> for ApiResult<T, E> 
-where T: Serialize, E: Serialize {
+impl<T> ApiResult<T, String>
+    where T: Serialize
+{
+    pub fn err_format<D: Display>(err: D) -> Self {
+        ApiResult {
+            data: None,
+            error: Some(format!("{}", err)),
+            success: false,
+        }
+    }
+}
+
+impl<T, E> From<Result<T, E>> for ApiResult<T, E>
+    where T: Serialize,
+          E: Serialize
+{
     fn from(from: Result<T, E>) -> Self {
         ApiResult::new(from)
     }
