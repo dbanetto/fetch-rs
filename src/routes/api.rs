@@ -16,10 +16,10 @@ pub mod series {
     use rocket::Route;
     use rocket::request::Form;
     use rocket_contrib::JSON;
-    use models::{SeriesForm, NewSeries, Series};
+    use models::*;
     use diesel::prelude::*;
-    use schema::series::dsl::*;
-    use schema::series;
+    use schema::{info_uri, series};
+    use diesel::result::QueryResult;
     use diesel::insert;
     use diesel;
 
@@ -27,7 +27,7 @@ pub mod series {
     fn all(db: DB) -> JSON<ApiResult<Vec<Series>, String>> {
         let conn = db.conn();
 
-        let result = series.load::<Series>(conn);
+        let result = series::dsl::series.load::<Series>(conn);
 
         ApiResult::json(result.map_err(|e| e.description().to_owned()))
     }
@@ -36,14 +36,17 @@ pub mod series {
     fn select(db: DB, series_id: i32) -> JSON<ApiResult<Series, String>> {
         let conn = db.conn();
 
-        let result = series.filter(id.eq(series_id)).select(series::all_columns).first(conn);
+        let result = series::dsl::series.filter(series::id.eq(series_id)).select(series::all_columns).first(conn);
 
         ApiResult::json(result.map_err(|e| e.description().to_owned()))
     }
 
     #[post("/new", data="<series_form>")]
-    fn new(db: DB, series_form: JSON<SeriesForm>) -> JSON<ApiResult<Series, String>> {
-        let new_series = NewSeries::from(series_form.unwrap());
+    fn new(db: DB,
+           series_form: JSON<SeriesForm>)
+           -> JSON<ApiResult<(Series, Vec<InfoUri>), String>> {
+        let series_form = series_form.unwrap();
+        let (new_series, info_uris) = series_form.into_new();
 
         let validate = new_series.validate();
 
@@ -52,12 +55,28 @@ pub mod series {
         }
 
         let conn = db.conn();
-        let series_id = insert(&new_series)
+        let new_series: QueryResult<Series> = insert(&new_series)
             .into(series::table)
             .returning(series::all_columns)
             .get_result(conn);
 
-        ApiResult::json(series_id.map_err(|e| e.description().to_owned()))
+        if new_series.is_err() {
+            return ApiResult::json(Err(new_series.unwrap_err().description().to_owned()));
+        }
+
+        let new_series: Series = new_series.unwrap();
+
+        let new_info_uris = {
+            insert(&info_uris.into_iter().map(|i| i.to_insertable(&new_series)).collect::<Vec<NewInfoUri>>())
+                .into(info_uri::table)
+                .returning(info_uri::all_columns)
+                .get_results(conn)
+        };
+
+        let result = new_info_uris.map(move |uris| (new_series, uris))
+                                  .map_err(|e| e.description().to_owned()); 
+
+        ApiResult::json(result)
     }
 
 

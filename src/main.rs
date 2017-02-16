@@ -17,12 +17,12 @@ extern crate rocket_contrib;
 extern crate dotenv;
 extern crate chrono;
 
-mod models;
-mod schema;
-mod db;
-mod util;
-mod routes;
-mod error;
+pub mod models;
+pub mod schema;
+pub mod db;
+pub mod util;
+pub mod routes;
+pub mod error;
 
 fn main() {
     routes::mount(rocket::ignite()).launch();

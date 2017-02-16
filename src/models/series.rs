@@ -53,21 +53,21 @@ impl NewSeries {
     }
 }
 
-impl From<SeriesForm> for NewSeries {
-    fn from(form: SeriesForm) -> Self {
-        NewSeries {
-            title: form.title,
-            start_date: match form.start_date {
+impl SeriesForm {
+    pub fn into_new(self) -> (NewSeries, Vec<InfoUriForm>) {
+        (NewSeries {
+            title: self.title,
+            start_date: match self.start_date {
                 Some(date) => date.parse::<NaiveDate>().ok(),
                 None => None,
             },
-            end_date: match form.end_date {
+            end_date: match self.end_date {
                 Some(date) => date.parse::<NaiveDate>().ok(),
                 None => None,
             },
-            episodes_total: form.episodes_total,
-            episodes_current: form.episodes_current,
-        }
+            episodes_total: self.episodes_total,
+            episodes_current: self.episodes_current,
+        }, self.info_uris )
     }
 }
 
@@ -116,7 +116,7 @@ mod test {
             .. Default::default()
         };
 
-        let series: NewSeries = series_form.into();
+        let (series, _) = series_form.into_new();
 
         assert!(series.start_date.is_some());
         assert_eq!(NaiveDate::from_ymd(2017, 1, 1), series.start_date.unwrap());
@@ -129,7 +129,7 @@ mod test {
             .. Default::default()
         };
 
-        let series: NewSeries = series_form.into();
+        let (series, _) = series_form.into_new();
 
         assert!(series.start_date.is_none());
     }
@@ -141,7 +141,7 @@ mod test {
             .. Default::default()
         };
 
-        let series: NewSeries = series_form.into();
+        let (series, _) = series_form.into_new();
 
         assert!(series.end_date.is_some());
         assert_eq!(NaiveDate::from_ymd(2017, 1, 1), series.end_date.unwrap());
@@ -154,7 +154,7 @@ mod test {
             .. Default::default()
         };
 
-        let series: NewSeries = series_form.into();
+        let (series, _) = series_form.into_new();
 
         assert!(series.end_date.is_none());
     }

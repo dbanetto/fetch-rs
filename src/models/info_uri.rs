@@ -16,7 +16,7 @@ pub struct InfoUri {
 pub struct NewInfoUri {
     series_id: i32,
     uri: String,
-    primary: Option<bool>,
+    primary: bool,
 }
 
 #[derive(Serialize, Deserialize, Debug, Default)]
@@ -26,11 +26,14 @@ pub struct InfoUriForm {
 }
 
 impl InfoUriForm {
-    pub fn into(self, series: Series) -> NewInfoUri {
+    pub fn to_insertable(self, series: &Series) -> NewInfoUri {
         NewInfoUri {
             series_id: series.id,
             uri: self.uri,
-            primary: self.primary,
+            primary: match self.primary {
+                Some(p) => p,
+                None => false,
+            }
         }
     }
 }
