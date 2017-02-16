@@ -5,7 +5,7 @@ use chrono::NaiveDate;
 
 #[get("/")]
 fn index() -> JSON<ApiResult<String, String>> {
-    ApiResult::json(Ok("API available".to_owned()))
+    ApiResult::ok("API available".to_owned()).json()
 }
 
 pub mod series {
@@ -31,7 +31,7 @@ pub mod series {
 
         let result = series::dsl::series.load::<Series>(conn);
 
-        ApiResult::json(result.map_err(|e| e.description().to_owned()))
+        ApiResult::new(result.map_err(|e| e.description().to_owned())).json()
     }
 
     #[get("/<series_id>")]
@@ -42,12 +42,12 @@ pub mod series {
             .select(series::all_columns)
             .first(conn) {
             Ok(s) => s,
-            Err(e) => return ApiResult::json(Err(e.description().to_owned())),
+            Err(e) => return ApiResult::err(e.description().to_owned()).json(),
         };
 
         let info_uris: Vec<InfoUri> = match InfoUri::belonging_to(&series).load(conn) {
             Ok(i) => i,
-            Err(e) => return ApiResult::json(Err(e.description().to_owned())),
+            Err(e) => return ApiResult::err(e.description().to_owned()).json(),
         };
 
         let mut json = serde_json::to_value(series);
@@ -55,7 +55,7 @@ pub mod series {
             .unwrap()
             .insert("info_uri".to_owned(), serde_json::to_value(info_uris));
 
-        ApiResult::json(Ok(json))
+        ApiResult::ok(json).json()
     }
 
     #[post("/new", data="<series_form>")]
@@ -64,7 +64,7 @@ pub mod series {
         let (new_series, info_uris) = series_form.into_new();
 
         if let Err(e) = new_series.validate() {
-            return ApiResult::json(Err(e.description().to_owned()));
+            return ApiResult::err(e.description().to_owned()).json();
         }
 
         let conn = db.conn();
@@ -73,7 +73,7 @@ pub mod series {
             .returning(series::all_columns)
             .get_result(conn) {
             Ok(s) => s,
-            Err(e) => return ApiResult::json(Err(e.description().to_owned())),
+            Err(e) => return ApiResult::err(e.description().to_owned()).json(),
         };
 
         let info_uris = info_uris.into_iter()
@@ -85,7 +85,7 @@ pub mod series {
             .returning(info_uri::all_columns)
             .get_results(conn) {
             Ok(uris) => uris,
-            Err(e) => return ApiResult::json(Err(e.description().to_owned())),
+            Err(e) => return ApiResult::err(e.description().to_owned()).json(),
         };
 
         let mut result = serde_json::to_value(new_series);
@@ -93,7 +93,7 @@ pub mod series {
             .unwrap()
             .insert("info_uri".to_owned(), serde_json::to_value(new_info_uris));
 
-        ApiResult::json(Ok(result))
+        ApiResult::ok(result).json()
     }
 
 

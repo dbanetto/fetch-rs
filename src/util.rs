@@ -26,8 +26,25 @@ where T: Serialize, E: Serialize {
             error: err,
         }
     }
-    pub fn json(data: Result<T, E>) -> JSON<Self> {
-        JSON(ApiResult::new(data))
+
+    pub fn err(err: E) -> Self {
+        ApiResult {
+            data: None,
+            error: Some(err),
+            success: false,
+        }
+    }
+
+    pub fn ok(data: T) -> Self {
+        ApiResult {
+            data: Some(data),
+            error: None,
+            success: true,
+        }
+    }
+
+    pub fn json(self) -> JSON<Self> {
+        JSON(self)
     }
 }
 
