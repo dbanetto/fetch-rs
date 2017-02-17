@@ -50,17 +50,17 @@ pub mod series {
             Err(e) => return ApiResult::err_format(e).json(),
         };
 
-        let mut json = serde_json::to_value(series);
+        let mut json = serde_json::to_value(series).unwrap();
         json.as_object_mut()
             .unwrap()
-            .insert("info_uri".to_owned(), serde_json::to_value(info_uris));
+            .insert("info_uri".to_owned(), serde_json::to_value(info_uris).unwrap());
 
         ApiResult::ok(json).json()
     }
 
     #[post("/new", data="<series_form>")]
     fn new(db: DB, series_form: JSON<SeriesForm>) -> JSON<ApiResult<serde_json::Value, String>> {
-        let series_form = series_form.unwrap();
+        let series_form = series_form.into_inner();
         let (new_series, info_uris) = series_form.into_new();
 
         if let Err(e) = new_series.validate() {
@@ -88,10 +88,10 @@ pub mod series {
             Err(e) => return ApiResult::err_format(e).json(),
         };
 
-        let mut result = serde_json::to_value(new_series);
+        let mut result = serde_json::to_value(new_series).unwrap();
         result.as_object_mut()
             .unwrap()
-            .insert("info_uri".to_owned(), serde_json::to_value(new_info_uris));
+            .insert("info_uri".to_owned(), serde_json::to_value(new_info_uris).unwrap());
 
         ApiResult::ok(result).json()
     }

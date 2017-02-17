@@ -3,6 +3,9 @@
 #![plugin(rocket_codegen)]
 #![feature(custom_derive)]
 
+// lint does not give useful info with the routes() pattern
+#![allow(unmounted_route)]
+
 #[macro_use] extern crate diesel_codegen;
 #[macro_use] extern crate diesel;
 #[macro_use] extern crate lazy_static;

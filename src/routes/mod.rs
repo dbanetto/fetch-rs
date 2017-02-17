@@ -23,7 +23,7 @@ fn index(db: DB) -> Template {
 
     let result = series.load::<Series>(conn).expect("Error loading posts");
 
-    context.insert("series".to_owned(), to_value(result));
+    context.insert("series".to_owned(), to_value(result).unwrap());
 
     Template::render("index", &context)
 }
