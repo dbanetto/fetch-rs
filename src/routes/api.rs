@@ -1,7 +1,6 @@
 use rocket::Route;
 use rocket_contrib::JSON;
 use util::ApiResult;
-use chrono::NaiveDate;
 
 #[get("/")]
 fn index() -> JSON<ApiResult<String, String>> {
@@ -14,16 +13,12 @@ pub mod series {
     use db::DB;
     use util::ApiResult;
     use rocket::Route;
-    use rocket::request::Form;
     use rocket_contrib::JSON;
     use models::*;
     use diesel::prelude::*;
     use schema::{info_uri, series};
-    use diesel::result::QueryResult;
     use diesel::insert;
-    use diesel::associations::BelongsTo;
     use serde_json;
-    use diesel;
 
     #[get("/")]
     fn all(db: DB) -> JSON<ApiResult<Vec<Series>, String>> {
@@ -77,7 +72,7 @@ pub mod series {
         };
 
         let info_uris = info_uris.into_iter()
-            .map(|i| i.to_insertable(&new_series))
+            .map(|i| i.into_insertable(&new_series))
             .collect::<Vec<NewInfoUri>>();
 
         let new_info_uris: Vec<InfoUri> = match insert(&info_uris)

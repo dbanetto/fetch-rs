@@ -26,7 +26,7 @@ pub struct InfoUriForm {
 }
 
 impl InfoUriForm {
-    pub fn to_insertable(self, series: &Series) -> NewInfoUri {
+    pub fn into_insertable(self, series: &Series) -> NewInfoUri {
         NewInfoUri {
             series_id: series.id,
             uri: self.uri,
