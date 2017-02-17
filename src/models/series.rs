@@ -38,15 +38,24 @@ pub struct SeriesForm {
 
 impl NewSeries {
     pub fn validate(&self) -> Result<()> {
+
         if self.start_date.is_some() && self.end_date.is_some() {
             let start = self.start_date.unwrap();
             let end = self.end_date.unwrap();
 
             if end < start {
                 return Err(ErrorKind::InvalidForm("series".to_owned(),
-                "end date is before start date".to_owned())
-                           .into());
+                                                  "end date is before start date".to_owned())
+                    .into());
             }
+        }
+
+        if self.episodes_current < 0 {
+            return Err(ErrorKind::InvalidForm("series".to_owned(),
+                                              "current episode must be greater or equal to than \
+                                               0"
+                                                  .to_owned())
+                .into());
         }
 
         Ok(())
@@ -56,18 +65,19 @@ impl NewSeries {
 impl SeriesForm {
     pub fn into_new(self) -> (NewSeries, Vec<InfoUriForm>) {
         (NewSeries {
-            title: self.title,
-            start_date: match self.start_date {
-                Some(date) => date.parse::<NaiveDate>().ok(),
-                None => None,
-            },
-            end_date: match self.end_date {
-                Some(date) => date.parse::<NaiveDate>().ok(),
-                None => None,
-            },
-            episodes_total: self.episodes_total,
-            episodes_current: self.episodes_current,
-        }, self.info_uris )
+             title: self.title,
+             start_date: match self.start_date {
+                 Some(date) => date.parse::<NaiveDate>().ok(),
+                 None => None,
+             },
+             end_date: match self.end_date {
+                 Some(date) => date.parse::<NaiveDate>().ok(),
+                 None => None,
+             },
+             episodes_total: self.episodes_total,
+             episodes_current: self.episodes_current,
+         },
+         self.info_uris)
     }
 }
 
@@ -81,7 +91,7 @@ mod test {
         let series = NewSeries {
             start_date: Some(NaiveDate::from_ymd(2017, 1, 1)),
             end_date: Some(NaiveDate::from_ymd(2017, 2, 1)),
-            .. Default::default()
+            ..Default::default()
         };
 
         assert!(series.validate().is_ok());
@@ -92,8 +102,29 @@ mod test {
         let series = NewSeries {
             start_date: Some(NaiveDate::from_ymd(2017, 2, 1)),
             end_date: Some(NaiveDate::from_ymd(2017, 1, 1)),
-            .. Default::default()
+            ..Default::default()
         };
+
+        assert!(series.validate().is_err());
+    }
+
+    #[test]
+    fn newseries_validate_episodes_current_greater_zero() {
+        let series = NewSeries { episodes_current: 1, ..Default::default() };
+
+        assert!(series.validate().is_ok());
+    }
+
+    #[test]
+    fn newseries_validate_episodes_current_equal_zero() {
+        let series = NewSeries { episodes_current: 0, ..Default::default() };
+
+        assert!(series.validate().is_ok());
+    }
+
+    #[test]
+    fn newseries_validate_episodes_current_less_than_zero() {
+        let series = NewSeries { episodes_current: -1, ..Default::default() };
 
         assert!(series.validate().is_err());
     }
@@ -103,7 +134,7 @@ mod test {
         let series = NewSeries {
             start_date: Some(NaiveDate::from_ymd(2017, 1, 1)),
             end_date: Some(NaiveDate::from_ymd(2017, 1, 1)),
-            .. Default::default()
+            ..Default::default()
         };
 
         assert!(series.validate().is_ok());
@@ -111,10 +142,8 @@ mod test {
 
     #[test]
     fn seriesform_to_newseries_date_parse_start_date_valid() {
-        let series_form = SeriesForm {
-            start_date: Some("2017-01-01".to_owned()),
-            .. Default::default()
-        };
+        let series_form =
+            SeriesForm { start_date: Some("2017-01-01".to_owned()), ..Default::default() };
 
         let (series, _) = series_form.into_new();
 
@@ -124,10 +153,8 @@ mod test {
 
     #[test]
     fn seriesform_to_newseries_date_parse_start_date_invalid() {
-        let series_form = SeriesForm {
-            start_date: Some("invalid date".to_owned()),
-            .. Default::default()
-        };
+        let series_form =
+            SeriesForm { start_date: Some("invalid date".to_owned()), ..Default::default() };
 
         let (series, _) = series_form.into_new();
 
@@ -136,10 +163,8 @@ mod test {
 
     #[test]
     fn seriesform_to_newseries_date_parse_end_date_valid() {
-        let series_form = SeriesForm {
-            end_date: Some("2017-01-01".to_owned()),
-            .. Default::default()
-        };
+        let series_form =
+            SeriesForm { end_date: Some("2017-01-01".to_owned()), ..Default::default() };
 
         let (series, _) = series_form.into_new();
 
@@ -149,10 +174,8 @@ mod test {
 
     #[test]
     fn seriesform_to_newseries_date_parse_end_date_invalid() {
-        let series_form = SeriesForm {
-            end_date: Some("invalid date".to_owned()),
-            .. Default::default()
-        };
+        let series_form =
+            SeriesForm { end_date: Some("invalid date".to_owned()), ..Default::default() };
 
         let (series, _) = series_form.into_new();
 
