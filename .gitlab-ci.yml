@@ -1,0 +1,36 @@
+image: "fnichol/rust:nightly"
+
+services:
+  - postgres:latest
+
+variables:
+  POSTGRES_DB: fetch_test
+  POSTGRES_USER: fetch
+  POSTGRES_PASSWORD: ""
+
+before_script:
+- apt-get update -yqq
+- apt-get install -yqq --no-install-recommends build-essential libclang-dev libpq-dev
+- cargo install diesel_cli
+
+stages:
+  - test
+  - style
+
+test:cargo:
+  stage: test
+  script:
+  - rustc --version && cargo --version
+  - echo "DATABASE_URL=postgres://fetch@postgres/fetch_test" > .env
+  - cat .env
+  - diesel migration run
+  - cargo build --verbose --release
+  - cargo test --verbose --jobs 1 --release
+
+style:rustfmt:
+  stage: style
+  allow_failure: true
+  script:
+  - rustc --version && cargo --version
+  - cargo install rustfmt
+  - cargo fmt -- --write-mode diff
