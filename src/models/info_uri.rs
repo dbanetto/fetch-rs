@@ -33,7 +33,7 @@ impl InfoUriForm {
             primary: match self.primary {
                 Some(p) => p,
                 None => false,
-            }
+            },
         }
     }
 }

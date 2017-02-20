@@ -3,7 +3,7 @@ use std::env;
 use dotenv::dotenv;
 use diesel::pg::PgConnection;
 use r2d2_diesel::ConnectionManager;
-use r2d2::{ Pool, Config, PooledConnection, GetTimeout };
+use r2d2::{Pool, Config, PooledConnection, GetTimeout};
 
 use rocket::request;
 use rocket::http::Status;

@@ -48,7 +48,8 @@ pub mod series {
         let mut json = serde_json::to_value(series).unwrap();
         json.as_object_mut()
             .unwrap()
-            .insert("info_uri".to_owned(), serde_json::to_value(info_uris).unwrap());
+            .insert("info_uri".to_owned(),
+                    serde_json::to_value(info_uris).unwrap());
 
         ApiResult::ok(json).json()
     }
@@ -86,7 +87,8 @@ pub mod series {
         let mut result = serde_json::to_value(new_series).unwrap();
         result.as_object_mut()
             .unwrap()
-            .insert("info_uri".to_owned(), serde_json::to_value(new_info_uris).unwrap());
+            .insert("info_uri".to_owned(),
+                    serde_json::to_value(new_info_uris).unwrap());
 
         ApiResult::ok(result).json()
     }
