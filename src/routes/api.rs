@@ -17,7 +17,7 @@ pub mod series {
     use models::*;
     use diesel::prelude::*;
     use schema::{info_uri, series};
-    use diesel::insert;
+    use diesel::{insert, update};
     use serde_json;
 
     #[get("/")]
@@ -93,9 +93,32 @@ pub mod series {
         ApiResult::ok(result).json()
     }
 
+    #[put("/<series_id>", data="<series_form>")]
+    fn update_series(db: DB,
+              series_id: i32,
+              series_form: JSON<SeriesForm>)
+              -> JSON<ApiResult<Series, String>> {
+        let conn = db.conn();
+
+        let (series_put, _) = series_form.into_inner().into_new();
+
+        let series: Series = match update(series::dsl::series.filter(series::id.eq(series_id)))
+            .set((series::title.eq(series_put.title),
+                  series::episodes_current.eq(series_put.episodes_current),
+                  series::episodes_total.eq(series_put.episodes_total),
+                  series::start_date.eq(series_put.start_date),
+                  series::end_date.eq(series_put.end_date)))
+            .returning(series::all_columns)
+            .get_result(conn) {
+            Ok(s) => s,
+            Err(e) => return ApiResult::err_format(e).json(),
+        };
+
+        ApiResult::ok(series).json()
+    }
 
     pub fn routes() -> Vec<Route> {
-        routes![all, new, select]
+        routes![all, new, select, update_series]
     }
 }
 
