@@ -102,6 +102,10 @@ pub mod series {
 
         let (series_put, _) = series_form.into_inner().into_new();
 
+        if let Err(e) = series_put.validate() {
+            return ApiResult::err_format(e).json();
+        }
+
         let series: Series = match update(series::dsl::series.filter(series::id.eq(series_id)))
             .set((series::title.eq(series_put.title),
                   series::episodes_current.eq(series_put.episodes_current),
