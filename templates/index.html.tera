@@ -12,7 +12,7 @@
             {% else %}
             <p>Ends whenever</p>
             {% endif %}
-            <p>There has been released {% if show.episodes_count is defined %}{{ show.episodes_count }}{% else %}?{% endif %}/{% if show.episodes_count is defined %}{{ show.episodes_total }}{% else %}?{% endif %}</p>
+            <p>There has been released {% if show.episodes_current is defined %}{{ show.episodes_current }}{% else %}?{% endif %}/{% if show.episodes_total is defined %}{{ show.episodes_total }}{% else %}?{% endif %}</p>
         </div>
     {% endfor %}
   </body>
