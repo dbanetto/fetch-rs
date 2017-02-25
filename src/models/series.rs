@@ -1,5 +1,6 @@
 use ::schema::*;
 use ::error::*;
+use std::str::FromStr;
 use models::InfoUriForm;
 use chrono::NaiveDate;
 
@@ -64,20 +65,30 @@ impl NewSeries {
 
 impl SeriesForm {
     pub fn into_new(self) -> (NewSeries, Vec<InfoUriForm>) {
+        let start_date = self.start_date();
+        let end_date = self.end_date();
+
         (NewSeries {
              title: self.title,
-             start_date: match self.start_date {
-                 Some(date) => date.parse::<NaiveDate>().ok(),
-                 None => None,
-             },
-             end_date: match self.end_date {
-                 Some(date) => date.parse::<NaiveDate>().ok(),
-                 None => None,
-             },
+             start_date: start_date,
+             end_date: end_date,
              episodes_total: self.episodes_total,
              episodes_current: self.episodes_current,
          },
          self.info_uris)
+    }
+
+    pub fn start_date(&self) -> Option<NaiveDate> {
+        match self.start_date {
+            Some(ref date) => NaiveDate::from_str(date).ok(),
+            None => None,
+        }
+    }
+    pub fn end_date(&self) -> Option<NaiveDate> {
+        match self.end_date {
+            Some(ref date) => NaiveDate::from_str(date).ok(),
+            None => None,
+        }
     }
 }
 
@@ -145,10 +156,10 @@ mod test {
         let series_form =
             SeriesForm { start_date: Some("2017-01-01".to_owned()), ..Default::default() };
 
-        let (series, _) = series_form.into_new();
+        let start_date = series_form.start_date();
 
-        assert!(series.start_date.is_some());
-        assert_eq!(NaiveDate::from_ymd(2017, 1, 1), series.start_date.unwrap());
+        assert!(start_date.is_some());
+        assert_eq!(NaiveDate::from_ymd(2017, 1, 1), start_date.unwrap());
     }
 
     #[test]
@@ -156,9 +167,9 @@ mod test {
         let series_form =
             SeriesForm { start_date: Some("invalid date".to_owned()), ..Default::default() };
 
-        let (series, _) = series_form.into_new();
+        let start_date = series_form.start_date();
 
-        assert!(series.start_date.is_none());
+        assert!(start_date.is_none());
     }
 
     #[test]
@@ -166,10 +177,10 @@ mod test {
         let series_form =
             SeriesForm { end_date: Some("2017-01-01".to_owned()), ..Default::default() };
 
-        let (series, _) = series_form.into_new();
+        let end_date = series_form.end_date();
 
-        assert!(series.end_date.is_some());
-        assert_eq!(NaiveDate::from_ymd(2017, 1, 1), series.end_date.unwrap());
+        assert!(end_date.is_some());
+        assert_eq!(NaiveDate::from_ymd(2017, 1, 1), end_date.unwrap());
     }
 
     #[test]
@@ -177,8 +188,8 @@ mod test {
         let series_form =
             SeriesForm { end_date: Some("invalid date".to_owned()), ..Default::default() };
 
-        let (series, _) = series_form.into_new();
+        let end_date = series_form.end_date();
 
-        assert!(series.end_date.is_none());
+        assert!(end_date.is_none());
     }
 }
