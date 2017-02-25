@@ -72,16 +72,20 @@ pub mod series {
             Err(e) => return ApiResult::err_format(e).json(),
         };
 
-        let info_uris = info_uris.into_iter()
-            .map(|i| i.into_insertable(&new_series))
-            .collect::<Vec<NewInfoUri>>();
-
-        let new_info_uris: Vec<InfoUri> = match insert(&info_uris)
-            .into(info_uri::table)
-            .returning(info_uri::all_columns)
-            .get_results(conn) {
-            Ok(uris) => uris,
-            Err(e) => return ApiResult::err_format(e).json(),
+        let new_info_uris: Vec<InfoUri> = match info_uris {
+            Some(uris) => {
+                let info_uris = uris.into_iter()
+                    .map(|i| i.into_insertable(&new_series))
+                    .collect::<Vec<NewInfoUri>>();
+                match insert(&info_uris)
+                    .into(info_uri::table)
+                    .returning(info_uri::all_columns)
+                    .get_results(conn) {
+                    Ok(uris) => uris,
+                    Err(e) => return ApiResult::err_format(e).json(),
+                }
+            }
+            None => Vec::new(),
         };
 
         let mut result = serde_json::to_value(new_series).unwrap();
@@ -95,9 +99,9 @@ pub mod series {
 
     #[put("/<series_id>", data="<series_form>")]
     fn update_series(db: DB,
-              series_id: i32,
-              series_form: JSON<SeriesForm>)
-              -> JSON<ApiResult<Series, String>> {
+                     series_id: i32,
+                     series_form: JSON<SeriesForm>)
+                     -> JSON<ApiResult<Series, String>> {
         let conn = db.conn();
 
         let (series_put, _) = series_form.into_inner().into_new();

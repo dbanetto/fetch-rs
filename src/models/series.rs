@@ -33,8 +33,8 @@ pub struct SeriesForm {
     pub start_date: Option<String>,
     pub end_date: Option<String>,
     pub episodes_total: Option<i32>,
-    pub episodes_current: i32,
-    pub info_uris: Vec<InfoUriForm>,
+    pub episodes_current: Option<i32>,
+    pub info_uris: Option<Vec<InfoUriForm>>,
 }
 
 impl NewSeries {
@@ -64,7 +64,7 @@ impl NewSeries {
 }
 
 impl SeriesForm {
-    pub fn into_new(self) -> (NewSeries, Vec<InfoUriForm>) {
+    pub fn into_new(self) -> (NewSeries, Option<Vec<InfoUriForm>>) {
         let start_date = self.start_date();
         let end_date = self.end_date();
 
@@ -73,7 +73,7 @@ impl SeriesForm {
              start_date: start_date,
              end_date: end_date,
              episodes_total: self.episodes_total,
-             episodes_current: self.episodes_current,
+             episodes_current: self.episodes_current.unwrap_or_default(),
          },
          self.info_uris)
     }
