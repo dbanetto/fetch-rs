@@ -17,7 +17,7 @@ pub mod series {
     use models::*;
     use diesel::prelude::*;
     use schema::{info_uri, series};
-    use diesel::{insert, update};
+    use diesel::{insert, update, delete};
     use serde_json;
 
     #[get("/")]
@@ -125,8 +125,20 @@ pub mod series {
         ApiResult::ok(series).json()
     }
 
+    #[delete("/<series_id>")]
+    fn delete_series(db: DB, series_id: i32) -> JSON<ApiResult<Series, String>> {
+        let conn = db.conn();
+
+        match delete(series::dsl::series.filter(series::id.eq(series_id)))
+            .returning(series::all_columns)
+            .get_result(conn) {
+            Ok(result) => ApiResult::ok(result).json(),
+            Err(e) => ApiResult::err_format(e).json(),
+        }
+    }
+
     pub fn routes() -> Vec<Route> {
-        routes![all, new, select, update_series]
+        routes![all, new, select, update_series, delete_series]
     }
 }
 
