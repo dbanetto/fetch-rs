@@ -39,5 +39,5 @@ pub fn mount(rocket: Rocket) -> Rocket {
     rocket.mount("/", routes())
         .mount("/api/v1", api::routes())
         .mount("/api/v1/series", api::series::routes())
-        .mount("/", routes![static_files])
+        .mount("/public", routes![static_files])
 }

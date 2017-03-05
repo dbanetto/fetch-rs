@@ -15,5 +15,8 @@
             <p>There has been released {% if show.episodes_current is defined %}{{ show.episodes_current }}{% else %}?{% endif %}/{% if show.episodes_total is defined %}{{ show.episodes_total }}{% else %}?{% endif %}</p>
         </div>
     {% endfor %}
+
+    <script src="public/bundle/vendor.js"></script>
+    <script src="public/bundle/main.js"></script>
   </body>
 </html>
