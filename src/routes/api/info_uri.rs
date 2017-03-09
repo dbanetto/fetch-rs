@@ -116,7 +116,7 @@ fn primary(db: DB, series_id: i32) -> JSON<ApiResult<InfoUri, String>> {
 
     let uris = match info_uri::dsl::info_uri.filter(info_uri::series_id.eq(series_id))
         .filter(info_uri::primary.eq(true))
-        .get_result(conn) {
+        .first(conn) {
         Ok(uri) => uri,
         Err(e) => return ApiResult::err_format(e).json(),
     };
