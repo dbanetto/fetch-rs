@@ -1,7 +1,8 @@
 import React from 'react';
 import ReactDOM, { render } from 'react-dom';
-import Greeter from './test.jsx';
+import Series from './series.jsx';
 
 window.onload = function() {
-  render(<Greeter name='You'/>, document.getElementById('greeter'));
+  var series = {title: "hi"};
+  render(<Series series={ series } />, document.getElementById('greeter'));
 }

@@ -16,6 +16,9 @@
         </div>
     {% endfor %}
 
+    <div id="greeter">
+    </div>
+
     <script src="public/bundle/vendor.js"></script>
     <script src="public/bundle/main.js"></script>
   </body>
