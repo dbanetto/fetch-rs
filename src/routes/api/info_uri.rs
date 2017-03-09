@@ -110,6 +110,20 @@ fn new(db: DB, series_id: i32, uri_form: JSON<InfoUriForm>) -> JSON<ApiResult<In
     ApiResult::ok(result).json()
 }
 
+#[get("/<series_id>/uri/primary")]
+fn primary(db: DB, series_id: i32) -> JSON<ApiResult<InfoUri, String>> {
+    let conn = db.conn();
+
+    let uris = match info_uri::dsl::info_uri.filter(info_uri::series_id.eq(series_id))
+        .filter(info_uri::primary.eq(true))
+        .get_result(conn) {
+        Ok(uri) => uri,
+        Err(e) => return ApiResult::err_format(e).json(),
+    };
+
+    ApiResult::ok(uris).json()
+}
+
 pub fn routes() -> Vec<Route> {
-    routes![all, get, update_uri, delete_uri, new]
+    routes![all, primary, get, update_uri, delete_uri, new]
 }
