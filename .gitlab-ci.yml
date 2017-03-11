@@ -11,7 +11,7 @@ variables:
 before_script:
 - apt-get update -yqq
 - apt-get install -yqq --no-install-recommends build-essential libclang-dev libpq-dev
-- cargo install diesel_cli
+- rustup update
 
 stages:
   - test
@@ -21,6 +21,7 @@ test:cargo:
   stage: test
   script:
   - rustc --version && cargo --version
+  - cargo install diesel_cli --no-default-features --features postgres 
   - echo "DATABASE_URL=postgres://fetch@postgres/fetch_test" > .env
   - cat .env
   - diesel migration run
