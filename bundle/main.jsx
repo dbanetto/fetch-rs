@@ -1,8 +1,5 @@
-import React from 'react';
-import ReactDOM, { render } from 'react-dom';
-import Series from './series.jsx';
+import router from './components/route.jsx';
+import React, { Component } from 'react';
+import { render } from 'react-dom';
 
-window.onload = function() {
-  var series = {title: "hi"};
-  render(<Series series={ series } />, document.getElementById('greeter'));
-}
+render(router(), document.getElementById('root'));

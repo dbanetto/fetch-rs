@@ -7,7 +7,8 @@ module.exports = {
     main: './bundle/main.jsx',
     vendor: [
       'react',
-      'react-dom'
+      'react-dom',
+      'react-router'
     ]
   },
   output: {
