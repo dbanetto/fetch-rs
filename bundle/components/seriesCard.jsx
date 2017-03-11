@@ -1,9 +1,6 @@
 import React from 'react';
 
 class SeriesCard extends React.Component {
-  constructor() {
-    super();
-  }
 
   getAiringSate() {
     let series = this.props.series;

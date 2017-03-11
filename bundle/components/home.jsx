@@ -3,11 +3,15 @@ import { Link } from 'react-router';
 import SeriesCard from './seriesCard.jsx';
 
 class Home extends Component {
-  componentDidMount() {
-    this.setState({
-      series: null
-    });
+  constructor() {
+    super();
 
+    this.state = {
+      series: null
+    };
+  }
+
+  componentDidMount() {
     this.loadSeries();
   }
 
