@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router';
 
 class SeriesCard extends React.Component {
 
@@ -35,6 +36,7 @@ class SeriesCard extends React.Component {
         <p>End date: { series.end_date || "unkown" }</p>
         <p>Episode: { series.episodes_current }/{ series.episodes_total || "??" }</p>
         <p>State: { this.getAiringSate() }</p>
+        <Link to={`/series/${ series.id }`}>view</Link>
       </div>
     </div>);
   }
