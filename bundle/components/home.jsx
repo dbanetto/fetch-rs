@@ -1,13 +1,14 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router';
 import SeriesCard from './seriesCard.jsx';
+import Store from '../store.js';
 
 class Home extends Component {
   constructor() {
     super();
 
     this.state = {
-      series: null
+      series: Store.getSeriesCache()
     };
   }
 
@@ -15,18 +16,13 @@ class Home extends Component {
     this.loadSeries();
   }
 
-  loadSeries() {
-    let home = this;
-    fetch('/api/v1/series')
-      .then(res => res.json())
-      .then(resp => {
-        if (resp.success) {
-          home.setState({
-            series: resp.data
-          });
-        } else {
-          throw resp.error;
-        }
+  loadSeries(useCache) {
+    let self = this;
+    Store.getSeries()
+      .then(series => {
+        self.setState({
+          series: series
+        });
       })
       .catch(alert);
   }

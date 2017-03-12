@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router';
+import Store from '../store.js';
 
 class View extends Component {
 
   constructor() {
     super();
-    
+
     this.state = {
       series: null,
     };
@@ -18,37 +19,47 @@ class View extends Component {
   getSeries() {
     let self = this;
 
-    fetch(`/api/v1/series/${ this.props.params.id }`)
-      .then(r => r.json())
-      .then( resp => {
-        if (!resp.success) {
-          self.props.router.push('/');
-          return;
-        }
-
+    Store.getSeriesId(this.props.params.id)
+      .then(series => {
         self.setState({
-          series: resp.data
+          series: series
         });
       })
-    .catch(alert);
-  }
-
-  back() {
-    return (<Link to='/'>back</Link>);
+    .catch(err => {
+      console.log(err);
+      self.props.router.push('/');
+    });
   }
 
   render() {
     if (this.state.series === null) {
-      return (<div><p>loading...</p>{ this.back() }</div>);
+      return (
+          <div>
+            <p>loading...</p>
+            <Link to='/'>back</Link>
+          </div>);
     }
 
     let series = this.state.series;
 
     return (
         <div>
-          <h2>{ JSON.stringify(series) }</h2>
           <div>
-            { this.back() }
+            <h1>{ series.title }</h1>
+            <p>Start date: { series.start_date || "unkown" }</p>
+            <p>End date: { series.end_date || "unkown" }</p>
+            <p>Episode: { series.episodes_current }/{ series.episodes_total || "??" }</p>
+          </div>
+          <div>
+            <span>
+              <Link to={ `/series/${ series.id }/edit` }>edit</Link>
+            </span>
+            <span>
+              <a href="javascript:void(0)">delete</a>
+            </span>
+            <span>
+              <Link to='/'>back</Link>
+              </span>
           </div>
         </div>
         );
