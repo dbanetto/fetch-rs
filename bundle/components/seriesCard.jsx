@@ -1,7 +1,25 @@
 import React from 'react';
 import { Link } from 'react-router';
+import Store from '../store.js';
 
 class SeriesCard extends React.Component {
+
+  constructor() {
+    super();
+
+    this.state = {
+      primary: null
+    }
+  }
+
+  componentDidMount() {
+    let self = this;
+    Store.getSeriesPrimary(this.props.series.id).then(uri => {
+        self.setState({
+          primary: uri
+        });
+    });
+  }
 
   getAiringSate() {
     let series = this.props.series;
@@ -36,6 +54,7 @@ class SeriesCard extends React.Component {
         <p>End date: { series.end_date || "unkown" }</p>
         <p>Episode: { series.episodes_current }/{ series.episodes_total || "??" }</p>
         <p>State: { this.getAiringSate() }</p>
+        { this.state.primary && <a href={ this.state.primary.uri }>link</a> }
         <Link to={`/series/${ series.id }`}>view</Link>
       </div>
     </div>);

@@ -9,6 +9,7 @@ class View extends Component {
 
     this.state = {
       series: null,
+      uri: null,
     };
   }
 
@@ -19,10 +20,14 @@ class View extends Component {
   getSeries() {
     let self = this;
 
-    Store.getSeriesId(this.props.params.id)
-      .then(series => {
+
+
+    Promise.all([Store.getSeriesId(this.props.params.id),
+        Store.getSeriesUri(this.props.params.id)])
+      .then(result => {
         self.setState({
-          series: series
+          series: result[0],
+          uri: result[1]
         });
       })
     .catch(err => {
@@ -49,6 +54,14 @@ class View extends Component {
             <p>Start date: { series.start_date || "unkown" }</p>
             <p>End date: { series.end_date || "unkown" }</p>
             <p>Episode: { series.episodes_current }/{ series.episodes_total || "??" }</p>
+            <div>
+              { this.state.uri && <ul>{
+                this.state.uri.map(u => <li>
+                  <a href={u.uri} className={ u.primary ? 'primary' : 'other' }>{ u.uri }</a>
+                </li>)
+                }
+              </ul> }
+            </div>
           </div>
           <div>
             <span>
@@ -59,7 +72,7 @@ class View extends Component {
             </span>
             <span>
               <Link to='/'>back</Link>
-              </span>
+            </span>
           </div>
         </div>
         );

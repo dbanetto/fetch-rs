@@ -44,6 +44,16 @@ class _Store {
     const endpoint = `/api/v1/series/${ id }`;
     return this._api_get(endpoint, options);
   }
+
+  getSeriesPrimary(id, options) {
+    const endpoint = `/api/v1/series/${ id }/uri/primary`;
+    return this._api_get(endpoint, options);
+  }
+
+  getSeriesUri(id, options) {
+    const endpoint = `/api/v1/series/${ id }/uri`;
+    return this._api_get(endpoint, options);
+  }
 }
 
 let Store = new _Store();
