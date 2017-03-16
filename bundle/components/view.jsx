@@ -20,8 +20,6 @@ class View extends Component {
   getSeries() {
     let self = this;
 
-
-
     Promise.all([Store.getSeriesId(this.props.params.id),
         Store.getSeriesUri(this.props.params.id)])
       .then(result => {
@@ -34,6 +32,25 @@ class View extends Component {
       console.log(err);
       self.props.router.push('/');
     });
+  }
+
+  handleDelete() {
+    let self = this;
+
+    let confirmed = confirm(`Are you sure you want to delete ${ this.state.title }?`);
+    if (!confirmed) {
+      return;
+    }
+
+    Store.deleteSeriesId(this.props.params.id)
+      .then(() => {
+        self.props.router.push('/');
+      })
+    .catch(err => {
+      console.log(err);
+      self.props.router.push('/');
+    });
+
   }
 
   render() {
@@ -68,7 +85,7 @@ class View extends Component {
               <Link to={ `/series/${ series.id }/edit` }>edit</Link>
             </span>
             <span>
-              <a href="javascript:void(0)">delete</a>
+              <a href="javascript:void(0)" onClick={ this.handleDelete.bind(this) }>delete</a>
             </span>
             <span>
               <Link to='/'>back</Link>

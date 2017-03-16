@@ -14,11 +14,12 @@ class SeriesCard extends React.Component {
 
   componentDidMount() {
     let self = this;
-    Store.getSeriesPrimary(this.props.series.id).then(uri => {
+    Store.getSeriesPrimary(this.props.series.id)
+      .then(uri => {
         self.setState({
           primary: uri
         });
-    });
+      }).catch(() => null);
   }
 
   getAiringSate() {
