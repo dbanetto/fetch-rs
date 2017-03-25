@@ -8,6 +8,7 @@ class _Store {
 
     // option to force fetching new data instead of cache
     let force = options && options.force ? options.force : false;
+    let storeErrors = options && options.nulls ? options.nulls : false;
 
     if (this.cache[endpoint] && !force) {
       // TODO: check cache timeout
