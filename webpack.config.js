@@ -8,7 +8,8 @@ module.exports = {
     vendor: [
       'react',
       'react-dom',
-      'react-router'
+      'react-router',
+      'react-jsonschema-form'
     ]
   },
   output: {

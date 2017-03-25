@@ -1,75 +1,77 @@
 import React, { Component } from 'react';
+import Form from 'react-jsonschema-form';
 
 class SeriesForm extends Component {
-  componentDidMount() {
 
-  }
-
-  handleSubmit(event) {
-    event.preventDefault();
-
-    let self = this;
-    let form = event.target;
-    let data = {};
-
-    for (var input of form) {
-      if (input.localName != 'input') {
-        continue;
-      }
-
-      if (input.value && input.value !== "") {
-        data[input.name] = input.value;
+  schema()  {
+    return {
+      title: "Series",
+      type: "object",
+      required: ["title"],
+      properties: {
+        title: { type: "string", title: "Title" },
+        start_date: { type: "string", format: "alt-date", title: "Start date" },
+        end_date: { type: "string", format: "alt-date", title: "End date" },
+        episodes_current: { type: "integer", format: "updown", title: "Current episode", minimum: 0, default: 0 },
+        episodes_total: { type: "integer", format: "updown", title: "Total episodes", minimum: 0 },
+        info_uris: {
+          title: "Info Uris",
+          type: "array",
+          items: {
+            type: "object",
+            properties: {
+              uri: { title: "Uri", type: "string", format: "uri" },
+              primary: { title: null, type: "boolean" }
+            }
+          }
+        }
       }
     }
+  }
 
-    if (form.reportValidity()) {
+  uiSchema() {
+    return {
+      info_uri: {
+        items: {
+          primary: {
+            "ui:widget": "radio"
+          }
+        }
+      }
+    }
+  }
 
-      // POST to backend
-      fetch(form.action, {
-        method: form.method,
-        body: JSON.stringify(data),
-        headers: {
-          'Content-Type': 'application/json'
-        }})
-      .then(r => r.json())
+  validate(formData, errors) {
+    // add validation
+    return errors;
+  }
+
+  handleSubmit(form) {
+    let self = this;
+    console.log(form.formData);
+
+    fetch('/api/v1/series/new', {
+      method: 'POST',
+      body: JSON.stringify(form.formData),
+      headers: {
+        'Content-Type': 'application/json'
+      }})
+    .then(r => r.json())
       .then(resp => {
         if (!resp.success) {
           throw resp.error;
         }
-
         // redirect to view
-        self.props.router.push(`/series/${1}`);
+        self.props.router.push(`/series/${ resp.data.id }`);
       })
-      .catch(alert);
-    }
+    .catch(alert);
   }
-
 
   render() {
     return (
-        <form action="/api/v1/series/new" method="POST" onSubmit={ this.handleSubmit.bind(this) }>
-          <div>
-            <label htmlFor="title">Title</label>
-            <input name="title" type="text" required />
-          </div>
-          <div>
-            <label htmlFor="start_date">Start Date</label>
-            <input name="start_date" type="date" />
-          </div>
-          <div>
-            <label htmlFor="end_date">End Date</label>
-            <input name="end_date" type="date" />
-          </div>
-          <div>
-            <label htmlFor="episides_current">Episides Current</label>
-            <input name="episides_current" type="number" min="0" placeholder="0" />
-          </div>
-          <div>
-            <label htmlFor="episides_total">Episides Total</label>
-            <input name="episides_total" type="number" min="0" />
-          </div>
-          <button type="submit">Submit</button>
-        </form>
+        <Form onSubmit={ this.handleSubmit.bind(this) }
+          schema={ this.schema() }
+          validate={ this.validate.bind(this) } />
         );
   }
 }
