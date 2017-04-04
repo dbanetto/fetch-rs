@@ -29,7 +29,7 @@ class Home extends Component {
 
   renderSeries() {
     if (this.state && this.state.series) {
-      return (<div>
+      return (<div className="card-box">
         { this.state.series.map(i => <SeriesCard key={i.id} series={i} />) }
       </div>);
     } else {
@@ -41,7 +41,7 @@ class Home extends Component {
     return (
         <div>
           <h2>Series List</h2>
-          { this.renderSeries() }
+            { this.renderSeries() }
             <Link to="/series/new">create</Link>
           <button onClick={this.loadSeries.bind(this)}>Reload</button>
         </div>

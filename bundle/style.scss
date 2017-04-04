@@ -1,0 +1,42 @@
+body {
+    font-family: 'Open Sans', serif;
+    margin: 5px;
+}
+
+.card-box {
+   display: flex;  
+   flex-direction: row;
+   flex-wrap: wrap;
+}
+
+.card {
+    flex: auto;
+}
+
+
+.status {
+    padding: 0.2em;
+    border-radius: 0.2em;
+}
+
+.status-unknown {
+    @extends .status;
+    background-color: #5b5b5b;
+    color: white;
+}
+.status-soon {
+    @extends .status;
+    background-color: #2b8594;
+    color: white;
+}
+.status-airing {
+    @extends .status;
+    background-color: #328632;
+    color: white;
+}
+.status-finished {
+    @extends .status;
+    background-color: #bf3030;
+    color: white;
+}
+

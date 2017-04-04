@@ -29,7 +29,7 @@ class SeriesCard extends React.Component {
     let start_date = series.start_date ? new Date(series.start_date) : null;
     let end_date = series.end_date ? new Date(series.end_date) : null;
 
-    let status = 'unkown';
+    let status = 'unknown';
 
     if (start_date && today.getTime() < start_date.getTime()) {
       status = 'soon';
@@ -42,17 +42,17 @@ class SeriesCard extends React.Component {
       }
     }
 
-    return (<span className={`status-${status}` }>{status}</span>);
+    return (<span className={`status status-${status}` }>{status}</span>);
   }
 
 
   render() {
     var series = this.props.series;
-    return (<div>
+    return (<div className="card">
       <h1>{ series.title }</h1>
       <div>
-        <p>Start date: { series.start_date || "unkown" }</p>
-        <p>End date: { series.end_date || "unkown" }</p>
+        <p>Start date: { series.start_date || "unknown" }</p>
+        <p>End date: { series.end_date || "unknown" }</p>
         <p>Episode: { series.episodes_current }/{ series.episodes_total || "??" }</p>
         <p>State: { this.getAiringSate() }</p>
         { this.state.primary && <a href={ this.state.primary.uri }>link</a> }
