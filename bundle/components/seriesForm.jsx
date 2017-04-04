@@ -14,6 +14,7 @@ class SeriesForm extends Component {
         end_date: { type: "string", format: "alt-date", title: "End date" },
         episodes_current: { type: "integer", format: "updown", title: "Current episode", minimum: 0, default: 0 },
         episodes_total: { type: "integer", format: "updown", title: "Total episodes", minimum: 0 },
+        poster_url: { type: "string", format: "uri", title: "Poster" },
         info_uris: {
           title: "Info Uris",
           type: "array",

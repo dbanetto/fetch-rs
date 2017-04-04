@@ -13,6 +13,7 @@ pub struct Series {
     pub end_date: Option<NaiveDate>,
     pub episodes_total: Option<i32>,
     pub episodes_current: i32,
+    pub poster_url: Option<String>,
 }
 
 
@@ -24,6 +25,7 @@ pub struct NewSeries {
     pub end_date: Option<NaiveDate>,
     pub episodes_total: Option<i32>,
     pub episodes_current: i32,
+    pub poster_url: Option<String>,
 }
 
 
@@ -34,6 +36,7 @@ pub struct SeriesForm {
     pub end_date: Option<String>,
     pub episodes_total: Option<i32>,
     pub episodes_current: Option<i32>,
+    pub poster_url: Option<String>,
     pub info_uris: Option<Vec<InfoUriForm>>,
 }
 
@@ -74,6 +77,7 @@ impl SeriesForm {
              end_date: end_date,
              episodes_total: self.episodes_total,
              episodes_current: self.episodes_current.unwrap_or_default(),
+             poster_url: self.poster_url,
          },
          self.info_uris)
     }
