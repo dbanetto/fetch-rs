@@ -37,7 +37,7 @@ class View extends Component {
   handleDelete() {
     let self = this;
 
-    let confirmed = confirm(`Are you sure you want to delete ${ this.state.title }?`);
+    let confirmed = confirm(`Are you sure you want to delete ${ this.state.series.title }?`);
     if (!confirmed) {
       return;
     }
