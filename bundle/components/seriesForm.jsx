@@ -29,9 +29,20 @@ class SeriesForm extends Component {
     console.log(JSON.stringify(formData));
 
     let self = this;
-
-    fetch('/api/v1/series/new', {
+    let action = {
       method: 'POST',
+      url: '/api/v1/series/new'
+    };
+
+    if (formData.id) {
+      action = {
+        method: 'PUT',
+        url: `/api/v1/series/${formData.id}/edit`
+      };
+    }
+
+    fetch(action.url, {
+      method: action.method,
       body: JSON.stringify(formData),
       headers: {
         'Content-Type': 'application/json'
