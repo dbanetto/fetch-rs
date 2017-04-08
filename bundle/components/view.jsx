@@ -53,6 +53,26 @@ class View extends Component {
 
   }
 
+  renderUriList() {
+
+    if (this.state.uri == undefined) {
+      return (<div></div>);
+    }
+
+    return (
+            <div>
+              <ul>
+                { this.state.uri.map((u, i) =>
+                <li key={i}>
+                  <a href={u.uri} className={ `link link-${u.primary ? 'primary' : 'other'}` }>{ u.uri }</a>
+                </li>
+                ) }
+
+              </ul>
+            </div>
+        );
+  }
+
   render() {
     if (this.state.series === null) {
       return (
@@ -71,14 +91,7 @@ class View extends Component {
             <p>Start date: { series.start_date || "unkown" }</p>
             <p>End date: { series.end_date || "unkown" }</p>
             <p>Episode: { series.episodes_current }/{ series.episodes_total || "??" }</p>
-            <div>
-              { this.state.uri && <ul>{
-                this.state.uri.map(u => <li>
-                  <a href={u.uri} className={ u.primary ? 'primary' : 'other' }>{ u.uri }</a>
-                </li>)
-                }
-              </ul> }
-            </div>
+            { this.renderUriList() }
           </div>
           <div>
             <span>
