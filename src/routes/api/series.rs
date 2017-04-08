@@ -7,6 +7,7 @@ use rocket_contrib::JSON;
 use models::*;
 use diesel::prelude::*;
 use schema::{info_uri, series};
+use super::info_uri::{new_uri, update_uri};
 use diesel::{insert, update, delete};
 use serde_json;
 
@@ -23,9 +24,10 @@ fn all(db: DB) -> JSON<ApiResult<Vec<Series>, String>> {
 fn select(db: DB, series_id: i32) -> JSON<ApiResult<Series, String>> {
     let conn = db.conn();
 
-    let series: Series = match series::dsl::series.filter(series::id.eq(series_id))
-        .select(series::all_columns)
-        .first(conn) {
+    let series: Series = match series::dsl::series
+              .filter(series::id.eq(series_id))
+              .select(series::all_columns)
+              .first(conn) {
         Ok(s) => s,
         Err(e) => return ApiResult::err_format(e).json(),
     };
@@ -43,10 +45,11 @@ fn new(db: DB, series_form: JSON<SeriesForm>) -> JSON<ApiResult<serde_json::Valu
     }
 
     let conn = db.conn();
+
     let new_series: Series = match insert(&new_series)
-        .into(series::table)
-        .returning(series::all_columns)
-        .get_result(conn) {
+              .into(series::table)
+              .returning(series::all_columns)
+              .get_result(conn) {
         Ok(s) => s,
         Err(e) => return ApiResult::err_format(e).json(),
     };
@@ -57,9 +60,9 @@ fn new(db: DB, series_form: JSON<SeriesForm>) -> JSON<ApiResult<serde_json::Valu
                 .map(|i| i.into_insertable(&new_series))
                 .collect::<Vec<NewInfoUri>>();
             match insert(&info_uris)
-                .into(info_uri::table)
-                .returning(info_uri::all_columns)
-                .get_results(conn) {
+                      .into(info_uri::table)
+                      .returning(info_uri::all_columns)
+                      .get_results(conn) {
                 Ok(uris) => uris,
                 Err(e) => return ApiResult::err_format(e).json(),
             }
@@ -68,7 +71,8 @@ fn new(db: DB, series_form: JSON<SeriesForm>) -> JSON<ApiResult<serde_json::Valu
     };
 
     let mut result = serde_json::to_value(new_series).unwrap();
-    result.as_object_mut()
+    result
+        .as_object_mut()
         .unwrap()
         .insert("info_uri".to_owned(),
                 serde_json::to_value(new_info_uris).unwrap());
@@ -83,23 +87,35 @@ fn update_series(db: DB,
                  -> JSON<ApiResult<Series, String>> {
     let conn = db.conn();
 
-    let (series_put, _) = series_form.into_inner().into_new();
+    let (series_put, info_uris) = series_form.into_inner().into_new();
 
     if let Err(e) = series_put.validate() {
         return ApiResult::err_format(e).json();
     }
 
     let series: Series = match update(series::dsl::series.filter(series::id.eq(series_id)))
-        .set((series::title.eq(series_put.title),
-              series::episodes_current.eq(series_put.episodes_current),
-              series::episodes_total.eq(series_put.episodes_total),
-              series::start_date.eq(series_put.start_date),
-              series::end_date.eq(series_put.end_date)))
-        .returning(series::all_columns)
-        .get_result(conn) {
+              .set((series::title.eq(series_put.title),
+                    series::episodes_current.eq(series_put.episodes_current),
+                    series::episodes_total.eq(series_put.episodes_total),
+                    series::start_date.eq(series_put.start_date),
+                    series::end_date.eq(series_put.end_date)))
+              .returning(series::all_columns)
+              .get_result(conn) {
         Ok(s) => s,
         Err(e) => return ApiResult::err_format(e).json(),
     };
+
+    if let Some(uris) = info_uris {
+        for uri in uris {
+            if uri.id.is_some() {
+                // update
+                update_uri(&db, series_id, uri);
+            } else {
+                // create
+                new_uri(&db, series_id, uri);
+            }
+        }
+    }
 
     ApiResult::ok(series).json()
 }
@@ -109,8 +125,8 @@ fn delete_series(db: DB, series_id: i32) -> JSON<ApiResult<Series, String>> {
     let conn = db.conn();
 
     match delete(series::dsl::series.filter(series::id.eq(series_id)))
-        .returning(series::all_columns)
-        .get_result(conn) {
+              .returning(series::all_columns)
+              .get_result(conn) {
         Ok(result) => ApiResult::ok(result).json(),
         Err(e) => ApiResult::err_format(e).json(),
     }

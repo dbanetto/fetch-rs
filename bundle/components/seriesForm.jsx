@@ -37,7 +37,7 @@ class SeriesForm extends Component {
     if (formData.id) {
       action = {
         method: 'PUT',
-        url: `/api/v1/series/${formData.id}/edit`
+        url: `/api/v1/series/${formData.id}`
       };
     }
 

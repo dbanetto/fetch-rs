@@ -4,7 +4,7 @@ use std::path::{PathBuf, Path};
 use rocket::response::NamedFile;
 use rocket::Route;
 
-mod api;
+pub mod api;
 
 #[get("/")]
 fn root() -> Option<NamedFile> {

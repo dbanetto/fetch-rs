@@ -21,6 +21,7 @@ pub struct NewInfoUri {
 
 #[derive(Serialize, Deserialize, Debug, Default)]
 pub struct InfoUriForm {
+    pub id: Option<i32>,
     pub uri: String,
     pub primary: Option<bool>,
 }
