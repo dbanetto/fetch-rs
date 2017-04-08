@@ -51,6 +51,7 @@ class SeriesCard extends React.Component {
     return (<div className="card">
       <h1>{ series.title }</h1>
       <div>
+        <img src={ series.poster_url } />
         <p>Start date: { series.start_date || "unknown" }</p>
         <p>End date: { series.end_date || "unknown" }</p>
         <p>Episode: { series.episodes_current }/{ series.episodes_total || "??" }</p>
