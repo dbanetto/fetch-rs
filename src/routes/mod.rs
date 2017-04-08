@@ -2,22 +2,32 @@ use rocket::Rocket;
 
 use std::path::{PathBuf, Path};
 use rocket::response::NamedFile;
+use rocket_contrib::Template;
+use std::collections::HashMap;
+use serde_json::Value;
 use rocket::Route;
 
 mod api;
 
 #[get("/")]
-fn index() -> Option<NamedFile> {
-    NamedFile::open(Path::new("public").join("index.html")).ok()
+fn root() -> Template {
+    let context: HashMap<String, Value> = HashMap::new();
+    Template::render("index", &context)
 }
 
 #[get("/<path..>")]
-fn static_files(path: PathBuf) -> Option<NamedFile> {
-    NamedFile::open(Path::new("public").join(path)).ok()
+fn index(path: Option<PathBuf>) -> Template {
+    let context: HashMap<String, Value> = HashMap::new();
+    Template::render("index", &context)
+}
+
+#[get("/public/<file..>")]
+fn static_files(file: PathBuf) -> Option<NamedFile> {
+    NamedFile::open(Path::new("public/").join(file)).ok()
 }
 
 fn routes() -> Vec<Route> {
-    routes![index, static_files]
+    routes![static_files, index, root]
 }
 
 pub fn mount(rocket: Rocket) -> Rocket {
