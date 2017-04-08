@@ -4,6 +4,7 @@ import App from './app.jsx';
 import Home from './home.jsx';
 import View from './view.jsx';
 import SeriesNew from './new.jsx';
+import SeriesEdit from './edit.jsx';
 
 function router() {
   return (
@@ -12,6 +13,7 @@ function router() {
           <IndexRoute component={Home} />
           <Route path="/series/new" component={SeriesNew} />
           <Route path="/series/:id" component={View} />
+          <Route path="/series/:id/edit" component={SeriesEdit} />
         </Route>
       </Router>
       );

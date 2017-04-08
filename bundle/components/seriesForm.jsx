@@ -6,7 +6,7 @@ class SeriesForm extends Component {
   constructor(props) {
     super();
 
-    let series = props && props.series ? prop.series : {};
+    let series = props && props.series ? props.series : {};
 
     this.state = {
       series: series
