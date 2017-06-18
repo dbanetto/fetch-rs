@@ -88,6 +88,7 @@ class View extends Component {
         <div>
           <div>
             <h1>{ series.title }</h1>
+            <p><img src={ series.poster_url }/></p>
             <p>Start date: { series.start_date || "unkown" }</p>
             <p>End date: { series.end_date || "unkown" }</p>
             <p>Episode: { series.episodes_current }/{ series.episodes_total || "??" }</p>

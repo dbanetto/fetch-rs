@@ -47,7 +47,7 @@ class SeriesForm extends Component {
       headers: {
         'Content-Type': 'application/json'
       }})
-    .then(r => r.json())
+      .then(r => r.json())
       .then(resp => {
         if (!resp.success) {
           throw resp.error;
@@ -55,7 +55,7 @@ class SeriesForm extends Component {
         // redirect to view
         self.props.router.push(`/series/${ resp.data.id }`);
       })
-    .catch(alert);
+      .catch(alert);
 
     return false;
   }
@@ -86,10 +86,13 @@ class SeriesForm extends Component {
             <input name="id" id="id" type="hidden" value={series.id} />
           </div>
           <div>
+            <label for="title">Title</label>
             <input name="title" id="title" type="text" value={series.title} required
               onChange={ this.handleUpdate.bind(this, 'title') } />
           </div>
           <div>
+            <label for="start_date">Start Date</label>
+            <label for="end_date">End Date</label>
             <input name="start_date" id="start_date" type="date" value={series.start_date}
               max={series.end_date}
               onChange={ this.handleUpdate.bind(this, 'start_date') } />
@@ -99,19 +102,23 @@ class SeriesForm extends Component {
               onChange={ this.handleUpdate.bind(this, 'end_date') } />
           </div>
           <div>
+            <label for="episodes_current">Current Episodes</label>
             <input name="episodes_current" id="episodes_current" type="number"
               min="0" max={series.episodes_total} value={series.episodes_current}
               onChange={ this.handleUpdate.bind(this, 'episodes_current') } />
 
+            <label for="episodes_total">Total Episodes</label>
             <input name="episodes_total" id="episodes_total" type="number"
               min={series.episodes_current} value={series.episodes_total}
               onChange={ this.handleUpdate.bind(this, 'episodes_total') } />
           </div>
           <div>
+            <label for="poster_url">Poster URL</label>
             <input name="poster_url" id="poster_url" type="url" value={series.poster_url}
               onChange={ this.handleUpdate.bind(this, 'poster_url') } />
           </div>
           <div>
+            <h3>Info URIs</h3>
             <UriList value={series.info_uris || []}
               handleUpdate={ this.handleInfoUriUpdate.bind(this) } />
           </div>
