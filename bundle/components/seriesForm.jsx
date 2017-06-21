@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import UriList from './uriList.jsx';
+import Store from '../store.js';
 
 class SeriesForm extends Component {
 
@@ -14,49 +15,35 @@ class SeriesForm extends Component {
   }
 
   validate(formData) {
-    // add validation
+    let errors = [];
+
+    let nonEmptyUri = formData.info_uris.filter((uri) => uri.uri.trim().length !== 0);
+    formData.info_uris = nonEmptyUri;
+
     return errors;
-  }
-
-  formData(form) {
-
   }
 
   handleSubmit(event) {
     event.preventDefault();
 
     let formData = this.state.series;
-    console.log(JSON.stringify(formData));
 
-    let self = this;
-    let action = {
-      method: 'POST',
-      url: '/api/v1/series/new'
-    };
-
-    if (formData.id) {
-      action = {
-        method: 'PUT',
-        url: `/api/v1/series/${formData.id}`
-      };
+    let errors = this.validate(formData);
+    if (errors.length > 0) {
+      console.log(errors);
+      return;
     }
 
-    fetch(action.url, {
-      method: action.method,
-      body: JSON.stringify(formData),
-      headers: {
-        'Content-Type': 'application/json'
-      }})
-      .then(r => r.json())
+    let self = this;
+
+    Store.upsertSeries(formData)
       .then(resp => {
-        if (!resp.success) {
-          throw resp.error;
-        }
         // redirect to view
-        self.props.router.push(`/series/${ resp.data.id }`);
+        self.props.router.push(`/series/${ resp.id }`);
       })
       .catch(alert);
 
+    // stops the HTML form from completing the request
     return false;
   }
 
@@ -86,13 +73,13 @@ class SeriesForm extends Component {
             <input name="id" id="id" type="hidden" value={series.id} />
           </div>
           <div>
-            <label for="title">Title</label>
+            <label htmlFor="title">Title</label>
             <input name="title" id="title" type="text" value={series.title} required
               onChange={ this.handleUpdate.bind(this, 'title') } />
           </div>
           <div>
-            <label for="start_date">Start Date</label>
-            <label for="end_date">End Date</label>
+            <label htmlFor="start_date">Start Date</label>
+            <label htmlFor="end_date">End Date</label>
             <input name="start_date" id="start_date" type="date" value={series.start_date}
               max={series.end_date}
               onChange={ this.handleUpdate.bind(this, 'start_date') } />
@@ -102,18 +89,18 @@ class SeriesForm extends Component {
               onChange={ this.handleUpdate.bind(this, 'end_date') } />
           </div>
           <div>
-            <label for="episodes_current">Current Episodes</label>
+            <label htmlFor="episodes_current">Current Episodes</label>
             <input name="episodes_current" id="episodes_current" type="number"
               min="0" max={series.episodes_total} value={series.episodes_current}
               onChange={ this.handleUpdate.bind(this, 'episodes_current') } />
 
-            <label for="episodes_total">Total Episodes</label>
+            <label htmlFor="episodes_total">Total Episodes</label>
             <input name="episodes_total" id="episodes_total" type="number"
               min={series.episodes_current} value={series.episodes_total}
               onChange={ this.handleUpdate.bind(this, 'episodes_total') } />
           </div>
           <div>
-            <label for="poster_url">Poster URL</label>
+            <label htmlFor="poster_url">Poster URL</label>
             <input name="poster_url" id="poster_url" type="url" value={series.poster_url}
               onChange={ this.handleUpdate.bind(this, 'poster_url') } />
           </div>
