@@ -1,5 +1,5 @@
 use serde::Serialize;
-use rocket_contrib::JSON;
+use rocket_contrib::Json;
 use std::fmt::Display;
 
 #[derive(Serialize)]
@@ -47,8 +47,8 @@ impl<T, E> ApiResult<T, E>
         }
     }
 
-    pub fn json(self) -> JSON<Self> {
-        JSON(self)
+    pub fn json(self) -> Json<Self> {
+        Json(self)
     }
 }
 

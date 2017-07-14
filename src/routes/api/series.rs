@@ -3,7 +3,7 @@ use std::error::Error;
 use db::DB;
 use util::ApiResult;
 use rocket::Route;
-use rocket_contrib::JSON;
+use rocket_contrib::Json;
 use models::*;
 use diesel::prelude::*;
 use schema::{info_uri, series};
@@ -12,7 +12,7 @@ use diesel::{insert, update, delete};
 use serde_json;
 
 #[get("/")]
-fn all(db: DB) -> JSON<ApiResult<Vec<Series>, String>> {
+fn all(db: DB) -> Json<ApiResult<Vec<Series>, String>> {
     let conn = db.conn();
 
     let result = series::dsl::series.load::<Series>(conn);
@@ -21,7 +21,7 @@ fn all(db: DB) -> JSON<ApiResult<Vec<Series>, String>> {
 }
 
 #[get("/<series_id>")]
-fn select(db: DB, series_id: i32) -> JSON<ApiResult<Series, String>> {
+fn select(db: DB, series_id: i32) -> Json<ApiResult<Series, String>> {
     let conn = db.conn();
 
     let series: Series = match series::dsl::series
@@ -36,7 +36,7 @@ fn select(db: DB, series_id: i32) -> JSON<ApiResult<Series, String>> {
 }
 
 #[post("/new", data="<series_form>")]
-fn new(db: DB, series_form: JSON<SeriesForm>) -> JSON<ApiResult<serde_json::Value, String>> {
+fn new(db: DB, series_form: Json<SeriesForm>) -> Json<ApiResult<serde_json::Value, String>> {
     let series_form = series_form.into_inner();
     let (new_series, info_uris) = series_form.into_new();
 
@@ -83,8 +83,8 @@ fn new(db: DB, series_form: JSON<SeriesForm>) -> JSON<ApiResult<serde_json::Valu
 #[put("/<series_id>", data="<series_form>")]
 fn update_series(db: DB,
                  series_id: i32,
-                 series_form: JSON<SeriesForm>)
-                 -> JSON<ApiResult<Series, String>> {
+                 series_form: Json<SeriesForm>)
+                 -> Json<ApiResult<Series, String>> {
     let conn = db.conn();
 
     let (series_put, info_uris) = series_form.into_inner().into_new();
@@ -122,7 +122,7 @@ fn update_series(db: DB,
 }
 
 #[delete("/<series_id>")]
-fn delete_series(db: DB, series_id: i32) -> JSON<ApiResult<Series, String>> {
+fn delete_series(db: DB, series_id: i32) -> Json<ApiResult<Series, String>> {
     let conn = db.conn();
 
     match delete(series::dsl::series.filter(series::id.eq(series_id)))

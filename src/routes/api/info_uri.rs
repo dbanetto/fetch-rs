@@ -1,14 +1,14 @@
 use db::DB;
 use util::ApiResult;
 use rocket::Route;
-use rocket_contrib::JSON;
+use rocket_contrib::Json;
 use diesel::prelude::*;
 use models::{InfoUri, InfoUriForm, Series};
 use schema::{info_uri, series};
 use diesel::{insert, update, delete};
 
 #[get("/<series_id>/uri")]
-fn all(db: DB, series_id: i32) -> JSON<ApiResult<Vec<InfoUri>, String>> {
+fn all(db: DB, series_id: i32) -> Json<ApiResult<Vec<InfoUri>, String>> {
     let conn = db.conn();
 
     let uris = match info_uri::dsl::info_uri
@@ -22,7 +22,7 @@ fn all(db: DB, series_id: i32) -> JSON<ApiResult<Vec<InfoUri>, String>> {
 }
 
 #[get("/<series_id>/uri/<uri_id>")]
-fn get(db: DB, series_id: i32, uri_id: i32) -> JSON<ApiResult<InfoUri, String>> {
+fn get(db: DB, series_id: i32, uri_id: i32) -> Json<ApiResult<InfoUri, String>> {
 
     let conn = db.conn();
 
@@ -41,8 +41,8 @@ fn get(db: DB, series_id: i32, uri_id: i32) -> JSON<ApiResult<InfoUri, String>> 
 fn update_api(db: DB,
               series_id: i32,
               uri_id: i32,
-              uri_update: JSON<InfoUriForm>)
-              -> JSON<ApiResult<InfoUri, String>> {
+              uri_update: Json<InfoUriForm>)
+              -> Json<ApiResult<InfoUri, String>> {
 
     let uri_update = uri_update.into_inner();
 
@@ -50,7 +50,7 @@ fn update_api(db: DB,
 }
 
 #[delete("/<series_id>/uri/<uri_id>")]
-fn delete_api(db: DB, series_id: i32, uri_id: i32) -> JSON<ApiResult<InfoUri, String>> {
+fn delete_api(db: DB, series_id: i32, uri_id: i32) -> Json<ApiResult<InfoUri, String>> {
 
     let conn = db.conn();
 
@@ -66,14 +66,14 @@ fn delete_api(db: DB, series_id: i32, uri_id: i32) -> JSON<ApiResult<InfoUri, St
 }
 
 #[post("/<series_id>/uri/new", data="<uri_form>")]
-fn new(db: DB, series_id: i32, uri_form: JSON<InfoUriForm>) -> JSON<ApiResult<InfoUri, String>> {
+fn new(db: DB, series_id: i32, uri_form: Json<InfoUriForm>) -> Json<ApiResult<InfoUri, String>> {
     let uri_form = uri_form.into_inner();
 
     new_uri(&db, series_id, uri_form).json()
 }
 
-#[get("/<series_id>/uri/primary")]
-fn primary(db: DB, series_id: i32) -> JSON<ApiResult<InfoUri, String>> {
+#[get("/<series_id>/uri_primary")]
+fn primary(db: DB, series_id: i32) -> Json<ApiResult<InfoUri, String>> {
     let conn = db.conn();
 
     let uris = match info_uri::dsl::info_uri
