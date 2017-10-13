@@ -47,9 +47,19 @@ class SeriesForm extends Component {
     return false;
   }
 
-  handleUpdate(value, event) {
+  handleUpdate(event, value) {
     let series = this.state.series;
-    series[value] = event.target.value;
+    let isNumber = false;
+    if (isNumber) {
+      let valueNum = parseInt(event.target.value);
+      if (isNaN(valueNum)) {
+        console.error('expected ' + event.target.value + ' to be a number');
+      } else {
+        series[value] = valueNum;
+      }
+    } else {
+      series[value] = event.target.value;
+    }
     this.setState({
       series: series
     });
@@ -92,12 +102,12 @@ class SeriesForm extends Component {
             <label htmlFor="episodes_current">Current Episodes</label>
             <input name="episodes_current" id="episodes_current" type="number"
               min="0" max={series.episodes_total} value={series.episodes_current}
-              onChange={ this.handleUpdate.bind(this, 'episodes_current') } />
+              onChange={ this.handleUpdate.bind(this, 'episodes_current', true) } />
 
             <label htmlFor="episodes_total">Total Episodes</label>
             <input name="episodes_total" id="episodes_total" type="number"
               min={series.episodes_current} value={series.episodes_total}
-              onChange={ this.handleUpdate.bind(this, 'episodes_total') } />
+              onChange={ this.handleUpdate.bind(this, 'episodes_total', true) } />
           </div>
           <div>
             <label htmlFor="poster_url">Poster URL</label>
