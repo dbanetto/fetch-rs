@@ -20,23 +20,55 @@ body {
 }
 
 .status-unknown {
-    @extends .status;
+    @extend .status;
     background-color: #5b5b5b;
     color: white;
 }
 .status-soon {
-    @extends .status;
+    @extend .status;
     background-color: #2b8594;
     color: white;
 }
 .status-airing {
-    @extends .status;
+    @extend .status;
     background-color: #328632;
     color: white;
 }
 .status-finished {
-    @extends .status;
+    @extend .status;
     background-color: #bf3030;
     color: white;
 }
 
+.card-box {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    // justify-content: space-around;
+    border: thick solid #550055;
+    align-items: baseline;
+justify-content: space-around;
+}
+
+.card {
+    border: thick solid #005555;
+    flex-grow: 1;
+
+    max-width: 100vw;
+    max-height: 100vh;
+
+    display: flex;
+    flex-direction: column;
+    // flex-wrap: wrap;
+    // justify-content: flex-start;
+
+    .poster img {
+        max-width: 250px;
+        height: 100%;
+    }
+
+    .card-body {
+        border: thick solid #555500;
+    }
+
+}

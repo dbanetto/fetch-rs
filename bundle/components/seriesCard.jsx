@@ -49,11 +49,11 @@ class SeriesCard extends React.Component {
   render() {
     var series = this.props.series;
     return (<div className="card">
-      <h1>{ series.title }</h1>
-      <div>
+      <div className="poster">
         <img src={ series.poster_url } />
-        <p>Start date: { series.start_date || "unknown" }</p>
-        <p>End date: { series.end_date || "unknown" }</p>
+      </div>
+      <div className="card-body">
+        <h1>{ series.title }</h1>
         <p>Episode: { series.episodes_current }/{ series.episodes_total || "??" }</p>
         <p>State: { this.getAiringSate() }</p>
         { this.state.primary && <a href={ this.state.primary.uri }>link</a> }
