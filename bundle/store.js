@@ -111,7 +111,7 @@ class _Store {
   }
 
   getSeriesPrimary(id, options) {
-    const endpoint = `/api/v1/series/${ id }/uri/primary`;
+    const endpoint = `/api/v1/series/${ id }/uri_primary`;
     // prevents repeat calls to the API for non-existing data
     var options = options ? options : {}
     options.nulls = true;

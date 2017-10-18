@@ -4,8 +4,9 @@ use std::fmt::Display;
 
 #[derive(Serialize)]
 pub struct ApiResult<T, E>
-    where T: Serialize,
-          E: Serialize
+where
+    T: Serialize,
+    E: Serialize,
 {
     success: bool,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -15,8 +16,9 @@ pub struct ApiResult<T, E>
 }
 
 impl<T, E> ApiResult<T, E>
-    where T: Serialize,
-          E: Serialize
+where
+    T: Serialize,
+    E: Serialize,
 {
     pub fn new(data: Result<T, E>) -> Self {
         let (data, err) = match data {
@@ -53,7 +55,8 @@ impl<T, E> ApiResult<T, E>
 }
 
 impl<T> ApiResult<T, String>
-    where T: Serialize
+where
+    T: Serialize,
 {
     pub fn err_format<D: Display>(err: D) -> Self {
         ApiResult {
@@ -65,8 +68,9 @@ impl<T> ApiResult<T, String>
 }
 
 impl<T, E> From<Result<T, E>> for ApiResult<T, E>
-    where T: Serialize,
-          E: Serialize
+where
+    T: Serialize,
+    E: Serialize,
 {
     fn from(from: Result<T, E>) -> Self {
         ApiResult::new(from)

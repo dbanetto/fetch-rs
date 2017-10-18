@@ -1,9 +1,9 @@
-use ::schema::*;
+use schema::*;
 use models::Series;
 
 #[derive(Identifiable, Queryable, Associations, Serialize, Deserialize, Debug, Default)]
-#[table_name="info_uri"]
-#[belongs_to(Series, foreign_key="series_id")]
+#[table_name = "info_uri"]
+#[belongs_to(Series, foreign_key = "series_id")]
 pub struct InfoUri {
     pub id: i32,
     pub series_id: i32,
@@ -12,7 +12,7 @@ pub struct InfoUri {
 }
 
 #[derive(Insertable, Serialize, Deserialize, Debug, Default)]
-#[table_name="info_uri"]
+#[table_name = "info_uri"]
 pub struct NewInfoUri {
     pub series_id: i32,
     pub uri: String,
