@@ -17,8 +17,9 @@ class SeriesForm extends Component {
   validate(formData) {
     let errors = [];
 
-    let nonEmptyUri = formData.info_uris.filter((uri) => uri.uri.trim().length !== 0);
-    formData.info_uris = nonEmptyUri;
+    let info_uris = formData.info_uris ? formData.info_uris : [];
+
+    formData.info_uris = info_uris.filter((uri) => uri.uri.trim().length !== 0);
 
     return errors;
   }
@@ -47,19 +48,15 @@ class SeriesForm extends Component {
     return false;
   }
 
-  handleUpdate(event, value) {
+  handleUpdate(value, event) {
     let series = this.state.series;
-    let isNumber = false;
-    if (isNumber) {
-      let valueNum = parseInt(event.target.value);
-      if (isNaN(valueNum)) {
-        console.error('expected ' + event.target.value + ' to be a number');
-      } else {
-        series[value] = valueNum;
-      }
-    } else {
-      series[value] = event.target.value;
-    }
+
+    console.log(this);
+    console.log(event);
+    console.log(value);
+
+    series[value] = event.target.value;
+
     this.setState({
       series: series
     });
@@ -86,28 +83,6 @@ class SeriesForm extends Component {
             <label htmlFor="title">Title</label>
             <input name="title" id="title" type="text" value={series.title} required
               onChange={ this.handleUpdate.bind(this, 'title') } />
-          </div>
-          <div>
-            <label htmlFor="start_date">Start Date</label>
-            <label htmlFor="end_date">End Date</label>
-            <input name="start_date" id="start_date" type="date" value={series.start_date}
-              max={series.end_date}
-              onChange={ this.handleUpdate.bind(this, 'start_date') } />
-
-            <input name="end_date" id="end_date" type="date" value={series.end_date}
-              min={series.start_date}
-              onChange={ this.handleUpdate.bind(this, 'end_date') } />
-          </div>
-          <div>
-            <label htmlFor="episodes_current">Current Episodes</label>
-            <input name="episodes_current" id="episodes_current" type="number"
-              min="0" max={series.episodes_total} value={series.episodes_current}
-              onChange={ this.handleUpdate.bind(this, 'episodes_current', true) } />
-
-            <label htmlFor="episodes_total">Total Episodes</label>
-            <input name="episodes_total" id="episodes_total" type="number"
-              min={series.episodes_current} value={series.episodes_total}
-              onChange={ this.handleUpdate.bind(this, 'episodes_total', true) } />
           </div>
           <div>
             <label htmlFor="poster_url">Poster URL</label>

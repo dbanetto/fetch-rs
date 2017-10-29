@@ -96,11 +96,7 @@ fn update_series(
     let series: Series = match update(series::dsl::series.filter(series::id.eq(series_id)))
         .set((
             series::title.eq(series_put.title),
-            series::episodes_current.eq(series_put.episodes_current),
-            series::episodes_total.eq(series_put.episodes_total),
-            series::start_date.eq(series_put.start_date),
             series::poster_url.eq(series_put.poster_url),
-            series::end_date.eq(series_put.end_date),
         ))
         .returning(series::all_columns)
         .get_result(conn) {
