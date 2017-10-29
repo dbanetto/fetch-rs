@@ -1,8 +1,8 @@
-import React from 'react';
-import { Link } from 'react-router';
+import { h, Component } from 'preact';
+import { Link } from 'preact-router';
 import Store from '../store.js';
 
-class SeriesCard extends React.Component {
+export default class SeriesCard extends Component {
 
   constructor() {
     super();
@@ -41,10 +41,8 @@ class SeriesCard extends React.Component {
         <h1>{ series.title }</h1>
         <p>State: { this.getAiringSate() }</p>
         { this.state.primary && <a href={ this.state.primary.uri }>link</a> }
-        <Link to={`/series/${ series.id }`}>view</Link>
+        <Link href={`/series/${ series.id }`}>view</Link>
       </div>
     </div>);
   }
 }
-
-export default SeriesCard;

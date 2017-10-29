@@ -1,8 +1,8 @@
-import React, { Component } from 'react';
-import { Link } from 'react-router';
+import { h, Component } from 'preact';
+import { route, Link } from 'preact-router';
 import Store from '../store.js';
 
-class View extends Component {
+export default class View extends Component {
 
   constructor() {
     super();
@@ -20,8 +20,11 @@ class View extends Component {
   getSeries() {
     let self = this;
 
-    Promise.all([Store.getSeriesId(this.props.params.id),
-        Store.getSeriesUri(this.props.params.id)])
+    console.log(this);
+    console.log(this.props);
+
+    Promise.all([Store.getSeriesId(this.props.matches.id),
+        Store.getSeriesUri(this.props.matches.id)])
       .then(result => {
         self.setState({
           series: result[0],
@@ -30,7 +33,7 @@ class View extends Component {
       })
     .catch(err => {
       console.log(err);
-      self.props.router.push('/');
+      route('/');
     });
   }
 
@@ -42,13 +45,13 @@ class View extends Component {
       return;
     }
 
-    Store.deleteSeriesId(this.props.params.id)
+    Store.deleteSeriesId(this.props.matches.id)
       .then(() => {
-        self.props.router.push('/');
+        route('/');
       })
     .catch(err => {
       console.log(err);
-      self.props.router.push('/');
+      route('/');
     });
 
   }
@@ -78,7 +81,7 @@ class View extends Component {
       return (
           <div>
             <p>loading...</p>
-            <Link to='/'>back</Link>
+            <Link href='/'>back</Link>
           </div>);
     }
 
@@ -93,18 +96,16 @@ class View extends Component {
           </div>
           <div>
             <span>
-              <Link to={ `/series/${ series.id }/edit` }>edit</Link>
+              <Link href={ `/series/${ series.id }/edit` }>edit</Link>
             </span>
             <span>
               <a href="javascript:void(0)" onClick={ this.handleDelete.bind(this) }>delete</a>
             </span>
             <span>
-              <Link to='/'>back</Link>
+              <Link href='/'>back</Link>
             </span>
           </div>
         </div>
         );
   }
 }
-
-export default View;

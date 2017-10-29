@@ -1,9 +1,9 @@
-import React, { Component } from 'react';
-import { Link } from 'react-router';
+import { h, Component } from 'preact';
+import { Link } from 'preact-router';
 import SeriesForm from './seriesForm.jsx';
 import Store from '../store.js';
 
-class SeriesEdit extends Component {
+export default class SeriesEdit extends Component {
 
   constructor() {
     super();
@@ -20,8 +20,8 @@ class SeriesEdit extends Component {
   getSeries() {
     let self = this;
 
-    Promise.all([Store.getSeriesId(this.props.params.id),
-        Store.getSeriesUri(this.props.params.id)])
+    Promise.all([Store.getSeriesId(this.props.matches.id),
+        Store.getSeriesUri(this.props.matches.id)])
       .then(result => {
         let series = result[0];
         series.info_uris = result[1];
@@ -32,7 +32,7 @@ class SeriesEdit extends Component {
       })
     .catch(err => {
       console.log(err);
-      self.props.router.push('/');
+      route('/');
     });
   }
 
@@ -42,7 +42,7 @@ class SeriesEdit extends Component {
       return (
           <div>
             <p>loading...</p>
-            <Link to='/'>back</Link>
+            <Link href='/'>back</Link>
             </div>
           );
     }
@@ -51,10 +51,8 @@ class SeriesEdit extends Component {
     return (
         <div>
           <SeriesForm router={ this.props.router } series={ this.state.series } />
-          <Link to="/">back</Link>
+          <Link href="/">back</Link>
         </div>
         );
   }
 }
-
-export default SeriesEdit;

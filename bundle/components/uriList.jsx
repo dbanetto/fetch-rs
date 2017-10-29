@@ -1,6 +1,6 @@
-import React, { Component } from 'react';
+import { h, Component } from 'preact';
 
-class UriList extends Component {
+export default class UriList extends Component {
 
   handleAdd() {
 
@@ -92,5 +92,3 @@ class UriElement extends Component {
   }
 
 }
-
-export default UriList;

@@ -1,8 +1,9 @@
-import React, { Component } from 'react';
+import { h, Component } from 'preact';
+import { route } from 'preact-router';
 import UriList from './uriList.jsx';
 import Store from '../store.js';
 
-class SeriesForm extends Component {
+export default class SeriesForm extends Component {
 
   constructor(props) {
     super();
@@ -40,7 +41,7 @@ class SeriesForm extends Component {
     Store.upsertSeries(formData)
       .then(resp => {
         // redirect to view
-        self.props.router.push(`/series/${ resp.id }`);
+        route(`/series/${ resp.id }`, true);
       })
       .catch(alert);
 
@@ -101,5 +102,3 @@ class SeriesForm extends Component {
         );
   }
 }
-
-export default SeriesForm;

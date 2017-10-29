@@ -2,10 +2,12 @@ const webpack = require('webpack');
 const path = require('path');
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
 
-const UglifyJsPlugin = process.env.ROCKET_ENV === "production" ? new webpack.optimize.UglifyJsPlugin() : null;
+let production = process.env.ROCKET_ENV === "production";
+
 const extractSass = new ExtractTextPlugin({
-    filename: "[name].css"
+  filename: "[name].css"
 });
+
 
 module.exports = {
   cache: true,
@@ -13,9 +15,8 @@ module.exports = {
     main: './bundle/main.jsx',
     style: './bundle/style.scss',
     vendor: [
-      'react',
-      'react-dom',
-      'react-router',
+      'preact',
+      'preact-router',
     ]
   },
   output: {
@@ -25,34 +26,43 @@ module.exports = {
   },
   module: {
     rules: [
-    {
-      test: /\.js$/,
-      exclude: /node_modules/,
-      loader: 'babel-loader?presets[]=es2015'
-    },
-    {
-      test: /\.jsx$/,
-      exclude: /node_modules/,
-      loader: 'babel-loader?presets[]=es2015&presets[]=react'
-    },
-    {
-      test: /\.scss$/,
-      use: extractSass.extract({
-        use: [{
-          loader: "css-loader"
-        }, {
-          loader: "sass-loader"
-        }],
+      {
+        test: /\.jsx?$/,
+        exclude: /node_modules/,
+        loader: 'babel-loader?presets[]=es2015'
+      },
+      {
+        test: /\.scss$/,
+        use: extractSass.extract({
+          use: [{
+            loader: "css-loader"
+          }, {
+            loader: "sass-loader"
+          }],
           // use style-loader in development
           fallback: "style-loader"
-      })
-    }
+        })
+      }
     ]
   },
   plugins: [
-    new webpack.optimize.CommonsChunkPlugin({name: "vendor", filename: "vendor.js", minChunks: Infinity}),
-    extractSass
-  ],
+
+    new webpack.optimize.CommonsChunkPlugin({
+      name: "vendor", filename: "vendor.js", minChunks: Infinity}),
+
+    extractSass,
+
+  ].concat(production ?
+    [
+      // production plugins
+      new webpack.optimize.UglifyJsPlugin({
+        compress: { warnings: false, drop_console: false, }
+      })
+    ] : [
+      // development plugins
+    ]
+
+  ),
   resolve: {
     extensions: ['.js', '.jsx', '.css', '.scss']
   },

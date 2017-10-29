@@ -1,9 +1,9 @@
-import React, { Component } from 'react';
-import { Link } from 'react-router';
+import { h, Component } from 'preact';
+import { Link } from 'preact-router';
 import SeriesCard from './seriesCard.jsx';
 import Store from '../store.js';
 
-class Home extends Component {
+export default class Home extends Component {
   constructor() {
     super();
 
@@ -42,11 +42,9 @@ class Home extends Component {
         <div>
           <h2>Series List</h2>
             { this.renderSeries() }
-            <Link to="/series/new">create</Link>
+            <Link href="/series/new">create</Link>
           <button onClick={this.loadSeries.bind(this)}>Reload</button>
         </div>
         );
   }
 }
-
-export default Home;

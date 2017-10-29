@@ -1,5 +1,4 @@
-import router from './components/route.jsx';
-import React, { Component } from 'react';
-import { render } from 'react-dom';
+import App from './components/app.jsx';
+import { h, render } from 'preact';
 
-render(router(), document.getElementById('root'));
+render(<App />, document.getElementById('root'));
