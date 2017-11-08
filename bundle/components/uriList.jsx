@@ -1,11 +1,12 @@
 import { h, Component } from 'preact';
+import uri from './uri.jsx';
 
 export default class UriList extends Component {
 
   handleAdd() {
 
     let elements = this.props.value;
-    elements.push({ uri: "", primary: false });
+    elements.push({ uri: "https://new", primary: false });
 
     this.props.handleUpdate(elements);
   }
@@ -84,7 +85,9 @@ class UriElement extends Component {
   render() {
     return (<div>
       <input type="hidden" name="id" className="uri" value={ this.props.value.id } />
-      <input type="uri" name="uri" className="uri" value={ this.props.value.uri } onChange={ this.handleUri.bind(this) } />
+
+      { uri.build(this.props.value.uri, { edit: true, handleUpdate: this.handleUri.bind(this) }) }
+
       <input type="radio" name="primary" className="primary" value={this.props.value.primary} checked={ this.props.value.primary } onChange={ this.handlePrimary.bind(this) }/>
 
       <button type="button" onClick={ this.props.handleDelete }>x</button>

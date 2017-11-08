@@ -51,7 +51,7 @@ export default class SeriesEdit extends Component {
     return (
         <div>
           <SeriesForm router={ this.props.router } series={ this.state.series } />
-          <Link href="/">back</Link>
+          <Link href={ `/series/${ this.state.series.id }` }>back</Link>
         </div>
         );
   }

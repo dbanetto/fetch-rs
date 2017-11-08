@@ -1,6 +1,7 @@
 import { h, Component } from 'preact';
 import { route, Link } from 'preact-router';
 import Store from '../store.js';
+import uri from './uri.jsx';
 
 export default class View extends Component {
 
@@ -19,9 +20,6 @@ export default class View extends Component {
 
   getSeries() {
     let self = this;
-
-    console.log(this);
-    console.log(this.props);
 
     Promise.all([Store.getSeriesId(this.props.matches.id),
         Store.getSeriesUri(this.props.matches.id)])
@@ -67,7 +65,7 @@ export default class View extends Component {
               <ul>
                 { this.state.uri.map((u, i) =>
                 <li key={i}>
-                  <a href={u.uri} className={ `link link-${u.primary ? 'primary' : 'other'}` }>{ u.uri }</a>
+                  { uri.build(u.uri) }
                 </li>
                 ) }
 

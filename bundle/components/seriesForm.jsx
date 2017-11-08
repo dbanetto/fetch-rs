@@ -2,6 +2,7 @@ import { h, Component } from 'preact';
 import { route } from 'preact-router';
 import UriList from './uriList.jsx';
 import Store from '../store.js';
+import uri from './uri.jsx';
 
 export default class SeriesForm extends Component {
 
@@ -87,8 +88,8 @@ export default class SeriesForm extends Component {
           </div>
           <div>
             <label htmlFor="poster_url">Poster URL</label>
-            <input name="poster_url" id="poster_url" type="url" value={series.poster_url}
-              onChange={ this.handleUpdate.bind(this, 'poster_url') } />
+            { uri.build(series.poster_url, { edit: true, protocol: 'image:', name: 'poster_url',
+              handleUpdate: this.handleUpdate.bind(this, 'poster_url') }) }
           </div>
           <div>
             <h3>Info URIs</h3>
