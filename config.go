@@ -24,6 +24,8 @@ type Config struct {
 	Fetch FetchConfig `json:"fetch"`
 	WebUI WebUIConfig `json:"webui"`
 	Sort  SortConfig  `json:"sort"`
+
+	Api string `json:"api"`
 }
 
 type WebUIConfig struct {
@@ -32,10 +34,8 @@ type WebUIConfig struct {
 }
 
 type FetchConfig struct {
-	CheckFilesystem bool              `json:"check_filesystem"`
 	SavePathDefault string            `json:"save_path_default"`
 	SavePaths       map[string]string `json:"save_paths"`
-	SearchPaths     []string          `json:"search_paths"`
 }
 
 type SortConfig struct {

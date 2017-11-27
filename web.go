@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-func Start(config WebUIConfig) {
+func Start(config Config) {
 	handleFunc("/", "GET", handleInfo)
 	handleFunc("/log", "GET", handleLog)
 	handleFunc("/status", "GET", handleStatus)
@@ -16,7 +16,7 @@ func Start(config WebUIConfig) {
 	handleFunc("/force/fetch", "POST", handleForceFetch)
 	handleFunc("/force/sort", "POST", handleForceSort)
 
-	addr := config.Host
+	addr := config.WebUI.Host
 
 	log.Printf("Server starting to listen on %v", addr)
 	log.Fatal(http.ListenAndServe(addr, nil))

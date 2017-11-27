@@ -1,18 +1,14 @@
 {
+  "api": "http://localhost:8080",
   "webui": {
     "enable": true,
     "host": "localhost:8181"
   },
   "fetch": {
+    "save_path_default": "./downloads",
     "save_paths": {
       "mp3$": "./podcasts"
-    },
-    "save_path_default": "./downloads",
-
-    "check_filesystem": true,
-    "search_paths": [
-      "./podcasts"
-        ]
+    }
   },
   "sort": {
     "save_paths": {
@@ -21,9 +17,9 @@
     "save_path_default": "./sorted",
     "search_paths": [
       "./downloads"
-        ],
-        "providers_to_move": [
-          "roosterteeth"
-        ]
+    ],
+    "providers_to_move": [
+      "roosterteeth"
+    ]
   }
 }

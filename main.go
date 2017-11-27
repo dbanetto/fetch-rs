@@ -14,10 +14,13 @@ func main() {
 		return
 	}
 
+	fmt.Println(options)
 	fmt.Println(config)
 
-	if config.WebUI.Enable {
-		Start()
+	if options.Fetch {
+		Fetch(config)
+	} else if config.WebUI.Enable {
+		Start(config)
 	}
 }
 
