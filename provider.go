@@ -1,18 +1,22 @@
 package main
 
 type FetchProvider interface {
-	fetch()
+	fetch(show Series) error
 }
 
 var baseProviders map[string]FetchProvider
+
+func GetProvider(name string) FetchProvider {
+	return baseProviders[name]
+}
 
 func RegisterFetchProvider(name string, provider FetchProvider) {
 	baseProviders[name] = provider
 }
 
-func GetSupportedProviders(client *API) (map[int]bool, error) {
+func GetSupportedProviders(client *API) (map[int]string, error) {
 
-	result := make(map[int]bool)
+	result := make(map[int]string)
 
 	providers, err := client.GetProviders()
 	if err != nil {
@@ -20,7 +24,9 @@ func GetSupportedProviders(client *API) (map[int]bool, error) {
 	}
 
 	for _, provider := range providers {
-		result[provider.ID] = baseProviders[provider.BaseProvider] != nil
+		if baseProviders[provider.BaseProvider] != nil {
+			result[provider.ID] = provider.BaseProvider
+		}
 	}
 
 	return result, nil
