@@ -1,5 +1,6 @@
 package main
 
+import "github.com/zyphrus/fetcher"
 import "fmt"
 import "flag"
 
@@ -7,7 +8,7 @@ func main() {
 
 	options := cli()
 
-	config, err := Parse(options.ConfigPath)
+	config, err := fetcher.Parse(options.ConfigPath)
 
 	if err != nil {
 		fmt.Errorf("Error while loading config: %v\n", err)
@@ -18,9 +19,9 @@ func main() {
 	fmt.Println(config)
 
 	if options.Fetch {
-		Fetch(config)
+		fetcher.Fetch(config)
 	} else if config.WebUI.Enable {
-		Start(config)
+		fetcher.Start(config)
 	}
 }
 
