@@ -7,17 +7,27 @@ func Fetch(config Config) {
 	client := Init(config.Api)
 
 	series, err := client.GetSeries()
-
 	if err != nil {
-		fmt.Errorf("Error during series %v", err)
+		fmt.Errorf("Error while getting series list: %v", err)
+		return
+	}
+
+	supportedProviders, err := GetSupportedProviders(client)
+	if err != nil {
+		fmt.Errorf("Error while getting supported providers: %v", err)
 		return
 	}
 
 	for i, show := range series {
-		fmt.Printf("%v: %v\n", i, show.Title)
-		handleShow(show, config.Fetch)
-	}
+		fmt.Printf("%v: %v ", i, show.Title)
 
+		if supportedProviders[show.ProviderID] {
+			fmt.Println("✓")
+			handleShow(show, config.Fetch)
+		} else {
+			fmt.Println("✖")
+		}
+	}
 }
 
 func handleShow(show Series, config FetchConfig) {
