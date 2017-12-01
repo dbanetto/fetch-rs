@@ -5,10 +5,7 @@
     "host": "localhost:8181"
   },
   "fetch": {
-    "save_path_default": "./downloads",
-    "save_paths": {
-      "mp3$": "./podcasts"
-    }
+    "save_path": "./downloads"
   },
   "sort": {
     "save_paths": {

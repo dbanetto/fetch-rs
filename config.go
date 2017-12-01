@@ -34,8 +34,7 @@ type WebUIConfig struct {
 }
 
 type FetchConfig struct {
-	SavePathDefault string            `json:"save_path_default"`
-	SavePaths       map[string]string `json:"save_paths"`
+	SavePath string `json:"save_path"`
 }
 
 type SortConfig struct {
