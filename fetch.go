@@ -21,16 +21,16 @@ func Fetch(config Config) {
 	for i, show := range series {
 		fmt.Printf("%v: %v ", i+1, show.Title)
 
-		if supportedProviders[show.ProviderID] != "" {
+		if val, ok := supportedProviders[show.ProviderID]; ok {
 			fmt.Println("✓")
-			handleShow(show, supportedProviders[show.ProviderID], config.Fetch)
+			handleShow(show, val, config.Fetch)
 		} else {
 			fmt.Println("✖")
 		}
 	}
 }
 
-func handleShow(show Series, provider string, config FetchConfig) {
+func handleShow(show Series, provider Provider, config FetchConfig) {
 
-	GetProvider(provider).fetch(show)
+	GetProvider(provider.BaseProvider).fetch(show)
 }

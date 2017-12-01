@@ -14,9 +14,9 @@ func RegisterFetchProvider(name string, provider FetchProvider) {
 	baseProviders[name] = provider
 }
 
-func GetSupportedProviders(client *API) (map[int]string, error) {
+func GetSupportedProviders(client *API) (map[int]Provider, error) {
 
-	result := make(map[int]string)
+	result := make(map[int]Provider)
 
 	providers, err := client.GetProviders()
 	if err != nil {
@@ -25,7 +25,7 @@ func GetSupportedProviders(client *API) (map[int]string, error) {
 
 	for _, provider := range providers {
 		if baseProviders[provider.BaseProvider] != nil {
-			result[provider.ID] = provider.BaseProvider
+			result[provider.ID] = provider
 		}
 	}
 
