@@ -20,8 +20,11 @@ func main() {
 
 	if options.Fetch {
 		fetcher.Fetch(config)
+	} else if options.Sort {
+		// TODO
 	} else if config.WebUI.Enable {
-		fetcher.Start(config)
+		// default action to start web server
+		fetcher.StartWeb(config)
 	}
 }
 

@@ -19,7 +19,7 @@ func Fetch(config Config) {
 	}
 
 	for i, show := range series {
-		fmt.Printf("%v: %v ", i, show.Title)
+		fmt.Printf("%v: %v ", i+1, show.Title)
 
 		if supportedProviders[show.ProviderID] != "" {
 			fmt.Println("✓")

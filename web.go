@@ -8,13 +8,13 @@ import (
 	"strings"
 )
 
-func Start(config Config) {
-	handleFunc("/", "GET", handleInfo)
-	handleFunc("/log", "GET", handleLog)
-	handleFunc("/status", "GET", handleStatus)
+func StartWeb(config Config) {
+	handleFunc("/", "GET", config, handleInfo)
+	handleFunc("/log", "GET", config, handleLog)
+	handleFunc("/status", "GET", config, handleStatus)
 
-	handleFunc("/force/fetch", "POST", handleForceFetch)
-	handleFunc("/force/sort", "POST", handleForceSort)
+	handleFunc("/force/fetch", "POST", config, handleForceFetch)
+	handleFunc("/force/sort", "POST", config, handleForceSort)
 
 	addr := config.WebUI.Host
 
@@ -22,21 +22,21 @@ func Start(config Config) {
 	log.Fatal(http.ListenAndServe(addr, nil))
 }
 
-func handleInfo(w http.ResponseWriter, r *http.Request) {
+func handleInfo(w http.ResponseWriter, r *http.Request, config Config) {
 	fmt.Fprint(w, "API is online")
 }
 
-func handleStatus(w http.ResponseWriter, r *http.Request) {
+func handleStatus(w http.ResponseWriter, r *http.Request, config Config) {
 	var res = make(map[string]interface{})
 
 	res["running"] = true
-	res["fetch_lock"] = true
-	res["sort_lock"] = true
+	res["fetch_lock"] = false
+	res["sort_lock"] = false
 
 	sendJson(res, w)
 }
 
-func handleLog(w http.ResponseWriter, r *http.Request) {
+func handleLog(w http.ResponseWriter, r *http.Request, config Config) {
 	var res = make(map[string]interface{})
 
 	res["success"] = true
@@ -45,17 +45,19 @@ func handleLog(w http.ResponseWriter, r *http.Request) {
 	sendJson(res, w)
 }
 
-func handleForceFetch(w http.ResponseWriter, r *http.Request) {
+func handleForceFetch(w http.ResponseWriter, r *http.Request, config Config) {
 	var res = make(map[string]interface{})
 
+	Fetch(config)
 	res["success"] = true
 
 	sendJson(res, w)
 }
 
-func handleForceSort(w http.ResponseWriter, r *http.Request) {
+func handleForceSort(w http.ResponseWriter, r *http.Request, config Config) {
 	var res = make(map[string]interface{})
 
+	// TODO: run sort command
 	res["success"] = true
 
 	sendJson(res, w)
@@ -72,9 +74,7 @@ func sendJson(d interface{}, w http.ResponseWriter) {
 	}
 }
 
-func handleFunc(pattern string, method string, handler func(http.ResponseWriter, *http.Request)) {
-
-	// patt := strings.TrimRight(pattern, "/")
+func handleFunc(pattern string, method string, config Config, handler func(http.ResponseWriter, *http.Request, Config)) {
 
 	http.HandleFunc(pattern, func(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Trying Request for %v (%v) against %v", r.URL.Path, r.Method, pattern)
@@ -83,7 +83,7 @@ func handleFunc(pattern string, method string, handler func(http.ResponseWriter,
 		if method == r.Method && (matched || matchedTrim) {
 			// debug
 			log.Printf("Matched for %v", pattern)
-			handler(w, r)
+			handler(w, r, config)
 		} else {
 			http.NotFound(w, r)
 		}
