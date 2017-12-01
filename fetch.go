@@ -32,5 +32,11 @@ func Fetch(config Config) {
 
 func handleShow(show Series, provider Provider, config FetchConfig) {
 
-	GetProvider(provider.BaseProvider).fetch(show)
+	handle := GetProvider(provider.BaseProvider)
+
+	err := handle(show, provider, config)
+	if err != nil {
+		fmt.Printf("Error: %v\n", err)
+	}
+
 }

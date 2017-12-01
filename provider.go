@@ -1,8 +1,6 @@
 package fetcher
 
-type FetchProvider interface {
-	fetch(show Series) error
-}
+type FetchProvider func(show Series, provider Provider, config FetchConfig) error
 
 var baseProviders map[string]FetchProvider
 
@@ -11,6 +9,10 @@ func GetProvider(name string) FetchProvider {
 }
 
 func RegisterFetchProvider(name string, provider FetchProvider) {
+	if baseProviders == nil {
+		baseProviders = make(map[string]FetchProvider)
+	}
+
 	baseProviders[name] = provider
 }
 
