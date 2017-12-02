@@ -1,6 +1,7 @@
 package fetcher
 
 import "fmt"
+import "sync"
 
 func Fetch(config Config) {
 
@@ -18,25 +19,33 @@ func Fetch(config Config) {
 		return
 	}
 
+	var wg sync.WaitGroup
+
 	for i, show := range series {
-		fmt.Printf("%v: %v ", i+1, show.Title)
 
 		if val, ok := supportedProviders[show.ProviderID]; ok {
-			fmt.Println("✓")
-			handleShow(show, val, config.Fetch)
+			wg.Add(1)
+
+			fmt.Printf("%v: %v ✓\n", i+1, show.Title)
+			go handleShow(show, val, config.Fetch, &wg)
 		} else {
-			fmt.Println("✖")
+			fmt.Printf("%v: %v ✖\n", i+1, show.Title)
 		}
 	}
+
+	wg.Wait()
+	fmt.Println("Completed search")
 }
 
-func handleShow(show Series, provider Provider, config FetchConfig) {
+func handleShow(show Series, provider Provider, config FetchConfig, wg *sync.WaitGroup) {
+	defer wg.Done()
 
 	handle := GetProvider(provider.BaseProvider)
 
 	err := handle(show, provider, config)
 	if err != nil {
-		fmt.Printf("Error: %v\n", err)
+		fmt.Printf("Error in %v: %v\n", show.Title, err)
 	}
 
+	fmt.Printf("Completed search for %v\n", show.Title)
 }
