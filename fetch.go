@@ -27,7 +27,7 @@ func Fetch(config Config) {
 			wg.Add(1)
 
 			fmt.Printf("%v: %v ✓\n", i+1, show.Title)
-			go handleShow(show, val, config.Fetch, &wg)
+			go handleShow(show, val, config, &wg)
 		} else {
 			fmt.Printf("%v: %v ✖\n", i+1, show.Title)
 		}
@@ -37,7 +37,7 @@ func Fetch(config Config) {
 	fmt.Println("Completed search")
 }
 
-func handleShow(show Series, provider Provider, config FetchConfig, wg *sync.WaitGroup) {
+func handleShow(show Series, provider Provider, config Config, wg *sync.WaitGroup) {
 	defer wg.Done()
 
 	handle := GetProvider(provider.BaseProvider)

@@ -1,22 +1,8 @@
 {
   "api": "http://localhost:8080",
+  "transmission_rpc": "http://localhost:9091/transmission/rpc",
   "webui": {
     "enable": true,
     "host": "localhost:8181"
-  },
-  "fetch": {
-    "save_path": "./downloads"
-  },
-  "sort": {
-    "save_paths": {
-      "rss": "./podcast"
-    },
-    "save_path_default": "./sorted",
-    "search_paths": [
-      "./downloads"
-    ],
-    "providers_to_move": [
-      "roosterteeth"
-    ]
   }
 }

@@ -1,6 +1,6 @@
 package fetcher
 
-type FetchProvider func(show Series, provider Provider, config FetchConfig) error
+type FetchProvider func(show Series, provider Provider, config Config) error
 
 var baseProviders map[string]FetchProvider
 
