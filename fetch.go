@@ -42,9 +42,14 @@ func handleShow(show Series, provider Provider, config FetchConfig, wg *sync.Wai
 
 	handle := GetProvider(provider.BaseProvider)
 
-	err := handle(show, provider, config)
-	if err != nil {
-		fmt.Printf("Error in %v: %v\n", show.Title, err)
+	for i := 1; i < 4; i++ {
+		err := handle(show, provider, config)
+		if err != nil {
+			fmt.Printf("Error in %v: %v\n", show.Title, err)
+			fmt.Printf("Retry search for %v #%v\n", show.Title, i)
+		} else {
+			break
+		}
 	}
 
 	fmt.Printf("Completed search for %v\n", show.Title)
