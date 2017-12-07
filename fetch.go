@@ -9,13 +9,13 @@ func Fetch(config Config) {
 
 	series, err := client.GetSeries()
 	if err != nil {
-		fmt.Errorf("Error while getting series list: %v", err)
+		fmt.Printf("Error while getting series list: %v", err)
 		return
 	}
 
 	supportedProviders, err := GetSupportedProviders(client)
 	if err != nil {
-		fmt.Errorf("Error while getting supported providers: %v", err)
+		fmt.Printf("Error while getting supported providers: %v", err)
 		return
 	}
 

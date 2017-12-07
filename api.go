@@ -1,8 +1,12 @@
 package fetcher
 
+import "fmt"
 import "encoding/json"
 import "io/ioutil"
 import "net/http"
+import "bytes"
+import "net/url"
+import "path"
 
 // Init creates an API with the given configuration
 func Init(url string) *API {
@@ -13,14 +17,19 @@ func Init(url string) *API {
 	return api
 }
 
-func (api *API) get(url string) ([]byte, error) {
-	r, err := http.NewRequest("GET", api.url+url, nil)
-
-	r.Header.Add("Content-Type", "application/json")
-
+func (api *API) get(endpoint string) ([]byte, error) {
+	apiUrl, err := url.Parse(api.url)
 	if err != nil {
 		return nil, err
 	}
+
+	apiUrl.Path = path.Join(apiUrl.Path, endpoint)
+	r, err := http.NewRequest("GET", apiUrl.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	r.Header.Add("Content-Type", "application/json")
 
 	resp, err := api.client.Do(r)
 	if err != nil {
@@ -72,6 +81,30 @@ func (api *API) GetProviders() ([]Provider, error) {
 	return *providers, nil
 }
 
+func (api *API) PostEpisodeCount(id int, count int) error {
+
+	values := map[string]int{"current_count": count}
+	data, err := json.Marshal(values)
+	fmt.Printf("%v\n", string(data))
+
+	apiUrl, err := url.Parse(api.url)
+	if err != nil {
+		return err
+	}
+
+	apiUrl.Path = path.Join(apiUrl.Path, "series", fmt.Sprint(id), "count")
+	// addition of "/" is to accommodate stupid API url rules
+	r, err := http.NewRequest("POST", apiUrl.String()+"/", bytes.NewBuffer(data))
+	if err != nil {
+		return err
+	}
+	r.Header.Add("Content-Type", "application/json")
+
+	_, err = api.client.Do(r)
+
+	return err
+}
+
 // API is a struct to interact with the API
 type API struct {
 	url    string
@@ -93,7 +126,7 @@ type Provider struct {
 type Series struct {
 	CurrentCount           int               `json:"current_count"`
 	EndDate                string            `json:"end_date"`
-	ID                     float64           `json:"id"`
+	ID                     int               `json:"id"`
 	InfoURL                string            `json:"info_url"`
 	MediaType              string            `json:"media_type"`
 	MediaTypeOptions       map[string]string `json:"media_type_options"`
