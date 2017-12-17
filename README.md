@@ -29,7 +29,7 @@ or by sending a POST request to `/force/fetch`, e.g.
 The configuration is in the form of a JSON file,
 see [config.json](./config.json) for an example file.
 
-```JSON
+```javascript
 {
   "api": "http://localhost:8080", // base location of fetch API
   "webui": {
