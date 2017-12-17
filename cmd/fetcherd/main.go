@@ -1,6 +1,6 @@
 package main
 
-import "github.com/zyphrus/fetcher"
+import "github.com/zyphrus/fetcherd-go"
 import "fmt"
 import "flag"
 
@@ -9,6 +9,8 @@ func main() {
 	options := cli()
 
 	config, err := fetcher.Parse(options.ConfigPath)
+
+	fetcher.RegisterFetchProvider("nyaa", fetcher.NyaaFetch)
 
 	if err != nil {
 		fmt.Errorf("Error while loading config: %v\n", err)
