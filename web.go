@@ -3,7 +3,7 @@ package fetcher
 import (
 	"encoding/json"
 	"fmt"
-	"log"
+	log "github.com/sirupsen/logrus"
 	"net/http"
 	"strings"
 )
@@ -18,8 +18,12 @@ func StartWeb(config Config) {
 
 	addr := config.WebUI.Host
 
-	log.Printf("Server starting to listen on %v", addr)
-	log.Fatal(http.ListenAndServe(addr, nil))
+	log.Info("Server starting to listen on %v", addr)
+
+	err := http.ListenAndServe(addr, nil)
+	if err != nil {
+		log.Fatal("Error during serving web interface", err)
+	}
 }
 
 func handleInfo(w http.ResponseWriter, r *http.Request, config Config) {
@@ -41,6 +45,7 @@ func handleLog(w http.ResponseWriter, r *http.Request, config Config) {
 
 	res["success"] = true
 	res["log"] = "Placeholder log"
+	// read the log if we can
 
 	sendJson(res, w)
 }
@@ -77,12 +82,12 @@ func sendJson(d interface{}, w http.ResponseWriter) {
 func handleFunc(pattern string, method string, config Config, handler func(http.ResponseWriter, *http.Request, Config)) {
 
 	http.HandleFunc(pattern, func(w http.ResponseWriter, r *http.Request) {
-		log.Printf("Trying Request for %v (%v) against %v", r.URL.Path, r.Method, pattern)
+		log.Debug("Trying Request for ", r.URL.Path, " (", r.Method, ") against ", pattern)
 		matched := pattern == r.URL.Path
 		matchedTrim := pattern == strings.TrimRight(r.URL.Path, "/")
 		if method == r.Method && (matched || matchedTrim) {
 			// debug
-			log.Printf("Matched for %v", pattern)
+			log.Debug("Matched for ", pattern)
 			handler(w, r, config)
 		} else {
 			http.NotFound(w, r)

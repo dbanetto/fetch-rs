@@ -1,12 +1,15 @@
 package fetcher
 
-import "fmt"
-import "encoding/json"
-import "io/ioutil"
-import "net/http"
-import "bytes"
-import "net/url"
-import "path"
+import (
+	"bytes"
+	"encoding/json"
+	"fmt"
+	log "github.com/sirupsen/logrus"
+	"io/ioutil"
+	"net/http"
+	"net/url"
+	"path"
+)
 
 // Init creates an API with the given configuration
 func Init(url string) *API {
@@ -31,12 +34,14 @@ func (api *API) get(endpoint string) ([]byte, error) {
 
 	r.Header.Add("Content-Type", "application/json")
 
+	log.Debug("sending Fetch API get request to ", endpoint)
 	resp, err := api.client.Do(r)
 	if err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
 
+	log.Debug("reading response to request for ", endpoint)
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
@@ -85,7 +90,6 @@ func (api *API) PostEpisodeCount(id int, count int) error {
 
 	values := map[string]int{"current_count": count}
 	data, err := json.Marshal(values)
-	fmt.Printf("%v\n", string(data))
 
 	apiUrl, err := url.Parse(api.url)
 	if err != nil {

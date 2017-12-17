@@ -1,8 +1,10 @@
 package main
 
-import "github.com/zyphrus/fetcherd-go"
-import "fmt"
-import "flag"
+import (
+	"flag"
+	log "github.com/sirupsen/logrus"
+	"github.com/zyphrus/fetcherd-go"
+)
 
 func main() {
 
@@ -13,14 +15,17 @@ func main() {
 	fetcher.RegisterFetchProvider("nyaa", fetcher.NyaaFetch)
 
 	if err != nil {
-		fmt.Errorf("Error while loading config: %v\n", err)
+		log.WithField("args", options).Fatal("Error while loading config:", err)
 		return
 	}
 
-	fmt.Println(options)
-	fmt.Println(config)
+	log.WithFields(log.Fields{
+		"config": config,
+		"args":   options,
+	}).Debug("Loaded settings")
 
 	if options.Fetch {
+		log.Info("Starting manual fetch")
 		fetcher.Fetch(config)
 	} else if config.WebUI.Enable {
 		// default action to start web server

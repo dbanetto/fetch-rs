@@ -1,7 +1,9 @@
 package fetcher
 
-import "fmt"
-import "sync"
+import (
+	log "github.com/sirupsen/logrus"
+	"sync"
+)
 
 func Fetch(config Config) {
 
@@ -9,13 +11,13 @@ func Fetch(config Config) {
 
 	series, err := client.GetSeries()
 	if err != nil {
-		fmt.Printf("Error while getting series list: %v", err)
+		log.Printf("Error while getting series list: %v", err)
 		return
 	}
 
 	supportedProviders, err := GetSupportedProviders(client)
 	if err != nil {
-		fmt.Printf("Error while getting supported providers: %v", err)
+		log.Printf("Error while getting supported providers: %v", err)
 		return
 	}
 
@@ -26,15 +28,15 @@ func Fetch(config Config) {
 		if val, ok := supportedProviders[show.ProviderID]; ok {
 			wg.Add(1)
 
-			fmt.Printf("%v: %v ✓\n", i+1, show.Title)
+			log.Printf("%v: %v ✓", i+1, show.Title)
 			go handleShow(show, val, config, &wg)
 		} else {
-			fmt.Printf("%v: %v ✖\n", i+1, show.Title)
+			log.Printf("%v: %v ✖", i+1, show.Title)
 		}
 	}
 
 	wg.Wait()
-	fmt.Println("Completed search")
+	log.Println("Completed search")
 }
 
 func handleShow(show Series, provider Provider, config Config, wg *sync.WaitGroup) {
@@ -45,12 +47,12 @@ func handleShow(show Series, provider Provider, config Config, wg *sync.WaitGrou
 	for i := 1; i < 4; i++ {
 		err := handle(show, provider, config)
 		if err != nil {
-			fmt.Printf("Error in %v: %v\n", show.Title, err)
-			fmt.Printf("Retry search for %v #%v\n", show.Title, i)
+			log.Printf("Error in %v: %v", show.Title, err)
+			log.Printf("Retry search for %v #%v", show.Title, i)
 		} else {
 			break
 		}
 	}
 
-	fmt.Printf("Completed search for %v\n", show.Title)
+	log.Printf("Completed search for %v", show.Title)
 }
