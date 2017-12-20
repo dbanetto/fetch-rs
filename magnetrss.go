@@ -27,24 +27,15 @@ func MagnetRss(show Series, provider Provider, config Config) error {
 
 	feedUrl := provider.BaseProviderOptions["feed_url"]
 
-	log.Debug("Feed url: ", feedUrl)
 	if feedUrl == "" {
 		log.WithField("series", show.Title).Error("Feed url is empty")
 		return nil
 	}
+	log.WithField("url", feedUrl).Info("Feed url for ", show.Title)
 
-	// Resolve the search title ti use
-	// by default use the title
-	search_title := strings.TrimSpace(show.Title)
-	if show.SearchTitle != "" {
-		// otherwise if 'search_title' is defined use that
-		search := strings.TrimSpace(show.SearchTitle)
-		if search != "" {
-			search_title = search
-		}
-	}
+	search_title := resolveSearchTitle(show)
 
-	log.Debug("search title", search_title)
+	log.Info("Searching for ", search_title)
 
 	// build the request
 	client := &http.Client{}
