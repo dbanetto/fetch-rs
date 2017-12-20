@@ -1,9 +1,7 @@
 package fetcher
 
 import (
-	"crypto/tls"
 	"encoding/xml"
-	"github.com/odwrtw/transmission"
 	log "github.com/sirupsen/logrus"
 	"io/ioutil"
 	"net/http"
@@ -22,16 +20,7 @@ func MagnetRss(show Series, provider Provider, config Config) error {
 		} `xml:"channel>item"`
 	}
 
-	tr := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-	}
-	httpClient := http.Client{Transport: tr}
-	conf := transmission.Config{
-		Address:    config.TransmissionRpc,
-		HTTPClient: &httpClient,
-	}
-
-	t, err := transmission.New(conf)
+	t, err := buildTransmission(config)
 	if err != nil {
 		return nil
 	}

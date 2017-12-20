@@ -1,10 +1,8 @@
 package fetcher
 
 import (
-	"crypto/tls"
 	"encoding/xml"
 	"fmt"
-	"github.com/odwrtw/transmission"
 	log "github.com/sirupsen/logrus"
 	"io/ioutil"
 	"net/http"
@@ -24,30 +22,12 @@ func NyaaFetch(show Series, provider Provider, config Config) error {
 		} `xml:"channel>item"`
 	}
 
-	tr := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-	}
-	httpClient := http.Client{Transport: tr}
-	conf := transmission.Config{
-		Address:    config.TransmissionRpc,
-		HTTPClient: &httpClient,
-	}
-
-	t, err := transmission.New(conf)
+	t, err := buildTransmission(config)
 	if err != nil {
-		return nil
+		return err
 	}
 
-	// Resolve the search title ti use
-	// by default use the title
-	search_title := strings.TrimSpace(show.Title)
-	if show.SearchTitle != "" {
-		// otherwise if 'search_title' is defined use that
-		search := strings.TrimSpace(show.SearchTitle)
-		if search != "" {
-			search_title = search
-		}
-	}
+	search_title := resolveSearchTitle(show)
 
 	// Supported  media type option
 	quality := url.PathEscape(show.MediaTypeOptions["quality"])
@@ -59,13 +39,13 @@ func NyaaFetch(show Series, provider Provider, config Config) error {
 		url.QueryEscape(search_title))
 
 	// logs the resulting URL
-	log.Infof("Searching with %v", search_url)
+	log.WithField("url", search_url).Info("Searching for ", search_title)
 
 	// Build the request
 	client := &http.Client{}
 	req, err := http.NewRequest("GET", search_url, nil)
 	if err != nil {
-		log.Errorf("Error during request building")
+		log.WithField("err", err).Errorf("Error during request building")
 		return err
 	}
 	req.Close = true
@@ -73,14 +53,14 @@ func NyaaFetch(show Series, provider Provider, config Config) error {
 	// Handle the response
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Errorf("Error during request")
+		log.WithField("err", err).Errorf("Error during request")
 		return err
 	}
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil { // FIXME: this can fail with EOF due to unknown reasons
-		log.Errorf("Error during read")
+		log.WithField("err", err).Errorf("Error during read")
 		return err
 	}
 
@@ -88,7 +68,7 @@ func NyaaFetch(show Series, provider Provider, config Config) error {
 	res := new(Nyaa)
 	err = xml.Unmarshal(body, &res)
 	if err != nil {
-		log.Errorf("Error during Unmarshal")
+		log.WithField("err", err).Errorf("Error during Unmarshal")
 		return err
 	}
 

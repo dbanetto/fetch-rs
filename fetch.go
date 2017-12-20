@@ -23,15 +23,15 @@ func Fetch(config Config) {
 
 	var wg sync.WaitGroup
 
-	for i, show := range series {
+	for _, show := range series {
 
 		if val, ok := supportedProviders[show.ProviderID]; ok {
 			wg.Add(1)
 
-			log.Printf("%v: %v ✓", i+1, show.Title)
+			log.WithField("id", val.ID).WithField("name", val.Name).Printf("Starting search for %v", show.Title)
 			go handleShow(show, val, config, &wg)
 		} else {
-			log.Printf("%v: %v ✖", i+1, show.Title)
+			log.WithField("id", show.ProviderID).Warnf("Unsupported series %v ", show.Title)
 		}
 	}
 
