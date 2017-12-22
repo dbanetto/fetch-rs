@@ -28,7 +28,7 @@ func Fetch(config Config) error {
 		if val, ok := supportedProviders[show.ProviderID]; ok {
 			wg.Add(1)
 
-			log.WithField("id", val.ID).WithField("name", val.Name).Printf("Starting search for %v", show.Title)
+			log.WithField("name", val.Name).WithField("base", val.BaseProvider).Printf("Starting search for %v", show.Title)
 			go handleShow(show, val, config, &wg)
 		} else {
 			log.WithField("id", show.ProviderID).Warnf("Unsupported series %v ", show.Title)
