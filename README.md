@@ -6,11 +6,19 @@ A Go implementation of the fetcherd ([python version](https://github.com/zyphrus
 
  - [X] fetch
  - [ ] sorting
+ - [x] Logging
  - [x] Web interface
+   - [x] force fetch `POST /force/fetch`
+   - [ ] force sort `POST /force/fetch`
+   - [ ] read log `GET /log`
  - [x] CLI based runs
  - [x] Configuration
 
 ## Running
+
+To get started run the following command in the `fetcherd-go` directory
+
+`go get ./`
 
 To start the web service
 
