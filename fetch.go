@@ -5,20 +5,20 @@ import (
 	"sync"
 )
 
-func Fetch(config Config) {
+func Fetch(config Config) error {
 
 	client := Init(config.Api)
 
 	series, err := client.GetSeries()
 	if err != nil {
-		log.Printf("Error while getting series list: %v", err)
-		return
+		log.Errorf("Error while getting series list: %v", err)
+		return err
 	}
 
 	supportedProviders, err := GetSupportedProviders(client)
 	if err != nil {
 		log.Printf("Error while getting supported providers: %v", err)
-		return
+		return err
 	}
 
 	var wg sync.WaitGroup
@@ -37,6 +37,7 @@ func Fetch(config Config) {
 
 	wg.Wait()
 	log.Println("Completed search")
+	return nil
 }
 
 func handleShow(show Series, provider Provider, config Config, wg *sync.WaitGroup) {

@@ -18,7 +18,7 @@ func StartWeb(config Config) {
 
 	addr := config.WebUI.Host
 
-	log.Info("Server starting to listen on %v", addr)
+	log.Info("Server starting to listen on ", addr)
 
 	err := http.ListenAndServe(addr, nil)
 	if err != nil {
@@ -53,8 +53,11 @@ func handleLog(w http.ResponseWriter, r *http.Request, config Config) {
 func handleForceFetch(w http.ResponseWriter, r *http.Request, config Config) {
 	var res = make(map[string]interface{})
 
-	Fetch(config)
-	res["success"] = true
+	err := Fetch(config)
+	res["success"] = err == nil
+	if err != nil {
+		res["error"] = fmt.Sprint(err)
+	}
 
 	sendJson(res, w)
 }
