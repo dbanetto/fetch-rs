@@ -32,6 +32,14 @@ or by sending a POST request to `/force/fetch`, e.g.
 
 `curl -X POST localhost:8181/force/fetch`
 
+## Docker
+
+Build the docker image with `docker build -t fetcherd .`
+
+And run it with `docker run -v $PWD/config.json:/etc/fetcherd.json -p 8181:8181 fetcherd`
+
+> Note: configuration needs to be mounted to `/etc/fetcherd.json`
+
 ## Config
 
 The configuration is in the form of a JSON file,
@@ -40,9 +48,10 @@ see [config.json](./config.json) for an example file.
 ```javascript
 {
   "api": "http://localhost:8080", // base location of fetch API
+  "transmission_rpc": "http://localhost:8081/transmission/rpc", // transmission RPC address
   "webui": {
     "enable": true, // if the web api should be run at all
-    "host": "localhost:8181" // where it should be hosted
+    "host": "0.0.0.0:8181" // where it should be hosted
   }
 }
 ```
