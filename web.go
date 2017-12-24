@@ -84,6 +84,11 @@ func sendJson(d interface{}, w http.ResponseWriter) {
 
 func handleFunc(pattern string, method string, config Config, handler func(http.ResponseWriter, *http.Request, Config)) {
 
+	// duplicates the handler with a trailing slash
+	if pattern == strings.TrimRight(pattern, "/") {
+		handleFunc(pattern+"/", method, config, handler)
+	}
+
 	http.HandleFunc(pattern, func(w http.ResponseWriter, r *http.Request) {
 		log.Debug("Trying Request for ", r.URL.Path, " (", r.Method, ") against ", pattern)
 		matched := pattern == r.URL.Path
