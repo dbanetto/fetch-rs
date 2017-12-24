@@ -5,6 +5,7 @@ import (
 	"fmt"
 	log "github.com/sirupsen/logrus"
 	"net/http"
+	"os/exec"
 	"strings"
 	"time"
 )
@@ -35,6 +36,7 @@ func handleStatus(w http.ResponseWriter, r *http.Request, config Config) {
 	var res = make(map[string]interface{})
 
 	res["running"] = true
+	// locks are deprecated and do not matter in this implementation
 	res["fetch_lock"] = false
 	res["sort_lock"] = false
 
@@ -46,7 +48,13 @@ func handleLog(w http.ResponseWriter, r *http.Request, config Config) {
 
 	res["success"] = true
 	res["log"] = make([]string, 0)
-	// read the log if we can
+	// HACK: this is a pretty dirty way to read the log
+	out, err := exec.Command("journalctl", "--no-pager", "-u", "fetcherd", "--output=cat").Output()
+	if err != nil {
+		log.WithField("err", err).Error("Failed to run journalctl command")
+	} else {
+		res["log"] = strings.Split(string(out), "\n")
+	}
 
 	sendJson(res, w)
 }
