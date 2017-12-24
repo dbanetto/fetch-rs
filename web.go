@@ -6,6 +6,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"net/http"
 	"strings"
+	"time"
 )
 
 func StartWeb(config Config) {
@@ -44,7 +45,7 @@ func handleLog(w http.ResponseWriter, r *http.Request, config Config) {
 	var res = make(map[string]interface{})
 
 	res["success"] = true
-	res["log"] = "Placeholder log"
+	res["log"] = make([]string, 0)
 	// read the log if we can
 
 	sendJson(res, w)
@@ -94,9 +95,12 @@ func handleFunc(pattern string, method string, config Config, handler func(http.
 		matched := pattern == r.URL.Path
 		matchedTrim := pattern == strings.TrimRight(r.URL.Path, "/")
 		if method == r.Method && (matched || matchedTrim) {
-			// debug
-			log.Debug("Matched for ", pattern)
+			start := time.Now()
+			log.WithField("path", r.URL.Path).WithField("method", r.Method).Info("Handling request")
 			handler(w, r, config)
+
+			end := time.Now()
+			log.WithField("time", end.Sub(start)).Info("Request complete")
 		} else {
 			http.NotFound(w, r)
 		}
