@@ -1,37 +1,29 @@
-#![feature(plugin)]
-// #![plugin(clippy)]
-#![plugin(rocket_codegen)]
-#![feature(custom_derive)]
-
-// lint does not give useful info with the routes() pattern
-#![allow(unmounted_route)]
-
-#[macro_use]
-extern crate diesel_codegen;
-#[macro_use]
-extern crate diesel;
-#[macro_use]
-extern crate lazy_static;
-#[macro_use]
-extern crate serde_derive;
-#[macro_use]
-extern crate error_chain;
-extern crate serde;
-extern crate serde_json;
+#[macro_use] extern crate diesel;
+#[macro_use] extern crate diesel_codegen;
+#[macro_use] extern crate error_chain;
+#[macro_use] extern crate lazy_static;
+#[macro_use] extern crate router;
+#[macro_use] extern crate serde_derive;
+extern crate chrono;
+extern crate dotenv;
+extern crate iron;
+extern crate mount;
 extern crate r2d2;
 extern crate r2d2_diesel;
-extern crate rocket;
-extern crate rocket_contrib;
-extern crate dotenv;
-extern crate chrono;
+extern crate serde;
+extern crate serde_json;
+extern crate staticfile;
 
-pub mod models;
-pub mod schema;
 pub mod db;
-pub mod util;
-pub mod routes;
 pub mod error;
+pub mod models;
+pub mod routes;
+pub mod schema;
+pub mod util;
+
+use iron::prelude::*;
 
 fn main() {
-    routes::mount(rocket::ignite()).launch();
+    let chain = Chain::new(routes::routes());
+    Iron::new(chain).http("127.0.0.1:3000").unwrap();
 }

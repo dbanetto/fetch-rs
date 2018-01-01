@@ -1,5 +1,6 @@
 use serde::Serialize;
-use rocket_contrib::Json;
+use serde_json;
+use serde_json::Value;
 use std::fmt::Display;
 
 #[derive(Serialize)]
@@ -49,8 +50,8 @@ where
         }
     }
 
-    pub fn json(self) -> Json<Self> {
-        Json(self)
+    pub fn json(self) -> Value {
+        serde_json::to_value(self).unwrap()
     }
 }
 
