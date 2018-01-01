@@ -1,6 +1,6 @@
 [package]
 authors = ["David Barnett <david@barnett.net.nz>"]
-name = "fetch-rocket"
+name = "fetch-rs"
 version = "0.1.0"
 
 [dependencies]

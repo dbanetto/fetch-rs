@@ -1,4 +1,4 @@
-# fetch-rocket
+# fetch-rs
 
 Fetch web interface similar to [fetch-django](https://github.com/zyphrus/fetch-django) using [rocket](https://rocket.rs/)+[diesel](https://diesel.rs)
 
