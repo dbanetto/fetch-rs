@@ -24,6 +24,25 @@ pub mod util;
 use iron::prelude::*;
 
 fn main() {
-    let chain = Chain::new(routes::routes());
-    Iron::new(chain).http("127.0.0.1:3000").unwrap();
+    let mut chain = Chain::new(routes::routes());
+    chain.link_after(ErrorLog);
+
+    let addr = "127.0.0.1:3000";
+    println!("Starting server on {}", addr);
+    Iron::new(chain)
+        .http(addr)
+        .unwrap();
+}
+
+struct ErrorLog;
+
+use iron::middleware::AfterMiddleware;
+
+impl AfterMiddleware for ErrorLog {
+
+    fn catch(&self, req: &mut Request, err: IronError) -> IronResult<Response> {
+        println!("{}: {:?}", req.url, err);
+        Err(err)
+    }
+
 }

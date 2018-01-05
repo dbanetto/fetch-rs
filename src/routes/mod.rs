@@ -22,6 +22,8 @@ use staticfile::Static;
 
 pub fn routes() -> Router {
     router!(
-       public: get "/public/" => Static::new(Path::new("public/")),
+       public: get "/public/*" => Static::new(Path::new("public/")),
+       index: get "/" => Static::new(Path::new("public/index.html")),
+       index_any: get "/*" => Static::new(Path::new("public/index.html")),
     )
 }
