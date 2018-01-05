@@ -41,7 +41,7 @@ use iron::middleware::AfterMiddleware;
 impl AfterMiddleware for ErrorLog {
 
     fn catch(&self, req: &mut Request, err: IronError) -> IronResult<Response> {
-        println!("{}: {:?}", req.url, err);
+        println!("ERROR {}: {}", req.url, err);
         Err(err)
     }
 

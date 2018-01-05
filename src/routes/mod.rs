@@ -1,6 +1,7 @@
 use std::path::{PathBuf, Path};
 use router::Router;
 use staticfile::Static;
+use mount::Mount;
 
 // pub mod api;
 
@@ -20,10 +21,17 @@ use staticfile::Static;
 // }
 
 
+
 pub fn routes() -> Router {
+    
+    // uses a mount to remove the /public/ part of the request
+    // so a file can be served from that directory
+    let mut public_dir = Mount::new();
+    public_dir.mount("/public/", Static::new("public/"));
+
     router!(
-       public: get "/public/*" => Static::new(Path::new("public/")),
-       index: get "/" => Static::new(Path::new("public/index.html")),
-       index_any: get "/*" => Static::new(Path::new("public/index.html")),
+       index: get "/" => Static::new("public/index.html"),
+       public: get "/public/*" => public_dir,
+       // TODO: default route always returns index.html
     )
 }
