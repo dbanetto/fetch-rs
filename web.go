@@ -49,7 +49,7 @@ func handleLog(w http.ResponseWriter, r *http.Request, config Config) {
 	res["success"] = true
 	res["log"] = make([]string, 0)
 	// HACK: this is a pretty dirty way to read the log
-	out, err := exec.Command("journalctl", "--no-pager", "-u", "fetcherd", "--output=cat").Output()
+	out, err := exec.Command("journalctl", "--no-pager", "-u", "fetcherd", "--output=cat", "-n", "100").Output()
 	if err != nil {
 		log.WithField("err", err).Error("Failed to run journalctl command")
 	} else {
