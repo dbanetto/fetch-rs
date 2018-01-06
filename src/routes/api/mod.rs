@@ -2,7 +2,6 @@
 // pub mod info_uri;
 
 use iron::prelude::*;
-use iron::response::WriteBody;
 use mount::Mount;
 use util::ApiResult;
 use serde_json;

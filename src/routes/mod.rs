@@ -1,4 +1,3 @@
-use router::Router;
 use staticfile::Static;
 use mount::Mount;
 use std::time::Duration;

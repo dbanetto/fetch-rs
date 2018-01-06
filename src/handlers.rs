@@ -1,17 +1,9 @@
-use std::path::{PathBuf, Path};
-use router::Router;
-use staticfile::Static;
-use mount::Mount;
+use std::path::PathBuf;
 
 use iron::prelude::*;
-use iron::response::WriteBody;
-use iron::status::Status;
-use hyper::header::{Headers, ContentType};
-use hyper::mime::{Mime, TopLevel, SubLevel, Attr, Value};
 use time::{self, Timespec};
 use std::time::Duration;
-use iron::modifier::Modifier;
-use iron::{Handler, Url, status};
+use iron::{Handler, status};
 use std::fs;
 
 pub struct CachedFile {
