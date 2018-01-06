@@ -8,15 +8,12 @@ use diesel::prelude::*;
 use schema::{info_uri, series};
 // use super::info_uri::{new_uri, update_uri};
 use diesel::{delete, insert, update};
-use serde_json;
 use iron::status::Status;
-use hyper::mime::{Attr, Mime, SubLevel, TopLevel, Value};
 use diesel::pg::PgConnection;
 
-fn all(db: &PgConnection) -> ApiResult<Vec<Series>, String> {
-    let conn = &db;
+fn all(conn: &PgConnection) -> ApiResult<Vec<Series>, String> {
 
-    let result = series::dsl::series.load::<Series>(*conn);
+    let result = series::dsl::series.load::<Series>(conn);
 
     ApiResult::new(result.map_err(|e| e.description().to_owned()))
 }
@@ -27,28 +24,7 @@ fn handle_all(req: &mut Request) -> IronResult<Response> {
         Err(err) => return Err(IronError::new(err, Status::RequestTimeout)),
     };
 
-    let result = all(&*conn);
-
-    let status = if result.success {
-        Status::Ok
-    } else {
-        Status::InternalServerError
-    };
-
-    let bytes = serde_json::to_vec(&result).unwrap();
-
-    let resp = Response::with((
-        bytes,
-        status,
-        Mime(
-            TopLevel::Application,
-            SubLevel::Json,
-            vec![(Attr::Charset, Value::Utf8)],
-        ),
-    ));
-
-
-    Ok(resp)
+    Ok(all(&*conn).into())
 }
 
 // #[get("/<series_id>")]

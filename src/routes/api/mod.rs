@@ -4,35 +4,13 @@ pub mod series;
 use iron::prelude::*;
 use mount::Mount;
 use util::ApiResult;
-use serde_json;
-use iron::status::Status;
-use hyper::mime::{Attr, Mime, SubLevel, TopLevel, Value};
-
 
 fn index() -> ApiResult<String, String> {
     ApiResult::ok("API available".to_owned())
 }
 
 fn handle_index(_: &mut Request) -> IronResult<Response> {
-    let result = index();
-
-    let status = if result.success {
-        Status::Ok
-    } else {
-        Status::InternalServerError
-    };
-
-    let bytes = serde_json::to_vec(&result).unwrap();
-
-    Ok(Response::with((
-        status,
-        bytes,
-        Mime(
-            TopLevel::Application,
-            SubLevel::Json,
-            vec![(Attr::Charset, Value::Utf8)],
-        ),
-    )))
+    Ok(index().into())
 }
 
 pub fn routes() -> Mount {

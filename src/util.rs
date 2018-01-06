@@ -2,6 +2,9 @@ use serde::Serialize;
 use serde_json;
 use serde_json::Value;
 use std::fmt::Display;
+use iron::prelude::*;
+use iron::status::Status;
+use hyper::mime::{Attr, Mime, SubLevel, TopLevel, Value as MimeValue};
 
 #[derive(Serialize)]
 pub struct ApiResult<T, E>
@@ -52,6 +55,32 @@ where
 
     pub fn json(self) -> Value {
         serde_json::to_value(self).unwrap()
+    }
+}
+
+impl<T, E> Into<Response> for ApiResult<T, E>
+where
+    T: Serialize,
+    E: Serialize,
+{
+    fn into(self) -> Response {
+        let status = if self.success {
+            Status::Ok
+        } else {
+            Status::InternalServerError
+        };
+
+        let bytes = serde_json::to_vec(&self).unwrap();
+
+        Response::with((
+            bytes,
+            status,
+            Mime(
+                TopLevel::Application,
+                SubLevel::Json,
+                vec![(Attr::Charset, MimeValue::Utf8)],
+            ),
+        ))
     }
 }
 
