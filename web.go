@@ -104,11 +104,10 @@ func handleFunc(pattern string, method string, config Config, handler func(http.
 		matchedTrim := pattern == strings.TrimRight(r.URL.Path, "/")
 		if method == r.Method && (matched || matchedTrim) {
 			start := time.Now()
-			log.WithField("path", r.URL.Path).WithField("method", r.Method).Info("Handling request")
 			handler(w, r, config)
 
 			end := time.Now()
-			log.WithField("time", end.Sub(start)).Info("Request complete")
+			log.WithField("path", r.URL.Path).WithField("method", r.Method).WithField("time", end.Sub(start)).Info("Request complete")
 		} else {
 			http.NotFound(w, r)
 		}
