@@ -14,9 +14,9 @@ where
 {
     pub success: bool,
     #[serde(skip_serializing_if = "Option::is_none")]
-    data: Option<T>,
+    pub data: Option<T>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    error: Option<E>,
+    pub error: Option<E>,
 }
 
 impl<T, E> ApiResult<T, E>

@@ -15,6 +15,8 @@ extern crate serde;
 extern crate serde_json;
 extern crate staticfile;
 extern crate time;
+#[cfg(test)]
+extern crate iron_test;
 
 pub mod db;
 pub mod error;

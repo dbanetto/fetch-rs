@@ -17,6 +17,7 @@ serde_json = "^1.0"
 hyper  = "^0.10.13"
 filetime = "0.1.14"
 time = "0.1.39"
+iron-test = "0.6.0"
 
 [dependencies.staticfile]
 features = ["cache"]
