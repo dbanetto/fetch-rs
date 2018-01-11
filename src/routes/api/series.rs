@@ -3,44 +3,98 @@ use router::Router;
 use std::error::Error;
 use db::DbConnection;
 use util::ApiResult;
+use iron::headers::ContentType;
 use models::*;
 use diesel::prelude::*;
+use serde_json;
+use std::str::FromStr;
 use schema::{info_uri, series};
 // use super::info_uri::{new_uri, update_uri};
 use diesel::{delete, insert, update};
+use hyper::mime::{Attr, Mime, SubLevel, TopLevel, Value as MimeValue};
 use iron::status::Status;
-use diesel::pg::PgConnection;
 
-fn all(conn: &PgConnection) -> ApiResult<Vec<Series>, String> {
+fn all(req: &mut Request) -> IronResult<Response> {
 
-    let result = series::dsl::series.load::<Series>(conn);
+    let conn = match req.extensions.get::<DbConnection>().unwrap().get() {
+        Ok(conn) => conn,
+        Err(err) => {
+            let bytes = serde_json::to_vec(
+                &ApiResult::<String, String>::err_format(err.description())).unwrap();
+            return Err(IronError::new(err,
+                                      (Status::BadRequest,
+                                       bytes,
+                                       Mime(
+                                           TopLevel::Application,
+                                           SubLevel::Json,
+                                           vec![(Attr::Charset, MimeValue::Utf8)],
+                                           ))
+                                     ))
 
-    ApiResult::new(result.map_err(|e| e.description().to_owned()))
+        },
+    };
+
+    let result = series::dsl::series.load::<Series>(&*conn);
+
+    let resp = ApiResult::new(result.map_err(|e| e.description().to_owned())).into();
+
+    Ok(resp)
 }
 
-fn handle_all(req: &mut Request) -> IronResult<Response> {
+
+fn select(req: &mut Request) -> IronResult<Response> {
+
+    let series_id: i32 = match req.extensions.get::<Router>().unwrap().find("id") {
+        Some(id) => {
+           match i32::from_str(id) {
+               Ok(value) => value,
+               Err(err) => {
+                   let bytes = serde_json::to_vec(
+                       &ApiResult::<String, String>::err_format(err.description())).unwrap();
+                   return Err(IronError::new(err,
+                                             (Status::BadRequest,
+                                              bytes,
+                                              Mime(
+                                                  TopLevel::Application,
+                                                  SubLevel::Json,
+                                                  vec![(Attr::Charset, MimeValue::Utf8)],
+                                                  ))
+                                            ))
+
+               },
+           }
+        },
+        None => unreachable!(), //return Err(IronError::new("Missing id paramter".into(), Status::BadRequest)),
+    };
+
     let conn = match req.extensions.get::<DbConnection>().unwrap().get() {
         Ok(conn) => conn,
         Err(err) => return Err(IronError::new(err, Status::RequestTimeout)),
     };
 
-    Ok(all(&*conn).into())
+    let series: Series = match series::dsl::series
+        .filter(series::id.eq(series_id))
+        .select(series::all_columns)
+        .first(&*conn) {
+        Ok(s) => s,
+        Err(err) => {
+
+            let bytes = serde_json::to_vec(
+                &ApiResult::<String, String>::err_format(err.description())).unwrap();
+            return Err(IronError::new(err,
+                                      (Status::BadRequest,
+                                       bytes,
+                                       Mime(
+                                           TopLevel::Application,
+                                           SubLevel::Json,
+                                           vec![(Attr::Charset, MimeValue::Utf8)],
+                                           ))
+                                     ))
+        }
+        };
+
+    Ok(ApiResult::<Series, String>::ok(series).into())
 }
-
-// #[get("/<series_id>")]
-// fn select(db: DB, series_id: i32) -> Json<ApiResult<Series, String>> {
-//     let conn = db.conn();
-
-//     let series: Series = match series::dsl::series
-//         .filter(series::id.eq(series_id))
-//         .select(series::all_columns)
-//         .first(conn) {
-//         Ok(s) => s,
-//         Err(e) => return ApiResult::err_format(e).json(),
-//     };
-
-//     ApiResult::ok(series).json()
-// }
 
 // #[post("/new", data = "<series_form>")]
 // fn new(db: DB, series_form: Json<SeriesForm>) -> Json<ApiResult<serde_json::Value, String>> {
@@ -141,6 +195,7 @@ fn handle_all(req: &mut Request) -> IronResult<Response> {
 
 pub fn routes() -> Router {
     router!(
-        index: get "/" => handle_all,
+        index: get "/" => all,
+        select: get "/:id" => select,
         )
 }
