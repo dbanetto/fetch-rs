@@ -26,8 +26,6 @@ mod test {
     use super::index;
     use iron_test::{request, response};
     use iron::headers::Headers;
-    use iron::prelude::*;
-    use util::ApiResult;
     use serde_json::{self, Value};
 
     #[test]

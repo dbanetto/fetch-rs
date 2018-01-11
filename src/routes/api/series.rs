@@ -3,7 +3,6 @@ use router::Router;
 use std::error::Error;
 use db::DbConnection;
 use util::ApiResult;
-use iron::headers::ContentType;
 use models::*;
 use diesel::prelude::*;
 use serde_json;
@@ -19,6 +18,7 @@ fn all(req: &mut Request) -> IronResult<Response> {
     let conn = match req.extensions.get::<DbConnection>().unwrap().get() {
         Ok(conn) => conn,
         Err(err) => {
+            // TODO: make this into a macro
             let bytes = serde_json::to_vec(
                 &ApiResult::<String, String>::err_format(err.description())).unwrap();
             return Err(IronError::new(err,
