@@ -7,6 +7,7 @@
 #[macro_use] extern crate serde_derive;
 extern crate chrono;
 extern crate dotenv;
+extern crate durationfmt;
 extern crate filetime;
 extern crate hyper;
 extern crate iron;
@@ -35,6 +36,7 @@ use iron::prelude::*;
 fn main() {
     let mut chain = Chain::new(routes::routes());
 
+    chain.link_before(middleware::Timer);
     chain.link_before(db::get_pool());
     chain.link_after(middleware::ErrorLog);
 
