@@ -32,7 +32,7 @@ use iron::prelude::*;
 fn main() {
     let mut chain = Chain::new(routes::routes());
 
-    chain.link_before(db::DbConnection::get_pool());
+    chain.link_before(db::get_pool());
     chain.link_after(middleware::ErrorLog);
 
     let addr = "127.0.0.1:3000";

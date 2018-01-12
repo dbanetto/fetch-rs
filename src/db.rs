@@ -12,15 +12,13 @@ pub struct DbConnection {
 
 impl typemap::Key for DbConnection { type Value = Pool<ConnectionManager<PgConnection>>; }
 
-impl DbConnection {
-    pub fn get_pool() -> DbConnection {
-        dotenv().ok();
+pub fn get_pool() -> DbConnection {
+    dotenv().ok();
 
-        let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set.");
-        let config = Config::default();
-        let manager = ConnectionManager::<PgConnection>::new(database_url);
-        let pool = Pool::new(config, manager).expect("Failed to create pool.");
+    let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set.");
+    let config = Config::default();
+    let manager = ConnectionManager::<PgConnection>::new(database_url);
+    let pool = Pool::new(config, manager).expect("Failed to create pool.");
 
-        DbConnection { pool: pool }
-    }
+    DbConnection { pool: pool }
 }
