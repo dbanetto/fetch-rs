@@ -4,7 +4,7 @@ use diesel::prelude::*;
 use models::{InfoUri, InfoUriForm, Series};
 use schema::{info_uri, series};
 use diesel::{insert, update, delete};
-use std::error::Error;
+use diesel::pg::PgConnection;
 
 // #[get("/<series_id>/uri")]
 // fn all(db: DB, series_id: i32) -> Json<ApiResult<Vec<InfoUri>, String>> {
@@ -88,14 +88,7 @@ use std::error::Error;
 //     ApiResult::ok(uris).json()
 // }
 
-pub fn new_uri(db: DbConnection, series_id: i32, uri_form: InfoUriForm) -> ApiResult<InfoUri, String> {
-
-    let conn = match db.pool.get() {
-        Ok(conn) => conn,
-        Err(err) => {
-            return ApiResult::err(err.description().to_owned())
-        },
-    };
+pub fn new_uri(conn: &PgConnection, series_id: i32, uri_form: InfoUriForm) -> ApiResult<InfoUri, String> {
 
     let series: Series = match series::dsl::series
         .filter(series::id.eq(series_id))
@@ -116,14 +109,7 @@ pub fn new_uri(db: DbConnection, series_id: i32, uri_form: InfoUriForm) -> ApiRe
     }
 }
 
-pub fn update_uri(db: DbConnection, series_id: i32, uri_update: InfoUriForm) -> ApiResult<InfoUri, String> {
-
-    let conn = match db.pool.get() {
-        Ok(conn) => conn,
-        Err(err) => {
-            return ApiResult::err(err.description().to_owned())
-        },
-    };
+pub fn update_uri(conn: &PgConnection, series_id: i32, uri_update: InfoUriForm) -> ApiResult<InfoUri, String> {
 
     let uri_id = match uri_update.id {
         Some(id) => id,
