@@ -1,5 +1,5 @@
 pub mod series;
-// pub mod info_uri;
+pub mod info_uri;
 
 use iron::prelude::*;
 use mount::Mount;

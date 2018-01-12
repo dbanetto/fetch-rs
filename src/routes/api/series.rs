@@ -7,7 +7,7 @@ use models::*;
 use diesel::prelude::*;
 use std::str::FromStr;
 use schema::{info_uri, series};
-// use super::info_uri::{new_uri, update_uri};
+use super::info_uri::{new_uri, update_uri};
 use diesel::{delete, insert, update};
 use iron::status::Status;
 
