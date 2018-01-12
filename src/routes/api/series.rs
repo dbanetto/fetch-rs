@@ -2,15 +2,13 @@ use iron::prelude::*;
 use router::Router;
 use std::error::Error;
 use db::DbConnection;
-use util::ApiResult;
+use util::{self, ApiResult};
 use models::*;
 use diesel::prelude::*;
-use serde_json;
 use std::str::FromStr;
 use schema::{info_uri, series};
 // use super::info_uri::{new_uri, update_uri};
 use diesel::{delete, insert, update};
-use hyper::mime::{Attr, Mime, SubLevel, TopLevel, Value as MimeValue};
 use iron::status::Status;
 
 fn all(req: &mut Request) -> IronResult<Response> {
@@ -18,19 +16,7 @@ fn all(req: &mut Request) -> IronResult<Response> {
     let conn = match req.extensions.get::<DbConnection>().unwrap().get() {
         Ok(conn) => conn,
         Err(err) => {
-            // TODO: make this into a macro
-            let bytes = serde_json::to_vec(
-                &ApiResult::<String, String>::err_format(err.description())).unwrap();
-            return Err(IronError::new(err,
-                                      (Status::BadRequest,
-                                       bytes,
-                                       Mime(
-                                           TopLevel::Application,
-                                           SubLevel::Json,
-                                           vec![(Attr::Charset, MimeValue::Utf8)],
-                                           ))
-                                     ))
-
+            return Err(util::api_error(err, Status::BadRequest))
         },
     };
 
@@ -49,18 +35,7 @@ fn select(req: &mut Request) -> IronResult<Response> {
            match i32::from_str(id) {
                Ok(value) => value,
                Err(err) => {
-                   let bytes = serde_json::to_vec(
-                       &ApiResult::<String, String>::err_format(err.description())).unwrap();
-                   return Err(IronError::new(err,
-                                             (Status::BadRequest,
-                                              bytes,
-                                              Mime(
-                                                  TopLevel::Application,
-                                                  SubLevel::Json,
-                                                  vec![(Attr::Charset, MimeValue::Utf8)],
-                                                  ))
-                                            ))
-
+                   return Err(util::api_error(err, Status::BadRequest))
                },
            }
         },
@@ -76,21 +51,10 @@ fn select(req: &mut Request) -> IronResult<Response> {
         .filter(series::id.eq(series_id))
         .select(series::all_columns)
         .first(&*conn) {
-        Ok(s) => s,
-        Err(err) => {
-
-            let bytes = serde_json::to_vec(
-                &ApiResult::<String, String>::err_format(err.description())).unwrap();
-            return Err(IronError::new(err,
-                                      (Status::BadRequest,
-                                       bytes,
-                                       Mime(
-                                           TopLevel::Application,
-                                           SubLevel::Json,
-                                           vec![(Attr::Charset, MimeValue::Utf8)],
-                                           ))
-                                     ))
-        }
+            Ok(s) => s,
+            Err(err) => {
+                return Err(util::api_error(err, Status::BadRequest))
+            }
         };
 
     Ok(ApiResult::<Series, String>::ok(series).into())

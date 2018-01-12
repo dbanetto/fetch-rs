@@ -5,6 +5,7 @@ use std::fmt::Display;
 use iron::prelude::*;
 use iron::status::Status;
 use hyper::mime::{Attr, Mime, SubLevel, TopLevel, Value as MimeValue};
+use std::error::Error;
 
 #[derive(Serialize)]
 pub struct ApiResult<T, E>
@@ -24,6 +25,7 @@ where
     T: Serialize,
     E: Serialize,
 {
+
     pub fn new(data: Result<T, E>) -> Self {
         let (data, err) = match data {
             Ok(x) => (Some(x), None),
@@ -56,6 +58,22 @@ where
     pub fn json(self) -> Value {
         serde_json::to_value(self).unwrap()
     }
+
+}
+
+
+pub fn api_error<E: 'static + Error + Send>(error: E, status: Status) -> IronError {
+    let description = format!("{}", error);
+    let bytes = serde_json::to_vec(&ApiResult::<String, String>::err_format(description)).unwrap();
+    IronError::new(error,
+                   (status,
+                    bytes,
+                    Mime(
+                        TopLevel::Application,
+                        SubLevel::Json,
+                        vec![(Attr::Charset, MimeValue::Utf8)],
+                        ))
+                  )
 }
 
 impl<T, E> Into<Response> for ApiResult<T, E>
