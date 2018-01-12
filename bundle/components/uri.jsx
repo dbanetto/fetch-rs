@@ -13,11 +13,18 @@ function addHandler(protocol, builder) {
 }
 
 function build(uri, options) {
-  let url = new URL(uri);
   options = options || {};
 
-  // allows override via options which protocol to use
-  let protocol = options.protocol || url.protocol;
+
+  var protocol = options.protocol;
+  try {
+    let url = new URL(uri);
+
+    // allows override via options which protocol to use
+    protocol = protocol || url.protocol;
+  } catch(err) {
+    // do nothing
+  }
 
   // use registered handler or default link handler
   var element = uriHandlers[protocol] || UriDefault;

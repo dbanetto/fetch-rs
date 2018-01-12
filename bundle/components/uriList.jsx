@@ -6,7 +6,7 @@ export default class UriList extends Component {
   handleAdd() {
 
     let elements = this.props.value;
-    elements.push({ uri: "https://new", primary: false });
+    elements.push({ uri: "", primary: false });
 
     this.props.handleUpdate(elements);
   }
