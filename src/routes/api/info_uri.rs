@@ -1,10 +1,11 @@
 use db::DbConnection;
-use util::ApiResult;
-use diesel::prelude::*;
 use models::{InfoUri, InfoUriForm, Series};
 use schema::{info_uri, series};
-use diesel::{insert, update, delete};
+use util::ApiResult;
+
 use diesel::pg::PgConnection;
+use diesel::prelude::*;
+use diesel::{insert, update, delete};
 
 // #[get("/<series_id>/uri")]
 // fn all(db: DB, series_id: i32) -> Json<ApiResult<Vec<InfoUri>, String>> {

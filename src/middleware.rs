@@ -8,7 +8,7 @@ pub struct ErrorLog;
 
 impl AfterMiddleware for ErrorLog {
     fn catch(&self, req: &mut Request, err: IronError) -> IronResult<Response> {
-        println!("ERROR {}: {}", req.url, err);
+        println!("ERROR {} {}: {}", req.method, req.url, err);
         Err(err)
     }
 }

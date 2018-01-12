@@ -1,17 +1,19 @@
 use db::DbConnection;
+use models::*;
+use schema::{info_uri, series};
+use super::info_uri::{new_uri, update_uri};
+use util::{api_error, ApiResult};
+
 use diesel::prelude::*;
 use diesel::{delete, insert, update};
 use iron::prelude::*;
 use iron::status::Status;
-use models::*;
 use router::Router;
-use schema::{info_uri, series};
 use serde_json::{self, Value};
-use std::io::Read;
+
 use std::error::Error;
+use std::io::Read;
 use std::str::FromStr;
-use super::info_uri::{new_uri, update_uri};
-use util::{api_error, ApiResult};
 
 fn all(req: &mut Request) -> IronResult<Response> {
     let conn = match req.extensions.get::<DbConnection>().unwrap().get() {
@@ -200,7 +202,7 @@ pub fn routes() -> Router {
         series_index: get "/" => all,
         series_select: get "/:id" => select,
         series_update: put "/:id" => update_series,
-        series_new: post "/" => new,
+        series_new: post "/new" => new,
         series_delete: delete "/:id" => delete_series,
         )
 }
