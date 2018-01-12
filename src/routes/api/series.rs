@@ -1,22 +1,24 @@
-use iron::prelude::*;
-use router::Router;
-use std::error::Error;
 use db::DbConnection;
-use util::{self, ApiResult};
-use models::*;
 use diesel::prelude::*;
-use std::str::FromStr;
-use schema::{info_uri, series};
-use super::info_uri::{new_uri, update_uri};
 use diesel::{delete, insert, update};
+use iron::prelude::*;
 use iron::status::Status;
+use models::*;
+use router::Router;
+use schema::{info_uri, series};
+use serde_json::{self, Value};
+use std::io::Read;
+use std::error::Error;
+use std::str::FromStr;
+use super::info_uri::{new_uri, update_uri};
+use util::{api_error, ApiResult};
 
 fn all(req: &mut Request) -> IronResult<Response> {
 
     let conn = match req.extensions.get::<DbConnection>().unwrap().get() {
         Ok(conn) => conn,
         Err(err) => {
-            return Err(util::api_error(err, Status::BadRequest))
+            return Err(api_error(err, Status::BadRequest))
         },
     };
 
@@ -32,19 +34,19 @@ fn select(req: &mut Request) -> IronResult<Response> {
 
     let series_id: i32 = match req.extensions.get::<Router>().unwrap().find("id") {
         Some(id) => {
-           match i32::from_str(id) {
-               Ok(value) => value,
-               Err(err) => {
-                   return Err(util::api_error(err, Status::BadRequest))
-               },
-           }
+            match i32::from_str(id) {
+                Ok(value) => value,
+                Err(err) => {
+                    return Err(api_error(err, Status::BadRequest))
+                },
+            }
         },
         None => unreachable!(), //return Err(IronError::new("Missing id paramter".into(), Status::BadRequest)),
     };
 
     let conn = match req.extensions.get::<DbConnection>().unwrap().get() {
         Ok(conn) => conn,
-        Err(err) => return Err(IronError::new(err, Status::RequestTimeout)),
+        Err(err) => return Err(api_error(err, Status::RequestTimeout)),
     };
 
     let series: Series = match series::dsl::series
@@ -53,56 +55,69 @@ fn select(req: &mut Request) -> IronResult<Response> {
         .first(&*conn) {
             Ok(s) => s,
             Err(err) => {
-                return Err(util::api_error(err, Status::BadRequest))
+                return Err(api_error(err, Status::BadRequest))
             }
         };
 
     Ok(ApiResult::<Series, String>::ok(series).into())
 }
 
-// #[post("/new", data = "<series_form>")]
-// fn new(db: DB, series_form: Json<SeriesForm>) -> Json<ApiResult<serde_json::Value, String>> {
-//     let series_form = series_form.into_inner();
-//     let (new_series, info_uris) = series_form.into_new();
+fn new(req: &mut Request) -> IronResult<Response> {
 
-//     if let Err(e) = new_series.validate() {
-//         return ApiResult::err_format(e).json();
-//     }
+    let mut buf = vec![];
+    match req.body.read_to_end(&mut buf) {
+        Ok(_) => (),
+        Err(err) => return Err(api_error(err, Status::BadRequest)),
+    };
 
-//     let conn = db.conn();
+    let series_form: SeriesForm = match serde_json::from_slice(&buf)  {
+        Ok(form) => form,
+        Err(err) => return Err(api_error(err, Status::BadRequest)),
+    };
 
-//     let new_series: Series = match insert(&new_series)
-//         .into(series::table)
-//         .returning(series::all_columns)
-//         .get_result(conn) {
-//         Ok(s) => s,
-//         Err(e) => return ApiResult::err_format(e).json(),
-//     };
+    let (new_series, info_uris) = series_form.into_new();
 
-//     let new_info_uris: Vec<InfoUri> = match info_uris {
-//         Some(uris) => {
-//             let info_uris = uris.into_iter()
-//                 .map(|i| i.into_insertable(&new_series))
-//                 .collect::<Vec<NewInfoUri>>();
-//             match insert(&info_uris)
-//                 .into(info_uri::table)
-//                 .returning(info_uri::all_columns)
-//                 .get_results(conn) {
-//                 Ok(uris) => uris,
-//                 Err(e) => return ApiResult::err_format(e).json(),
-//             }
-//         }
-//         None => Vec::new(),
-//     };
+    if let Err(e) = new_series.validate() {
+        return Err(api_error(e, Status::BadRequest));
+    }
 
-//     let mut result = serde_json::to_value(new_series).unwrap();
-//     result.as_object_mut().unwrap().insert(
-//         "info_uri".to_owned(),
-//         serde_json::to_value(new_info_uris).unwrap(),
-//     );
+    let conn = match req.extensions.get::<DbConnection>().unwrap().get() {
+        Ok(conn) => conn,
+        Err(err) => return Err(api_error(err, Status::RequestTimeout)),
+    };
 
-//     ApiResult::ok(result).json()
-// }
+    let new_series: Series = match insert(&new_series)
+        .into(series::table)
+        .returning(series::all_columns)
+        .get_result(&*conn) {
+            Ok(series) => series,
+            Err(err) => return Err(api_error(err, Status::BadRequest)),
+        };
+
+    let new_info_uris: Vec<InfoUri> = match info_uris {
+        Some(uris) => {
+            let info_uris = uris.into_iter()
+                .map(|i| i.into_insertable(&new_series))
+                .collect::<Vec<NewInfoUri>>();
+            match insert(&info_uris)
+                .into(info_uri::table)
+                .returning(info_uri::all_columns)
+                .get_results(&*conn) {
+                    Ok(uris) => uris,
+                    Err(err) => return Err(api_error(err, Status::BadRequest)),
+                }
+        }
+        None => Vec::new(),
+    };
+
+    let mut result = serde_json::to_value(new_series).unwrap();
+    result.as_object_mut().unwrap().insert(
+        "info_uri".to_owned(),
+        serde_json::to_value(new_info_uris).unwrap(),
+        );
+
+    Ok(ApiResult::<Value, String>::ok(result).into())
+}
 
 // #[put("/<series_id>", data = "<series_form>")]
 // fn update_series(
@@ -161,5 +176,6 @@ pub fn routes() -> Router {
     router!(
         index: get "/" => all,
         select: get "/:id" => select,
+        new: post "/" => new,
         )
 }

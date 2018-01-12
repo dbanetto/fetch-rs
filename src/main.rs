@@ -1,3 +1,5 @@
+#![recursion_limit="128"]
+
 #[macro_use] extern crate diesel;
 #[macro_use] extern crate diesel_codegen;
 #[macro_use] extern crate error_chain;
@@ -15,6 +17,7 @@ extern crate serde;
 extern crate serde_json;
 extern crate staticfile;
 extern crate time;
+
 #[cfg(test)]
 extern crate iron_test;
 
