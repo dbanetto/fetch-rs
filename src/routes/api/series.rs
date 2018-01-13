@@ -2,7 +2,7 @@ use db::DbConnection;
 use models::*;
 use schema::{info_uri, series};
 use super::info_uri::{new_uri, update_uri};
-use util::{api_error, ApiResult};
+use util::{api_error, api_success, ApiResult};
 
 use diesel::prelude::*;
 use diesel::{delete, insert, update};
@@ -52,7 +52,7 @@ fn select(req: &mut Request) -> IronResult<Response> {
         Err(err) => return Err(api_error(err, Status::BadRequest)),
     };
 
-    Ok(ApiResult::<Series, String>::ok(series).into())
+    Ok(api_success(series))
 }
 
 fn new(req: &mut Request) -> IronResult<Response> {
@@ -110,7 +110,7 @@ fn new(req: &mut Request) -> IronResult<Response> {
         serde_json::to_value(new_info_uris).unwrap(),
     );
 
-    Ok(ApiResult::<Value, String>::ok(result).into())
+    Ok(api_success(result))
 }
 
 fn update_series(req: &mut Request) -> IronResult<Response> {
@@ -168,7 +168,7 @@ fn update_series(req: &mut Request) -> IronResult<Response> {
         }
     }
 
-    Ok(ApiResult::<Series, String>::ok(series).into())
+    Ok(api_success(series))
 }
 
 fn delete_series(req: &mut Request) -> IronResult<Response> {
@@ -191,7 +191,7 @@ fn delete_series(req: &mut Request) -> IronResult<Response> {
         .returning(series::all_columns)
         .get_result(&*conn)
     {
-        Ok(result) => Ok(ApiResult::<Series, String>::ok(result).into()),
+        Ok(result) => Ok(api_success::<Series>(result)),
         Err(err) => Err(api_error(err, Status::BadRequest)),
     }
 }

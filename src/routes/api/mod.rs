@@ -3,10 +3,10 @@ pub mod info_uri;
 
 use iron::prelude::*;
 use mount::Mount;
-use util::ApiResult;
+use util::api_success;
 
 fn index(_: &mut Request) -> IronResult<Response> {
-    Ok(ApiResult::<String, String>::ok("API available".to_owned()).into())
+    Ok(api_success("API available"))
 }
 
 pub fn routes() -> Mount {
