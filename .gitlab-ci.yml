@@ -1,4 +1,4 @@
-image: "fnichol/rust:nightly"
+image: "rust:1.23"
 
 services:
   - postgres:latest
