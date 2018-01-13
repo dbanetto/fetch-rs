@@ -5,6 +5,8 @@ use util::{api_success, api_error, ApiResult};
 use std::str::FromStr;
 use iron::status::Status;
 use iron::prelude::*;
+use std::io::Read;
+use serde_json;
 use router::Router;
 
 use diesel::pg::PgConnection;
@@ -70,18 +72,42 @@ fn select(req: &mut Request) -> IronResult<Response> {
     Ok(api_success(uri))
 }
 
-// #[put("/<series_id>/uri/<uri_id>", data = "<uri_update>")]
-// fn update_api(
-//     db: DB,
-//     series_id: i32,
-//     uri_id: i32,
-//     uri_update: Json<InfoUriForm>,
-// ) -> Json<ApiResult<InfoUri, String>> {
+fn update_api(req: &mut Request) -> IronResult<Response> {
 
-//     let uri_update = uri_update.into_inner();
+    let series_id: i32 = match req.extensions.get::<Router>().unwrap().find("series_id") {
+        Some(id) => match i32::from_str(id) {
+            Ok(value) => value,
+            Err(err) => return Err(api_error(err, Status::BadRequest)),
+        },
+        None => unreachable!(),
+    };
 
-//     update_uri(&db, series_id, uri_update).json()
-// }
+    let uri_id: i32 = match req.extensions.get::<Router>().unwrap().find("uri_id") {
+        Some(id) => match i32::from_str(id) {
+            Ok(value) => value,
+            Err(err) => return Err(api_error(err, Status::BadRequest)),
+        },
+        None => unreachable!(),
+    };
+
+    let mut buf = vec![];
+    match req.body.read_to_end(&mut buf) {
+        Ok(_) => (),
+        Err(err) => return Err(api_error(err, Status::BadRequest)),
+    };
+
+    let uri_update: InfoUriForm = match serde_json::from_slice(&buf) {
+        Ok(form) => form,
+        Err(err) => return Err(api_error(err, Status::BadRequest)),
+    };
+
+    let conn = match req.extensions.get::<DbConnection>().unwrap().get() {
+        Ok(conn) => conn,
+        Err(err) => return Err(api_error(err, Status::RequestTimeout)),
+    };
+
+    Ok(update_uri(&*conn, series_id, uri_update).into())
+}
 
 // #[delete("/<series_id>/uri/<uri_id>")]
 // fn delete_api(db: DB, series_id: i32, uri_id: i32) -> Json<ApiResult<InfoUri, String>> {
@@ -190,5 +216,6 @@ pub fn routes() -> Router {
         all: get "/:series_id" => all,
         primary: get "/:series_id/primary" => primary,
         select: get "/:series_id/:uri_id" => select,
+        select: put "/:series_id/:uri_id" => update_api,
         )
 }
