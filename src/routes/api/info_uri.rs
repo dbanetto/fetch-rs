@@ -36,21 +36,39 @@ fn all(req: &mut Request) -> IronResult<Response> {
     Ok(api_success(uris))
 }
 
-// #[get("/<series_id>/uri/<uri_id>")]
-// fn get(db: DB, series_id: i32, uri_id: i32) -> Json<ApiResult<InfoUri, String>> {
+fn select(req: &mut Request) -> IronResult<Response> {
 
-//     let conn = db.conn();
+    let series_id: i32 = match req.extensions.get::<Router>().unwrap().find("series_id") {
+        Some(id) => match i32::from_str(id) {
+            Ok(value) => value,
+            Err(err) => return Err(api_error(err, Status::BadRequest)),
+        },
+        None => unreachable!(),
+    };
 
-//     let uri: InfoUri = match info_uri::dsl::info_uri
-//         .filter(info_uri::series_id.eq(series_id))
-//         .filter(info_uri::id.eq(uri_id))
-//         .first(conn) {
-//         Ok(uri) => uri,
-//         Err(e) => return ApiResult::err_format(e).json(),
-//     };
+    let uri_id: i32 = match req.extensions.get::<Router>().unwrap().find("uri_id") {
+        Some(id) => match i32::from_str(id) {
+            Ok(value) => value,
+            Err(err) => return Err(api_error(err, Status::BadRequest)),
+        },
+        None => unreachable!(),
+    };
 
-//     ApiResult::ok(uri).json()
-// }
+    let conn = match req.extensions.get::<DbConnection>().unwrap().get() {
+        Ok(conn) => conn,
+        Err(err) => return Err(api_error(err, Status::RequestTimeout)),
+    };
+
+    let uri: InfoUri = match info_uri::dsl::info_uri
+        .filter(info_uri::series_id.eq(series_id))
+        .filter(info_uri::id.eq(uri_id))
+        .first(&*conn) {
+        Ok(uri) => uri,
+        Err(err) => return Err(api_error(err, Status::BadRequest)),
+    };
+
+    Ok(api_success(uri))
+}
 
 // #[put("/<series_id>/uri/<uri_id>", data = "<uri_update>")]
 // fn update_api(
@@ -171,5 +189,6 @@ pub fn routes() -> Router {
     router!(
         all: get "/:series_id" => all,
         primary: get "/:series_id/primary" => primary,
+        select: get "/:series_id/:uri_id" => select,
         )
 }
