@@ -35,7 +35,7 @@ style:rustfmt:
   - rustc --version && cargo --version
   - cargo fmt -- --write-mode diff
 
-pages:
+deploy:pages:
   stage: deploy
   script:
     - cargo doc
