@@ -9,19 +9,20 @@ variables:
   POSTGRES_PASSWORD: ""
 
 before_script:
-- apt-get update -yqq
-- apt-get install -yqq --no-install-recommends build-essential libclang-dev libpq-dev
+  - apt-get update -yqq
+  - apt-get install -yqq --no-install-recommends build-essential libclang-dev libpq-dev
 
 stages:
   - test
   - style
+  - deploy
 
 test:cargo:
   stage: test
   script:
   - rustc --version && cargo --version
   - cargo install diesel_cli --no-default-features --features postgres 
-  - echo "DATABASE_URL=postgres://fetch@postgres/fetch_test" > .env
+  - echo "DATABASE_URL=postgres://$POSTGRES_USER:$POSTGRES_PASSWORD$@postgres/$POSTGRES_DB" > .env
   - cat .env
   - diesel migration run
   - cargo build --verbose --release
@@ -32,5 +33,17 @@ style:rustfmt:
   allow_failure: true
   script:
   - rustc --version && cargo --version
-  - cargo install rustfmt
   - cargo fmt -- --write-mode diff
+
+pages:
+  stage: deploy
+  script:
+    - cargo doc
+    - mv target/doc public
+    - echo "<meta http-equiv=refresh content=1;url=fetch-rs/index.html>" > public/index.html
+  artifacts:
+    paths:
+    - public
+  only:
+    - master
+
