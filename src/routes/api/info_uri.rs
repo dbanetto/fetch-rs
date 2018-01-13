@@ -112,21 +112,40 @@ fn update_api(req: &mut Request) -> IronResult<Response> {
 }
 
 // #[delete("/<series_id>/uri/<uri_id>")]
-// fn delete_api(db: DB, series_id: i32, uri_id: i32) -> Json<ApiResult<InfoUri, String>> {
+fn delete_api(req: &mut Request) -> IronResult<Response> {
 
-//     let conn = db.conn();
+    let series_id: i32 = match req.extensions.get::<Router>().unwrap().find("series_id") {
+        Some(id) => match i32::from_str(id) {
+            Ok(value) => value,
+            Err(err) => return Err(api_error(err, Status::BadRequest)),
+        },
+        None => unreachable!(),
+    };
 
-//     let uri = match delete(
-//         info_uri::dsl::info_uri
-//             .filter(info_uri::id.eq(uri_id))
-//             .filter(info_uri::series_id.eq(series_id)),
-//     ).get_result(conn) {
-//         Ok(uri) => uri,
-//         Err(e) => return ApiResult::err_format(e).json(),
-//     };
+    let uri_id: i32 = match req.extensions.get::<Router>().unwrap().find("uri_id") {
+        Some(id) => match i32::from_str(id) {
+            Ok(value) => value,
+            Err(err) => return Err(api_error(err, Status::BadRequest)),
+        },
+        None => unreachable!(),
+    };
 
-//     ApiResult::ok(uri).json()
-// }
+    let conn = match req.extensions.get::<DbConnection>().unwrap().get() {
+        Ok(conn) => conn,
+        Err(err) => return Err(api_error(err, Status::RequestTimeout)),
+    };
+
+    let uri: InfoUri = match delete(
+        info_uri::dsl::info_uri
+            .filter(info_uri::id.eq(uri_id))
+            .filter(info_uri::series_id.eq(series_id)),
+    ).get_result(&*conn) {
+        Ok(uri) => uri,
+        Err(err) => return Err(api_error(err, Status::BadRequest)),
+    };
+
+    Ok(api_success(uri))
+}
 
 // #[post("/<series_id>/uri/new", data = "<uri_form>")]
 // fn new(db: DB, series_id: i32, uri_form: Json<InfoUriForm>) -> Json<ApiResult<InfoUri, String>> {
@@ -218,6 +237,7 @@ pub fn routes() -> Router {
         all: get "/:series_id" => all,
         primary: get "/:series_id/primary" => primary,
         select: get "/:series_id/:uri_id" => select,
-        select: put "/:series_id/:uri_id" => update_api,
+        update: put "/:series_id/:uri_id" => update_api,
+        delete: delete "/:series_id/:uri_id" => delete_api,
         )
 }
