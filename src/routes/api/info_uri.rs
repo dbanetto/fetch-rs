@@ -96,10 +96,12 @@ fn update_api(req: &mut Request) -> IronResult<Response> {
         Err(err) => return Err(api_error(err, Status::BadRequest)),
     };
 
-    let uri_update: InfoUriForm = match serde_json::from_slice(&buf) {
+    let mut uri_update: InfoUriForm = match serde_json::from_slice(&buf) {
         Ok(form) => form,
         Err(err) => return Err(api_error(err, Status::BadRequest)),
     };
+
+    uri_update.id = Some(uri_id);
 
     let conn = match req.extensions.get::<DbConnection>().unwrap().get() {
         Ok(conn) => conn,
