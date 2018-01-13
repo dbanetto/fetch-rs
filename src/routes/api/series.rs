@@ -9,7 +9,7 @@ use diesel::{delete, insert, update};
 use iron::prelude::*;
 use iron::status::Status;
 use router::Router;
-use serde_json::{self, Value};
+use serde_json;
 
 use std::error::Error;
 use std::io::Read;
