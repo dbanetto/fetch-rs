@@ -20,24 +20,26 @@ stages:
 test:cargo:
   stage: test
   script:
-  - rustc --version && cargo --version
-  - cargo install diesel_cli --no-default-features --features postgres 
-  - echo "DATABASE_URL=postgres://${POSTGRES_USER}@postgres/${POSTGRES_DB}" > .env
-  - cat .env
-  - diesel migration run
-  - cargo build --verbose --release
-  - cargo test --verbose --jobs 1 --release
+    - rustc --version && cargo --version && rustup --version
+    - cargo install diesel_cli --no-default-features --features postgres 
+    - echo "DATABASE_URL=postgres://${POSTGRES_USER}@postgres/${POSTGRES_DB}" > .env
+    - cat .env
+    - diesel migration run
+    - cargo build --verbose --release
+    - cargo test --verbose --jobs 1 --release
 
 style:rustfmt:
   stage: style
   allow_failure: true
   script:
-  - rustc --version && cargo --version
-  - cargo fmt -- --write-mode diff
+    - rustc --version && cargo --version && rustup --version
+    - rustup component add rustfmt-preview
+    - rustfmt --write-mode diff src/**.rs
 
 deploy:pages:
   stage: deploy
   script:
+    - rustc --version && cargo --version && rustup --version
     - cargo doc
     - mv target/doc public
     - echo "<meta http-equiv=refresh content=1;url=fetch-rs/index.html>" > public/index.html
