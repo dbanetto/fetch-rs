@@ -147,12 +147,34 @@ fn delete_api(req: &mut Request) -> IronResult<Response> {
     Ok(api_success(uri))
 }
 
-// #[post("/<series_id>/uri/new", data = "<uri_form>")]
-// fn new(db: DB, series_id: i32, uri_form: Json<InfoUriForm>) -> Json<ApiResult<InfoUri, String>> {
-//     let uri_form = uri_form.into_inner();
+fn new(req: &mut Request) -> IronResult<Response> {
 
-//     new_uri(&db, series_id, uri_form).json()
-// }
+    let series_id: i32 = match req.extensions.get::<Router>().unwrap().find("series_id") {
+        Some(id) => match i32::from_str(id) {
+            Ok(value) => value,
+            Err(err) => return Err(api_error(err, Status::BadRequest)),
+        },
+        None => unreachable!(),
+    };
+
+    let mut buf = vec![];
+    match req.body.read_to_end(&mut buf) {
+        Ok(_) => (),
+        Err(err) => return Err(api_error(err, Status::BadRequest)),
+    };
+
+    let uri_form: InfoUriForm = match serde_json::from_slice(&buf) {
+        Ok(form) => form,
+        Err(err) => return Err(api_error(err, Status::BadRequest)),
+    };
+
+    let conn = match req.extensions.get::<DbConnection>().unwrap().get() {
+        Ok(conn) => conn,
+        Err(err) => return Err(api_error(err, Status::RequestTimeout)),
+    };
+
+    Ok(new_uri(&*conn, series_id, uri_form).into())
+}
 
 fn primary(req: &mut Request) -> IronResult<Response> {
     let series_id: i32 = match req.extensions.get::<Router>().unwrap().find("series_id") {
@@ -239,5 +261,6 @@ pub fn routes() -> Router {
         select: get "/:series_id/:uri_id" => select,
         update: put "/:series_id/:uri_id" => update_api,
         delete: delete "/:series_id/:uri_id" => delete_api,
+        create: post "/:series_id/new" => new,
         )
 }
