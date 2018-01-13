@@ -1,25 +1,40 @@
 use db::DbConnection;
 use models::{InfoUri, InfoUriForm, Series};
 use schema::{info_uri, series};
-use util::ApiResult;
+use util::{api_success, api_error, ApiResult};
+use std::str::FromStr;
+use iron::status::Status;
+use iron::prelude::*;
+use router::Router;
 
 use diesel::pg::PgConnection;
 use diesel::prelude::*;
 use diesel::{insert, update, delete};
 
-// #[get("/<series_id>/uri")]
-// fn all(db: DB, series_id: i32) -> Json<ApiResult<Vec<InfoUri>, String>> {
-//     let conn = db.conn();
+fn all(req: &mut Request) -> IronResult<Response> {
+    let series_id: i32 = match req.extensions.get::<Router>().unwrap().find("series_id") {
+        Some(id) => match i32::from_str(id) {
+            Ok(value) => value,
+            Err(err) => return Err(api_error(err, Status::BadRequest)),
+        },
+        None => unreachable!(),
+    };
 
-//     let uris = match info_uri::dsl::info_uri
-//         .filter(info_uri::series_id.eq(series_id))
-//         .get_results(conn) {
-//         Ok(uris) => uris,
-//         Err(e) => return ApiResult::err_format(e).json(),
-//     };
+    let conn = match req.extensions.get::<DbConnection>().unwrap().get() {
+        Ok(conn) => conn,
+        Err(err) => return Err(api_error(err, Status::RequestTimeout)),
+    };
 
-//     ApiResult::ok(uris).json()
-// }
+    let uris: Vec<InfoUri> = match info_uri::dsl::info_uri
+        .filter(info_uri::series_id.eq(series_id))
+        .get_results(&*conn) {
+        Ok(uris) => uris,
+        Err(err) => return Err(api_error(err, Status::BadRequest)),
+    };
+
+    
+    Ok(api_success(uris))
+}
 
 // #[get("/<series_id>/uri/<uri_id>")]
 // fn get(db: DB, series_id: i32, uri_id: i32) -> Json<ApiResult<InfoUri, String>> {
@@ -142,6 +157,9 @@ pub fn update_uri(conn: &PgConnection, series_id: i32, uri_update: InfoUriForm) 
     ApiResult::new(result.map_err(|e| format!("{}", e)))
 }
 
-// pub fn routes() -> Vec<Route> {
-//     routes![all, primary, get, update_api, delete_api, new]
-// }
+pub fn routes() -> Router {
+    router!(
+        all: get "/:series_id/uri" => all,
+
+        )
+}

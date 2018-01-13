@@ -76,6 +76,21 @@ pub fn api_error<E: 'static + Error + Send>(error: E, status: Status) -> IronErr
                   )
 }
 
+pub fn api_success<T: Serialize>(data: T) -> Response {
+
+        let bytes = serde_json::to_vec(&ApiResult::<T, String>::ok(data)).unwrap();
+
+        Response::with((
+            bytes,
+            Status::Ok,
+            Mime(
+                TopLevel::Application,
+                SubLevel::Json,
+                vec![(Attr::Charset, MimeValue::Utf8)],
+            ),
+        ))
+}
+
 impl<T, E> Into<Response> for ApiResult<T, E>
 where
     T: Serialize,

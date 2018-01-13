@@ -18,6 +18,7 @@ pub fn routes() -> Mount {
 
     mount.mount("/", router);
     mount.mount("/series/", series::routes());
+    mount.mount("/series/", info_uri::routes());
     mount
 }
 
