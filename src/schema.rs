@@ -1,5 +1,4 @@
 table! {
-
     series {
         id -> Integer,
         title -> VarChar,
@@ -8,12 +7,13 @@ table! {
 }
 
 table! {
-    info_uri {
+
+    info_blob {
        id -> Integer,
        series_id -> Integer,
-       uri -> VarChar,
+       blob -> Jsonb,
        primary -> Bool,
     }
 }
 
-joinable!(info_uri -> series (series_id));
+joinable!(info_blob -> series (series_id));

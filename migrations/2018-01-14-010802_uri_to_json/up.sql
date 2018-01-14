@@ -1,0 +1,8 @@
+DROP TABLE info_uri;
+
+CREATE TABLE info_blob (
+    id SERIAL PRIMARY KEY,
+    series_id INTEGER NOT NULL REFERENCES Series(id) ON DELETE CASCADE,
+    blob JSONB NOT NULL,
+    "primary" BOOLEAN DEFAULT FALSE NOT NULL
+);

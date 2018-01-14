@@ -1,7 +1,7 @@
 use db::DbConnection;
 use models::*;
-use schema::{info_uri, series};
-use super::info_uri::{new_uri, update_uri};
+use schema::{info_blob, series};
+use super::info_blob::{new_blob, update_blob};
 use util::{api_error, api_success, ApiResult};
 
 use diesel::prelude::*;
@@ -67,7 +67,7 @@ fn new(req: &mut Request) -> IronResult<Response> {
         Err(err) => return Err(api_error(err, Status::BadRequest)),
     };
 
-    let (new_series, info_uris) = series_form.into_new();
+    let (new_series, blobs) = series_form.into_new();
 
     if let Err(err) = new_series.validate() {
         return Err(api_error(err, Status::BadRequest));
@@ -87,17 +87,17 @@ fn new(req: &mut Request) -> IronResult<Response> {
         Err(err) => return Err(api_error(err, Status::BadRequest)),
     };
 
-    let new_info_uris: Vec<InfoUri> = match info_uris {
-        Some(uris) => {
-            let info_uris = uris.into_iter()
+    let new_blobs: Vec<InfoBlob> = match blobs {
+        Some(blobs) => {
+            let blobs = blobs.into_iter()
                 .map(|i| i.into_insertable(&new_series))
-                .collect::<Vec<NewInfoUri>>();
-            match insert_into(info_uri::table)
-                .values(&info_uris)
-                .returning(info_uri::all_columns)
+                .collect::<Vec<NewInfoBlob>>();
+            match insert_into(info_blob::table)
+                .values(&blobs)
+                .returning(info_blob::all_columns)
                 .get_results(&*conn)
             {
-                Ok(uris) => uris,
+                Ok(blobs) => blobs,
                 Err(err) => return Err(api_error(err, Status::BadRequest)),
             }
         }
@@ -106,8 +106,8 @@ fn new(req: &mut Request) -> IronResult<Response> {
 
     let mut result = serde_json::to_value(new_series).unwrap();
     result.as_object_mut().unwrap().insert(
-        "info_uri".to_owned(),
-        serde_json::to_value(new_info_uris).unwrap(),
+        "blob".to_owned(),
+        serde_json::to_value(new_blobs).unwrap(),
     );
 
     Ok(api_success(result))
@@ -138,7 +138,7 @@ fn update_series(req: &mut Request) -> IronResult<Response> {
         Err(err) => return Err(api_error(err, Status::BadRequest)),
     };
 
-    let (series_put, info_uris) = series_form.into_new();
+    let (series_put, blobs) = series_form.into_new();
 
     if let Err(err) = series_put.validate() {
         return Err(api_error(err, Status::BadRequest));
@@ -156,14 +156,14 @@ fn update_series(req: &mut Request) -> IronResult<Response> {
         Err(err) => return Err(api_error(err, Status::BadRequest)),
     };
 
-    if let Some(uris) = info_uris {
-        for uri in uris {
-            if uri.id.is_some() {
+    if let Some(blobs) = blobs {
+        for blob in blobs {
+            if blob.id.is_some() {
                 // update
-                update_uri(&*conn, series_id, uri);
+                update_blob(&*conn, series_id, blob);
             } else {
                 // create
-                new_uri(&*conn, series_id, uri);
+                new_blob(&*conn, series_id, blob);
             }
         }
     }

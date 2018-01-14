@@ -1,12 +1,13 @@
 use db::DbConnection;
-use models::{InfoUri, InfoUriForm, Series};
-use schema::{info_uri, series};
+use models::{InfoBlob, InfoBlobForm, Series};
+use schema::{info_blob, series};
 use util::{api_success, api_error, ApiResult};
 use std::str::FromStr;
 use iron::status::Status;
 use iron::prelude::*;
+use diesel::prelude::*;
 use std::io::Read;
-use serde_json;
+use serde_json::{self, Value};
 use router::Router;
 
 use diesel::pg::PgConnection;
@@ -27,15 +28,15 @@ fn all(req: &mut Request) -> IronResult<Response> {
         Err(err) => return Err(api_error(err, Status::RequestTimeout)),
     };
 
-    let uris: Vec<InfoUri> = match info_uri::dsl::info_uri
-        .filter(info_uri::series_id.eq(series_id))
+    let blobs: Vec<InfoBlob> = match info_blob::dsl::info_blob
+        .filter(info_blob::series_id.eq(series_id))
         .get_results(&*conn) {
-        Ok(uris) => uris,
+        Ok(blobs) => blobs,
         Err(err) => return Err(api_error(err, Status::BadRequest)),
     };
 
     
-    Ok(api_success(uris))
+    Ok(api_success(blobs))
 }
 
 fn select(req: &mut Request) -> IronResult<Response> {
@@ -48,7 +49,7 @@ fn select(req: &mut Request) -> IronResult<Response> {
         None => unreachable!(),
     };
 
-    let uri_id: i32 = match req.extensions.get::<Router>().unwrap().find("uri_id") {
+    let blob_id: i32 = match req.extensions.get::<Router>().unwrap().find("blob_id") {
         Some(id) => match i32::from_str(id) {
             Ok(value) => value,
             Err(err) => return Err(api_error(err, Status::BadRequest)),
@@ -61,15 +62,15 @@ fn select(req: &mut Request) -> IronResult<Response> {
         Err(err) => return Err(api_error(err, Status::RequestTimeout)),
     };
 
-    let uri: InfoUri = match info_uri::dsl::info_uri
-        .filter(info_uri::series_id.eq(series_id))
-        .filter(info_uri::id.eq(uri_id))
+    let blob: InfoBlob = match info_blob::dsl::info_blob
+        .filter(info_blob::series_id.eq(series_id))
+        .filter(info_blob::id.eq(blob_id))
         .first(&*conn) {
-        Ok(uri) => uri,
+        Ok(blob) => blob,
         Err(err) => return Err(api_error(err, Status::BadRequest)),
     };
 
-    Ok(api_success(uri))
+    Ok(api_success(blob))
 }
 
 fn update_api(req: &mut Request) -> IronResult<Response> {
@@ -82,7 +83,7 @@ fn update_api(req: &mut Request) -> IronResult<Response> {
         None => unreachable!(),
     };
 
-    let uri_id: i32 = match req.extensions.get::<Router>().unwrap().find("uri_id") {
+    let blob_id: i32 = match req.extensions.get::<Router>().unwrap().find("blob_id") {
         Some(id) => match i32::from_str(id) {
             Ok(value) => value,
             Err(err) => return Err(api_error(err, Status::BadRequest)),
@@ -96,22 +97,22 @@ fn update_api(req: &mut Request) -> IronResult<Response> {
         Err(err) => return Err(api_error(err, Status::BadRequest)),
     };
 
-    let mut uri_update: InfoUriForm = match serde_json::from_slice(&buf) {
+    let mut blob_update: InfoBlobForm = match serde_json::from_slice(&buf) {
         Ok(form) => form,
         Err(err) => return Err(api_error(err, Status::BadRequest)),
     };
 
-    uri_update.id = Some(uri_id);
+    blob_update.id = Some(blob_id);
 
     let conn = match req.extensions.get::<DbConnection>().unwrap().get() {
         Ok(conn) => conn,
         Err(err) => return Err(api_error(err, Status::RequestTimeout)),
     };
 
-    Ok(update_uri(&*conn, series_id, uri_update).into())
+    Ok(update_blob(&*conn, series_id, blob_update).into())
 }
 
-// #[delete("/<series_id>/uri/<uri_id>")]
+// #[delete("/<series_id>/blob/<blob_id>")]
 fn delete_api(req: &mut Request) -> IronResult<Response> {
 
     let series_id: i32 = match req.extensions.get::<Router>().unwrap().find("series_id") {
@@ -122,7 +123,7 @@ fn delete_api(req: &mut Request) -> IronResult<Response> {
         None => unreachable!(),
     };
 
-    let uri_id: i32 = match req.extensions.get::<Router>().unwrap().find("uri_id") {
+    let blob_id: i32 = match req.extensions.get::<Router>().unwrap().find("blob_id") {
         Some(id) => match i32::from_str(id) {
             Ok(value) => value,
             Err(err) => return Err(api_error(err, Status::BadRequest)),
@@ -135,16 +136,16 @@ fn delete_api(req: &mut Request) -> IronResult<Response> {
         Err(err) => return Err(api_error(err, Status::RequestTimeout)),
     };
 
-    let uri: InfoUri = match delete(
-        info_uri::dsl::info_uri
-            .filter(info_uri::id.eq(uri_id))
-            .filter(info_uri::series_id.eq(series_id)),
+    let blob: InfoBlob = match delete(
+        info_blob::dsl::info_blob
+            .filter(info_blob::id.eq(blob_id))
+            .filter(info_blob::series_id.eq(series_id)),
     ).get_result(&*conn) {
-        Ok(uri) => uri,
+        Ok(blob) => blob,
         Err(err) => return Err(api_error(err, Status::BadRequest)),
     };
 
-    Ok(api_success(uri))
+    Ok(api_success(blob))
 }
 
 fn new(req: &mut Request) -> IronResult<Response> {
@@ -163,7 +164,7 @@ fn new(req: &mut Request) -> IronResult<Response> {
         Err(err) => return Err(api_error(err, Status::BadRequest)),
     };
 
-    let uri_form: InfoUriForm = match serde_json::from_slice(&buf) {
+    let blob_form: InfoBlobForm = match serde_json::from_slice(&buf) {
         Ok(form) => form,
         Err(err) => return Err(api_error(err, Status::BadRequest)),
     };
@@ -173,7 +174,7 @@ fn new(req: &mut Request) -> IronResult<Response> {
         Err(err) => return Err(api_error(err, Status::RequestTimeout)),
     };
 
-    Ok(new_uri(&*conn, series_id, uri_form).into())
+    Ok(new_blob(&*conn, series_id, blob_form).into())
 }
 
 fn primary(req: &mut Request) -> IronResult<Response> {
@@ -190,18 +191,18 @@ fn primary(req: &mut Request) -> IronResult<Response> {
         Err(err) => return Err(api_error(err, Status::RequestTimeout)),
     };
 
-    let uris: InfoUri = match info_uri::dsl::info_uri
-        .filter(info_uri::series_id.eq(series_id))
-        .filter(info_uri::primary.eq(true))
+    let blobs: InfoBlob = match info_blob::dsl::info_blob
+        .filter(info_blob::series_id.eq(series_id))
+        .filter(info_blob::primary.eq(true))
         .first(&*conn) {
-        Ok(uri) => uri,
+        Ok(blob) => blob,
         Err(err) => return Err(api_error(err, Status::BadRequest)),
     };
 
-    Ok(api_success(uris))
+    Ok(api_success(blobs))
 }
 
-pub fn new_uri(conn: &PgConnection, series_id: i32, uri_form: InfoUriForm) -> ApiResult<InfoUri, String> {
+pub fn new_blob(conn: &PgConnection, series_id: i32, blob_form: InfoBlobForm) -> ApiResult<InfoBlob, String> {
 
     let series: Series = match series::dsl::series
         .filter(series::id.eq(series_id))
@@ -211,43 +212,43 @@ pub fn new_uri(conn: &PgConnection, series_id: i32, uri_form: InfoUriForm) -> Ap
         Err(e) => return ApiResult::err_format(e),
     };
 
-    let info_uri = uri_form.into_insertable(&series);
+    let blob = blob_form.into_insertable(&series);
 
-    match insert_into(info_uri::table)
-        .values(&info_uri)
-        .returning(info_uri::all_columns)
+    match insert_into(info_blob::table)
+        .values(&blob)
+        .returning(info_blob::all_columns)
         .get_result(&*conn) {
-        Ok(uri) => ApiResult::ok(uri),
+        Ok(blob) => ApiResult::ok(blob),
         Err(e) => ApiResult::err_format(e),
     }
 }
 
-pub fn update_uri(conn: &PgConnection, series_id: i32, uri_update: InfoUriForm) -> ApiResult<InfoUri, String> {
+pub fn update_blob(conn: &PgConnection, series_id: i32, blob_update: InfoBlobForm) -> ApiResult<InfoBlob, String> {
 
-    let uri_id = match uri_update.id {
+    let blob_id = match blob_update.id {
         Some(id) => id,
         None => return ApiResult::err("id not given".to_owned()),
     };
 
     let query = update(
-        info_uri::dsl::info_uri
-            .filter(info_uri::id.eq(uri_id))
-            .filter(info_uri::series_id.eq(series_id)),
+        info_blob::dsl::info_blob
+            .filter(info_blob::id.eq(blob_id))
+            .filter(info_blob::series_id.eq(series_id)),
     );
 
     // prevent overriding primary if it is not given
-    let result = if uri_update.primary.is_some() {
+    let result = if blob_update.primary.is_some() {
         query
             .set((
-                info_uri::uri.eq(uri_update.uri),
-                info_uri::primary.eq(uri_update.primary.unwrap()),
+                info_blob::blob.eq(blob_update.blob),
+                info_blob::primary.eq(blob_update.primary.unwrap()),
             ))
-            .returning(info_uri::all_columns)
+            .returning(info_blob::all_columns)
             .get_result(&*conn)
     } else {
         query
-            .set((info_uri::uri.eq(uri_update.uri),))
-            .returning(info_uri::all_columns)
+            .set((info_blob::blob.eq(blob_update.blob),))
+            .returning(info_blob::all_columns)
             .get_result(&*conn)
     };
 
@@ -258,9 +259,9 @@ pub fn routes() -> Router {
     router!(
         all: get "/:series_id" => all,
         primary: get "/:series_id/primary" => primary,
-        select: get "/:series_id/:uri_id" => select,
-        update: put "/:series_id/:uri_id" => update_api,
-        delete: delete "/:series_id/:uri_id" => delete_api,
+        select: get "/:series_id/:blob_id" => select,
+        update: put "/:series_id/:blob_id" => update_api,
+        delete: delete "/:series_id/:blob_id" => delete_api,
         create: post "/:series_id/new" => new,
         )
 }

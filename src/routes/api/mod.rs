@@ -1,5 +1,5 @@
 pub mod series;
-pub mod info_uri;
+pub mod info_blob;
 
 use iron::prelude::*;
 use mount::Mount;
@@ -18,7 +18,7 @@ pub fn routes() -> Mount {
 
     mount.mount("/", router);
     mount.mount("/series/", series::routes());
-    mount.mount("/uri/", info_uri::routes());
+    mount.mount("/blob/", info_blob::routes());
     mount
 }
 
@@ -40,5 +40,4 @@ mod test {
         assert!(result.get("data").is_some());
         assert!(result.get("error").is_none());
     }
-
 }

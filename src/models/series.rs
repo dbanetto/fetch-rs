@@ -1,6 +1,6 @@
 use schema::*;
 use error::*;
-use models::InfoUriForm;
+use models::InfoBlobForm;
 
 #[derive(Queryable, Associations, Identifiable, Serialize, Deserialize, Debug, Default)]
 #[table_name = "series"]
@@ -23,7 +23,7 @@ pub struct NewSeries {
 pub struct SeriesForm {
     pub title: String,
     pub poster_url: Option<String>,
-    pub info_uris: Option<Vec<InfoUriForm>>,
+    pub blobs: Option<Vec<InfoBlobForm>>,
 }
 
 impl NewSeries {
@@ -33,13 +33,13 @@ impl NewSeries {
 }
 
 impl SeriesForm {
-    pub fn into_new(self) -> (NewSeries, Option<Vec<InfoUriForm>>) {
+    pub fn into_new(self) -> (NewSeries, Option<Vec<InfoBlobForm>>) {
         (
             NewSeries {
                 title: self.title,
                 poster_url: self.poster_url,
             },
-            self.info_uris,
+            self.blobs,
         )
     }
 }
