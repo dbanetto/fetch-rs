@@ -124,7 +124,7 @@ class _Store {
   }
 
   deleteSeriesId(id) {
-    const endpoint = `/api/v1/info/${ id }`;
+    const endpoint = `/api/v1/series/${ id }`;
     return this._api_delete(endpoint);
   }
 
