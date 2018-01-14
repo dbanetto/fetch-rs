@@ -17,7 +17,7 @@ pub fn get_pool() -> DbConnection {
 
     let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set.");
     let config = Config::default();
-    let manager = ConnectionManager::<PgConnection>::new(database_url);
+    let manager = ConnectionManager::new(database_url);
     let pool = Pool::new(config, manager).expect("Failed to create pool.");
 
     DbConnection { pool: pool }

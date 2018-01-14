@@ -11,7 +11,7 @@ use router::Router;
 
 use diesel::pg::PgConnection;
 use diesel::prelude::*;
-use diesel::{insert, update, delete};
+use diesel::{insert_into, update, delete};
 
 fn all(req: &mut Request) -> IronResult<Response> {
     let series_id: i32 = match req.extensions.get::<Router>().unwrap().find("series_id") {
@@ -213,8 +213,8 @@ pub fn new_uri(conn: &PgConnection, series_id: i32, uri_form: InfoUriForm) -> Ap
 
     let info_uri = uri_form.into_insertable(&series);
 
-    match insert(&info_uri)
-        .into(info_uri::table)
+    match insert_into(info_uri::table)
+        .values(&info_uri)
         .returning(info_uri::all_columns)
         .get_result(&*conn) {
         Ok(uri) => ApiResult::ok(uri),

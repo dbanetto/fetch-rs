@@ -5,7 +5,7 @@ use super::info_uri::{new_uri, update_uri};
 use util::{api_error, api_success, ApiResult};
 
 use diesel::prelude::*;
-use diesel::{delete, insert, update};
+use diesel::{delete, insert_into, update};
 use iron::prelude::*;
 use iron::status::Status;
 use router::Router;
@@ -78,8 +78,8 @@ fn new(req: &mut Request) -> IronResult<Response> {
         Err(err) => return Err(api_error(err, Status::RequestTimeout)),
     };
 
-    let new_series: Series = match insert(&new_series)
-        .into(series::table)
+    let new_series: Series = match insert_into(series::table)
+        .values(&new_series)
         .returning(series::all_columns)
         .get_result(&*conn)
     {
@@ -92,8 +92,8 @@ fn new(req: &mut Request) -> IronResult<Response> {
             let info_uris = uris.into_iter()
                 .map(|i| i.into_insertable(&new_series))
                 .collect::<Vec<NewInfoUri>>();
-            match insert(&info_uris)
-                .into(info_uri::table)
+            match insert_into(info_uri::table)
+                .values(&info_uris)
                 .returning(info_uri::all_columns)
                 .get_results(&*conn)
             {
