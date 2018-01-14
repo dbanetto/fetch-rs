@@ -111,20 +111,20 @@ class _Store {
   }
 
   getSeriesPrimary(id, options) {
-    const endpoint = `/api/v1/uri/${ id }/primary`;
+    const endpoint = `/api/v1/info/${ id }/primary`;
     // prevents repeat calls to the API for non-existing data
     var options = options ? options : {}
     options.nulls = true;
     return this._api_get(endpoint, options);
   }
 
-  getSeriesUri(id, options) {
-    const endpoint = `/api/v1/uri/${ id }`;
+  getSeriesInfo(id, options) {
+    const endpoint = `/api/v1/info/${ id }`;
     return this._api_get(endpoint, options);
   }
 
   deleteSeriesId(id) {
-    const endpoint = `/api/v1/uri/${ id }`;
+    const endpoint = `/api/v1/info/${ id }`;
     return this._api_delete(endpoint);
   }
 

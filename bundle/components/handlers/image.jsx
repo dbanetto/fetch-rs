@@ -1,7 +1,7 @@
 import { h, Component } from 'preact';
 
 
-export default class UriImage extends Component {
+export default class ImageHandler extends Component {
 
   constructor() {
     super();
@@ -12,20 +12,24 @@ export default class UriImage extends Component {
   }
 
   renderView() {
-    return ( <img src={ this.props.uri } />);
+    return ( <img src={ this.props.blob.src } />);
+  }
+
+  handleUpdate(event) {
+    this.props.handleUpdate({ type: "image", src: event.target.value });
   }
 
   renderEdit() {
     return (
       <span>
         <input type="url"
-          name={ this.props.name || 'uri' }
-          value={ this.props.uri }
-      onChange={ this.props.handleUpdate }  />
+          name={ this.props.blob.name || '' }
+          value={ this.props.blob.src }
+      onChange={ this.handleUpdate.bind(this) }  />
       <div class="preview">
         <span>Preview</span>
         <div>
-          <img src={ this.props.uri } />
+          <img src={ this.props.blob.src } />
       </div>
       </div>
       </span>

@@ -20,20 +20,22 @@ export default class SeriesEdit extends Component {
   getSeries() {
     let self = this;
 
-    Promise.all([Store.getSeriesId(this.props.matches.id),
-        Store.getSeriesUri(this.props.matches.id)])
+    Promise.all([
+      Store.getSeriesId(this.props.matches.id),
+      Store.getSeriesInfo(this.props.matches.id)
+    ])
       .then(result => {
         let series = result[0];
-        series.info_uris = result[1];
+        series.info = result[1];
 
         self.setState({
           series: series,
         });
       })
-    .catch(err => {
-      console.log(err);
-      route('/');
-    });
+      .catch(err => {
+        console.log(err);
+        route('/');
+      });
   }
 
 
@@ -47,7 +49,6 @@ export default class SeriesEdit extends Component {
           );
     }
 
-    console.log(this.state.series);
     return (
         <div>
           <SeriesForm router={ this.props.router } series={ this.state.series } />

@@ -1,7 +1,7 @@
 import { h, Component } from 'preact';
 import { route, Link } from 'preact-router';
 import Store from '../store.js';
-import uri from './uri.jsx';
+import handler from './handler.jsx';
 
 export default class View extends Component {
 
@@ -10,7 +10,7 @@ export default class View extends Component {
 
     this.state = {
       series: null,
-      uri: null,
+      info: null,
     };
   }
 
@@ -21,18 +21,20 @@ export default class View extends Component {
   getSeries() {
     let self = this;
 
-    Promise.all([Store.getSeriesId(this.props.matches.id),
-        Store.getSeriesUri(this.props.matches.id)])
+    Promise.all([
+      Store.getSeriesId(this.props.matches.id),
+      Store.getSeriesInfo(this.props.matches.id)
+    ])
       .then(result => {
         self.setState({
           series: result[0],
-          uri: result[1]
+          info: result[1]
         });
       })
-    .catch(err => {
-      console.log(err);
-      route('/');
-    });
+      .catch(err => {
+        console.log(err);
+        route('/');
+      });
   }
 
   handleDelete() {
@@ -54,18 +56,18 @@ export default class View extends Component {
 
   }
 
-  renderUriList() {
+  renderInfoList() {
 
-    if (this.state.uri == undefined) {
+    if (this.state.info == undefined) {
       return (<div></div>);
     }
 
     return (
             <div>
               <ul>
-                { this.state.uri.map((u, i) =>
+                { this.state.info.map((u, i) =>
                 <li key={i}>
-                  { uri.build(u.uri) }
+                  { handler.build(u.blob) }
                 </li>
                 ) }
 
@@ -90,7 +92,7 @@ export default class View extends Component {
           <div>
             <h1>{ series.title }</h1>
             <p><img src={ series.poster_url }/></p>
-            { this.renderUriList() }
+            { this.renderInfoList() }
           </div>
           <div>
             <span>

@@ -1,12 +1,12 @@
 import { h, Component } from 'preact';
-import uri from './uri.jsx';
+import handler from './handler.jsx';
 
-export default class UriList extends Component {
+export default class InfoList extends Component {
 
   handleAdd() {
 
     let elements = this.props.value;
-    elements.push({ uri: "", primary: false });
+    elements.push({ blob: {}, type: "url", primary: false });
 
     this.props.handleUpdate(elements);
   }
@@ -25,6 +25,9 @@ export default class UriList extends Component {
     let elements = this.props.value;
 
     // hack
+    console.log("info list update");
+    console.log(elements[key]);
+    console.log(value);
     elements[key] = value;
 
     this.props.handleUpdate(elements);
@@ -47,7 +50,7 @@ export default class UriList extends Component {
   }
 
   buildElement(ele, index) {
-    return (<UriElement
+    return (<InfoElement
             handleDelete={ this.handleDelete.bind(this, index) }
             handleUpdate={ this.handleUpdate.bind(this, index) }
             handlePrimary={ this.handlePrimary.bind(this, index) }
@@ -60,7 +63,7 @@ export default class UriList extends Component {
   render() {
     return  (
         <div>
-          { this.props.value.map((e, i) => this.buildElement(e, i)) }
+          { this.props.value.map((ele, index) => this.buildElement(ele, index)) }
 
           <button type="button" onClick={ this.handleAdd.bind(this) }>add</button>
         </div>
@@ -69,11 +72,11 @@ export default class UriList extends Component {
 }
 
 
-class UriElement extends Component {
+class InfoElement extends Component {
 
-  handleUri(event) {
+  handleUri(blob) {
     let value = this.props.value;
-    value.uri = event.target.value;
+    value.blob = blob;
 
     this.props.handleUpdate(value);
   }
@@ -84,9 +87,9 @@ class UriElement extends Component {
 
   render() {
     return (<div>
-      <input type="hidden" name="id" className="uri" value={ this.props.value.id } />
+      <input type="hidden" name="id" className="info-element" value={ this.props.value.id } />
 
-      { uri.build(this.props.value.uri, { edit: true, handleUpdate: this.handleUri.bind(this) }) }
+      { handler.build(this.props.value.blob, { type: this.props.type, edit: true, handleUpdate: this.handleUri.bind(this) }) }
 
       <input type="radio" name="primary" className="primary" value={this.props.value.primary} checked={ this.props.value.primary } onChange={ this.handlePrimary.bind(this) }/>
 

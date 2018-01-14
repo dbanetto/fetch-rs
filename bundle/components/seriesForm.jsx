@@ -1,8 +1,8 @@
 import { h, Component } from 'preact';
 import { route } from 'preact-router';
-import UriList from './uriList.jsx';
+import InfoList from './infoList.jsx';
 import Store from '../store.js';
-import uri from './uri.jsx';
+import handler from './handler.jsx';
 
 export default class SeriesForm extends Component {
 
@@ -19,9 +19,9 @@ export default class SeriesForm extends Component {
   validate(formData) {
     let errors = [];
 
-    let info_uris = formData.info_uris ? formData.info_uris : [];
+    let blobs = formData.blobs ? formData.blobs : [];
 
-    formData.info_uris = info_uris.filter((uri) => uri.uri.trim().length !== 0);
+    // formData.blobs = blobs.filter((blob) => blobs);
 
     return errors;
   }
@@ -50,28 +50,32 @@ export default class SeriesForm extends Component {
     return false;
   }
 
-  handleUpdate(value, event) {
+  handleUpdate(value, blob) {
     let series = this.state.series;
 
-    console.log(this);
-    console.log(event);
-    console.log(value);
+    blob = blob.target ? blob.target.value : blob;
 
-    series[value] = event.target.value;
+    series[value] = blob;
+
+    console.log("series");
+    console.log(series);
+    this.setState({
+      series: series
+    });
+  }
+
+  handleInfoUpdate(value) {
+    let series = this.state.series;
+
+    series.blobs = value;
 
     this.setState({
       series: series
     });
   }
 
-  handleInfoUriUpdate(value) {
-    let series = this.state.series;
-
-    series.info_uris = value;
-
-    this.setState({
-      series: series
-    });
+  handleUpdatePoster(blob) {
+    this.handleUpdate('poster_url', blob.src);
   }
 
   render() {
@@ -88,13 +92,13 @@ export default class SeriesForm extends Component {
           </div>
           <div>
             <label htmlFor="poster_url">Poster URL</label>
-            { uri.build(series.poster_url, { edit: true, protocol: 'image:', name: 'poster_url',
-              handleUpdate: this.handleUpdate.bind(this, 'poster_url') }) }
+            { handler.build({ src: series.poster_url }, { edit: true, type: 'image', name: 'poster_url',
+              handleUpdate: this.handleUpdatePoster.bind(this) }) }
           </div>
           <div>
-            <h3>Info URIs</h3>
-            <UriList value={series.info_uris || []}
-              handleUpdate={ this.handleInfoUriUpdate.bind(this) } />
+            <h3>Info</h3>.
+            <InfoList value={series.info || []}
+              handleUpdate={ this.handleInfoUpdate.bind(this) } />
           </div>
           <div>
             <input type="submit" />

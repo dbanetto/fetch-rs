@@ -1,35 +1,26 @@
 import { h, Component } from 'preact';
-import UriDefault from './uri/default.jsx';
-import UriImage from './uri/image.jsx';
+import UrlHandler from './handlers/url.jsx';
+import ImageHandler from './handlers/image.jsx';
 
-let uriHandlers = {
-  'http:': UriDefault,
-  'https:': UriDefault,
-  'image:': UriImage,
+let typeHandlers = {
+  'url': UrlHandler,
+  'image': ImageHandler,
 };
 
 function addHandler(protocol, builder) {
   uriHandlers[protocol] = builder;
 }
 
-function build(uri, options) {
+function build(blob, options) {
   options = options || {};
 
 
-  var protocol = options.protocol;
-  try {
-    let url = new URL(uri);
-
-    // allows override via options which protocol to use
-    protocol = protocol || url.protocol;
-  } catch(err) {
-    // do nothing
-  }
+  var type = options.type || blob.type;
 
   // use registered handler or default link handler
-  var element = uriHandlers[protocol] || UriDefault;
+  var element = typeHandlers[type] || UrlHandler;
 
-  console.log("created url with " + element.name());
+  console.log("created handler with " + element.name() + " for " + type);
 
   // a reminder that handleUpdate should be set if editting
   if (options.edit && typeof(options.handleUpdate) !== "function") {
@@ -38,7 +29,7 @@ function build(uri, options) {
 
   return h(element,
     {
-      uri: uri,
+      blob: blob,
 
       // optional properties for elements
       edit: options.edit || false,
