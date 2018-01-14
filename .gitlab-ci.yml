@@ -17,7 +17,7 @@ stages:
   - style
   - deploy
 
-test:cargo:
+cargo:
   stage: test
   script:
     - rustc --version && cargo --version && rustup --version
@@ -28,7 +28,7 @@ test:cargo:
     - cargo build --verbose --release
     - cargo test --verbose --jobs 1 --release
 
-style:rustfmt:
+rustfmt:
   stage: style
   allow_failure: true
   script:
@@ -36,7 +36,7 @@ style:rustfmt:
     - rustup component add rustfmt-preview
     - rustfmt --write-mode diff src/**.rs
 
-deploy:pages:
+pages:
   stage: deploy
   script:
     - rustc --version && cargo --version && rustup --version
