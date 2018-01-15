@@ -43,7 +43,7 @@ pages:
     - cargo doc
     - rm -rf public
     - mv target/doc public
-    - echo "<meta http-equiv=refresh content=1;url=fetch-rs/index.html>" > public/index.html
+    - echo "<meta http-equiv=refresh content=1;url=fetch_rs/index.html>" > public/index.html
   artifacts:
     paths:
     - public
