@@ -1,20 +1,24 @@
-#![recursion_limit="128"]
+#![recursion_limit = "128"]
 
-#[macro_use] extern crate diesel;
-#[macro_use] extern crate diesel_derives;
-#[macro_use] extern crate error_chain;
-#[macro_use] extern crate router;
-#[macro_use] extern crate serde_derive;
 extern crate chrono;
+#[macro_use]
+extern crate diesel;
+#[macro_use]
+extern crate diesel_derives;
 extern crate dotenv;
 extern crate durationfmt;
+#[macro_use]
+extern crate error_chain;
 extern crate filetime;
 extern crate hyper;
 extern crate iron;
 extern crate mount;
 extern crate r2d2;
-extern crate r2d2_diesel;
+#[macro_use]
+extern crate router;
 extern crate serde;
+#[macro_use]
+extern crate serde_derive;
 extern crate serde_json;
 extern crate staticfile;
 extern crate time;

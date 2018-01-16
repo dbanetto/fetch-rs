@@ -89,7 +89,8 @@ fn new(req: &mut Request) -> IronResult<Response> {
 
     let new_blobs: Vec<InfoBlob> = match blobs {
         Some(blobs) => {
-            let blobs = blobs.into_iter()
+            let blobs = blobs
+                .into_iter()
                 .map(|i| i.into_insertable(&new_series))
                 .collect::<Vec<NewInfoBlob>>();
             match insert_into(info_blob::table)
@@ -105,10 +106,10 @@ fn new(req: &mut Request) -> IronResult<Response> {
     };
 
     let mut result = serde_json::to_value(new_series).unwrap();
-    result.as_object_mut().unwrap().insert(
-        "blob".to_owned(),
-        serde_json::to_value(new_blobs).unwrap(),
-    );
+    result
+        .as_object_mut()
+        .unwrap()
+        .insert("blob".to_owned(), serde_json::to_value(new_blobs).unwrap());
 
     Ok(api_success(result))
 }

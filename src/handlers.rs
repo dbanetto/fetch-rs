@@ -3,7 +3,7 @@ use std::path::PathBuf;
 use iron::prelude::*;
 use time::{self, Timespec};
 use std::time::Duration;
-use iron::{Handler, status};
+use iron::{status, Handler};
 use std::fs;
 
 pub struct CachedFile {
@@ -20,11 +20,16 @@ impl CachedFile {
         }
     }
 
-    fn response_with_cache(&self, req: &mut Request, size: u64, modified: Timespec) -> IronResult<Response> {
-        use iron::headers::{CacheControl, LastModified, CacheDirective, HttpDate};
+    fn response_with_cache(
+        &self,
+        req: &mut Request,
+        size: u64,
+        modified: Timespec,
+    ) -> IronResult<Response> {
+        use iron::headers::{CacheControl, CacheDirective, HttpDate, LastModified};
         use iron::headers::{ContentLength, ContentType, ETag, EntityTag};
         use iron::method::Method;
-        use iron::mime::{Mime, TopLevel, SubLevel};
+        use iron::mime::{Mime, SubLevel, TopLevel};
         use iron::modifiers::Header;
 
         let seconds = self.timeout.as_secs() as u32;
@@ -37,25 +42,35 @@ impl CachedFile {
             let has_ct = req.headers.get::<ContentType>();
             let cont_type = match has_ct {
                 None => ContentType(Mime(TopLevel::Text, SubLevel::Plain, vec![])),
-                Some(t) => t.clone()
+                Some(t) => t.clone(),
             };
-            Response::with((status::Ok, Header(cont_type), Header(ContentLength(metadata.len()))))
+            Response::with((
+                status::Ok,
+                Header(cont_type),
+                Header(ContentLength(metadata.len())),
+            ))
         } else {
             Response::with((status::Ok, self.path.clone()))
         };
 
         response.headers.set(CacheControl(cache));
-        response.headers.set(LastModified(HttpDate(time::at(modified))));
-        response.headers.set(ETag(EntityTag::weak(format!("{0:x}-{1:x}.{2:x}", size, modified.sec, modified.nsec))));
+        response
+            .headers
+            .set(LastModified(HttpDate(time::at(modified))));
+        response.headers.set(ETag(EntityTag::weak(format!(
+            "{0:x}-{1:x}.{2:x}",
+            size,
+            modified.sec,
+            modified.nsec
+        ))));
 
         Ok(response)
     }
 }
 
-impl  Handler for CachedFile {
-
+impl Handler for CachedFile {
     fn handle(&self, req: &mut Request) -> IronResult<Response> {
-        use iron::headers::{IfModifiedSince, HttpDate};
+        use iron::headers::{HttpDate, IfModifiedSince};
 
         let (size, last_modified_time) = match fs::metadata(&self.path) {
             Err(error) => return Err(IronError::new(error, status::InternalServerError)),
@@ -64,7 +79,7 @@ impl  Handler for CachedFile {
 
                 let time = FileTime::from_last_modification_time(&metadata);
                 (metadata.len(), Timespec::new(time.seconds() as i64, 0))
-            },
+            }
         };
 
         let if_modified_since = match req.headers.get::<IfModifiedSince>().cloned() {

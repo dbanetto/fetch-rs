@@ -7,7 +7,6 @@ table! {
 }
 
 table! {
-
     info_blob {
        id -> Integer,
        series_id -> Integer,

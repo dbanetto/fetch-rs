@@ -14,10 +14,8 @@ where
     E: Serialize,
 {
     pub success: bool,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub data: Option<T>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub error: Option<E>,
+    #[serde(skip_serializing_if = "Option::is_none")] pub data: Option<T>,
+    #[serde(skip_serializing_if = "Option::is_none")] pub error: Option<E>,
 }
 
 impl<T, E> ApiResult<T, E>
@@ -25,7 +23,6 @@ where
     T: Serialize,
     E: Serialize,
 {
-
     pub fn new(data: Result<T, E>) -> Self {
         let (data, err) = match data {
             Ok(x) => (Some(x), None),
@@ -58,37 +55,38 @@ where
     pub fn json(self) -> Value {
         serde_json::to_value(self).unwrap()
     }
-
 }
 
 
 pub fn api_error<E: 'static + Error + Send>(error: E, status: Status) -> IronError {
     let description = format!("{}", error);
     let bytes = serde_json::to_vec(&ApiResult::<String, String>::err_format(description)).unwrap();
-    IronError::new(error,
-                   (status,
-                    bytes,
-                    Mime(
-                        TopLevel::Application,
-                        SubLevel::Json,
-                        vec![(Attr::Charset, MimeValue::Utf8)],
-                        ))
-                  )
-}
-
-pub fn api_success<T: Serialize>(data: T) -> Response {
-
-        let bytes = serde_json::to_vec(&ApiResult::<T, String>::ok(data)).unwrap();
-
-        Response::with((
+    IronError::new(
+        error,
+        (
+            status,
             bytes,
-            Status::Ok,
             Mime(
                 TopLevel::Application,
                 SubLevel::Json,
                 vec![(Attr::Charset, MimeValue::Utf8)],
             ),
-        ))
+        ),
+    )
+}
+
+pub fn api_success<T: Serialize>(data: T) -> Response {
+    let bytes = serde_json::to_vec(&ApiResult::<T, String>::ok(data)).unwrap();
+
+    Response::with((
+        bytes,
+        Status::Ok,
+        Mime(
+            TopLevel::Application,
+            SubLevel::Json,
+            vec![(Attr::Charset, MimeValue::Utf8)],
+        ),
+    ))
 }
 
 impl<T, E> Into<Response> for ApiResult<T, E>
