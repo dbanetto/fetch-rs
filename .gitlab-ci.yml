@@ -17,6 +17,11 @@ stages:
   - style
   - deploy
 
+cache:
+  untracked: true
+  paths:
+    - target
+
 cargo:
   stage: test
   script:
