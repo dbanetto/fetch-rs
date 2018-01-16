@@ -6,7 +6,7 @@ services:
 variables:
   POSTGRES_DB: fetch_test
   POSTGRES_USER: fetch
-  POSTGRES_PASSWORD: ""
+  POSTGRES_PASSWORD: "adfjkv389gqyh39gheilfgeuj"
 
 before_script:
   - apt-get update -yqq
@@ -27,7 +27,7 @@ cargo:
   script:
     - rustc --version && cargo --version && rustup --version
     - cargo install diesel_cli --no-default-features --features postgres 
-    - echo "DATABASE_URL=postgres://${POSTGRES_USER}@postgres/${POSTGRES_DB}" > .env
+    - echo "DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres/${POSTGRES_DB}" > .env
     - cat .env
     - diesel migration run
     - cargo build --verbose --release
