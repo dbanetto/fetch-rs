@@ -7,8 +7,6 @@ variables:
   POSTGRES_DB: fetch_test
   POSTGRES_USER: fetch
   POSTGRES_PASSWORD: "adfjkv389gqyh39gheilfgeuj"
-  CARGO_HOME: $CI_PROJECT_DIR/cargo
-  PATH: "$CARGO_HOME/bin:$PATH"
 
 
 stages:
@@ -25,12 +23,12 @@ cargo:
     - du -hs target
     - du -hs cargo
     - rustc --version && cargo --version && rustup --version
-    - cargo install diesel_cli --no-default-features --features postgres 
+    - CARGO_HOME=$CI_PROJECT_DIR/cargo cargo install diesel_cli --no-default-features --features postgres 
     - echo "DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres/${POSTGRES_DB}" > .env
     - cat .env
     - diesel migration run
-    - cargo build --verbose --release
-    - cargo test --verbose --jobs 1 --release
+    - CARGO_HOME=$CI_PROJECT_DIR/cargo cargo build --verbose --release
+    - CARGO_HOME=$CI_PROJECT_DIR/cargo cargo test --verbose --jobs 1 --release
   cache:
     paths:
       - target/
