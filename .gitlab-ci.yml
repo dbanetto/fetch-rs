@@ -20,13 +20,13 @@ cargo:
     - apt-get update -yqq
     - apt-get install -yqq --no-install-recommends build-essential libclang-dev libpq-dev
   script:
-    - du -hs target
-    - du -hs cargo
+    - du -hs target || true
+    - du -hs cargo || true
     - rustc --version && cargo --version && rustup --version
     - CARGO_HOME=$CI_PROJECT_DIR/cargo cargo install diesel_cli --no-default-features --features postgres 
     - echo "DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres/${POSTGRES_DB}" > .env
     - cat .env
-    - diesel migration run
+    - $CARGO_HOME/bin/diesel migration run
     - CARGO_HOME=$CI_PROJECT_DIR/cargo cargo build --verbose --release
     - CARGO_HOME=$CI_PROJECT_DIR/cargo cargo test --verbose --jobs 1 --release
   cache:
