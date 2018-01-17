@@ -7,6 +7,7 @@ variables:
   POSTGRES_DB: fetch_test
   POSTGRES_USER: fetch
   POSTGRES_PASSWORD: "adfjkv389gqyh39gheilfgeuj"
+  CARGO_HOME: $CI_PROJECT_DIR/cargo
 
 
 stages:
@@ -20,6 +21,8 @@ cargo:
     - apt-get update -yqq
     - apt-get install -yqq --no-install-recommends build-essential libclang-dev libpq-dev
   script:
+    - du -hs target
+    - du -hs cargo
     - rustc --version && cargo --version && rustup --version
     - cargo install diesel_cli --no-default-features --features postgres 
     - echo "DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres/${POSTGRES_DB}" > .env
@@ -28,9 +31,9 @@ cargo:
     - cargo build --verbose --release
     - cargo test --verbose --jobs 1 --release
   cache:
-    untracked: true
     paths:
-      - target
+      - target/
+      - cargo/
 
 rustfmt:
   stage: style
@@ -38,7 +41,7 @@ rustfmt:
   script:
     - rustc --version && cargo --version && rustup --version
     - rustup component add rustfmt-preview
-    - rustfmt --write-mode diff src/**.rs
+    - $CARGO_HOME/bin/rustfmt --write-mode diff src/**.rs
 
 pages:
   stage: deploy
