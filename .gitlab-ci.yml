@@ -8,6 +8,7 @@ variables:
   POSTGRES_USER: fetch
   POSTGRES_PASSWORD: "adfjkv389gqyh39gheilfgeuj"
   CARGO_HOME: $CI_PROJECT_DIR/cargo
+  PATH: "$CARGO_HOME/bin:$PATH"
 
 
 stages:
@@ -41,7 +42,7 @@ rustfmt:
   script:
     - rustc --version && cargo --version && rustup --version
     - rustup component add rustfmt-preview
-    - $CARGO_HOME/bin/rustfmt --write-mode diff src/**.rs
+    - rustfmt --write-mode diff src/**.rs
 
 pages:
   stage: deploy
