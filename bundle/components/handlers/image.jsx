@@ -16,22 +16,22 @@ export default class ImageHandler extends Component {
   }
 
   handleUpdate(event) {
-    this.props.handleUpdate({ type: "image", src: event.target.value });
+    this.props.handleUpdate({ src: event.target.value });
   }
 
   renderEdit() {
     return (
       <span>
         <input type="url"
-          name={ this.props.blob.name || '' }
+          name={ this.props.name || '' }
           value={ this.props.blob.src }
-      onChange={ this.handleUpdate.bind(this) }  />
-      <div class="preview">
-        <span>Preview</span>
-        <div>
-          <img src={ this.props.blob.src } />
-      </div>
-      </div>
+          onChange={ this.handleUpdate.bind(this) }  />
+        <div class="preview">
+          <span>Preview</span>
+          <div>
+            <img src={ this.props.blob.src } />
+          </div>
+        </div>
       </span>
     );
   }

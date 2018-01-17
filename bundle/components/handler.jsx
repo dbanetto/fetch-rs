@@ -11,16 +11,15 @@ function addHandler(protocol, builder) {
   uriHandlers[protocol] = builder;
 }
 
-function build(blob, options) {
+function build(blob, type, options) {
   options = options || {};
 
-
-  var type = options.type || blob.type;
+  console.log("selected:" + String(type));
 
   // use registered handler or default link handler
   var element = typeHandlers[type] || UrlHandler;
 
-  console.log("created handler with " + element.name() + " for " + type);
+  console.log("created handler with " + element.name() + " for " + String(type));
 
   // a reminder that handleUpdate should be set if editting
   if (options.edit && typeof(options.handleUpdate) !== "function") {
@@ -38,4 +37,21 @@ function build(blob, options) {
     });
 }
 
-export default { build: build, addHandler: addHandler };
+function listTypes() {
+
+  let types = [];
+  for (var key in typeHandlers) {
+    types.push({
+      name: typeHandlers[key].name(),
+      type: key
+    });
+  }
+
+  return types;
+}
+
+export default {
+  build: build,
+  addHandler: addHandler,
+  listTypes: listTypes
+};

@@ -67,7 +67,7 @@ export default class View extends Component {
               <ul>
                 { this.state.info.map((u, i) =>
                 <li key={i}>
-                  { handler.build(u.blob) }
+                  { handler.build(u.blob, u.info_type) }
                 </li>
                 ) }
 

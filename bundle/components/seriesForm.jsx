@@ -50,24 +50,28 @@ export default class SeriesForm extends Component {
     return false;
   }
 
-  handleUpdate(value, blob) {
+  handleUpdate(key, value) {
     let series = this.state.series;
 
-    blob = blob.target ? blob.target.value : blob;
+    value = value.target ? value.target.value : value;
 
-    series[value] = blob;
-
-    console.log("series");
+    console.log("before series");
     console.log(series);
+
+    series[key] = value;
+
+    console.log("after series");
+    console.log(series);
+
     this.setState({
       series: series
     });
   }
 
-  handleInfoUpdate(value) {
+  handleInfoUpdate(key, value) {
     let series = this.state.series;
 
-    series.blobs = value;
+    series.info = value;
 
     this.setState({
       series: series
@@ -92,7 +96,7 @@ export default class SeriesForm extends Component {
           </div>
           <div>
             <label htmlFor="poster_url">Poster URL</label>
-            { handler.build({ src: series.poster_url }, { edit: true, type: 'image', name: 'poster_url',
+            { handler.build({ src: series.poster_url }, 'image', { edit: true, name: 'poster_url',
               handleUpdate: this.handleUpdatePoster.bind(this) }) }
           </div>
           <div>

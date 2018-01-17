@@ -16,13 +16,17 @@ export default class UriDefault extends Component {
   }
 
   handleUpdate(event) {
-    this.props.handleUpdate({ type: "url", url: event.target.value });
+    this.props.handleUpdate({ url: event.target.value });
   }
 
   renderEdit() {
     console.log(this.props);
-    return ( <input type="url" name={ this.props.blob.name || 'url' } value={ this.props.blob.url }
-      onChange={ this.handleUpdate.bind(this) }  />);
+    return ( <input
+      type="url"
+      name={ this.props.name || 'url' }
+      value={ this.props.blob.url }
+      onChange={ this.handleUpdate.bind(this) }
+    />);
   }
 
   render() {
