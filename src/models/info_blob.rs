@@ -10,6 +10,7 @@ pub struct InfoBlob {
     pub series_id: i32,
     pub blob: Value,
     pub primary: bool,
+    pub info_type: String,
 }
 
 #[derive(Insertable, Serialize, Deserialize, Debug, Default)]
@@ -18,6 +19,7 @@ pub struct NewInfoBlob {
     pub series_id: i32,
     pub blob: Value,
     pub primary: bool,
+    pub info_type: String,
 }
 
 #[derive(Serialize, Deserialize, Debug, Default)]
@@ -25,6 +27,7 @@ pub struct InfoBlobForm {
     pub id: Option<i32>,
     pub blob: Value,
     pub primary: Option<bool>,
+    pub info_type: String,
 }
 
 impl InfoBlobForm {
@@ -32,6 +35,7 @@ impl InfoBlobForm {
         NewInfoBlob {
             series_id: series.id,
             blob: self.blob,
+            info_type: self.info_type,
             primary: match self.primary {
                 Some(p) => p,
                 None => false,

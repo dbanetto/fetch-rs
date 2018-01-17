@@ -247,13 +247,17 @@ pub fn update_blob(
         query
             .set((
                 info_blob::blob.eq(blob_update.blob),
+                info_blob::info_type.eq(blob_update.info_type),
                 info_blob::primary.eq(blob_update.primary.unwrap()),
             ))
             .returning(info_blob::all_columns)
             .get_result(&*conn)
     } else {
         query
-            .set((info_blob::blob.eq(blob_update.blob),))
+            .set((
+                info_blob::blob.eq(blob_update.blob),
+                info_blob::info_type.eq(blob_update.info_type),
+            ))
             .returning(info_blob::all_columns)
             .get_result(&*conn)
     };
