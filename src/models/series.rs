@@ -23,7 +23,7 @@ pub struct NewSeries {
 pub struct SeriesForm {
     pub title: String,
     pub poster_url: Option<String>,
-    pub blobs: Option<Vec<InfoBlobForm>>,
+    pub info: Option<Vec<InfoBlobForm>>,
 }
 
 impl NewSeries {
@@ -39,7 +39,7 @@ impl SeriesForm {
                 title: self.title,
                 poster_url: self.poster_url,
             },
-            self.blobs,
+            self.info,
         )
     }
 }
