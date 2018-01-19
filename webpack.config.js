@@ -2,7 +2,7 @@ const webpack = require('webpack');
 const path = require('path');
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
 
-let production = process.env.ROCKET_ENV === "production";
+let production = process.env.ENV === "production";
 
 const extractSass = new ExtractTextPlugin({
   filename: "[name].css"
@@ -11,6 +11,7 @@ const extractSass = new ExtractTextPlugin({
 
 module.exports = {
   cache: true,
+  devtool: production ? '' : 'source-map',
   entry: {
     main: './bundle/main.jsx',
     style: './bundle/style.scss',
@@ -29,7 +30,7 @@ module.exports = {
       {
         test: /\.jsx?$/,
         exclude: /node_modules/,
-        loader: 'babel-loader?presets[]=es2015'
+        loader: 'babel-loader'
       },
       {
         test: /\.scss$/,
@@ -56,10 +57,19 @@ module.exports = {
     [
       // production plugins
       new webpack.optimize.UglifyJsPlugin({
-        compress: { warnings: false, drop_console: false, }
+        test: /.jsx?$/,
+        sourceMap: true,
+        uglifyOptions: {
+          compress: true,
+          warnings: false
+        }
       })
     ] : [
       // development plugins
+      new webpack.SourceMapDevToolPlugin({
+        filename: '[name].js.map',
+        exclude: ['vendor.js']
+      })
     ]
 
   ),
