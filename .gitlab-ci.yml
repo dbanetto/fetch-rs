@@ -23,7 +23,7 @@ cargo:
     - du -hs target || true
     - du -hs cargo || true
     - rustc --version && cargo --version && rustup --version
-    - CARGO_HOME=$CI_PROJECT_DIR/cargo cargo install diesel_cli --no-default-features --features postgres 
+    - CARGO_HOME=$CI_PROJECT_DIR/cargo cargo install diesel_cli --no-default-features --features postgres --force
     - echo "DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres/${POSTGRES_DB}" > .env
     - cat .env
     - $CI_PROJECT_DIR/cargo/bin/diesel migration run
