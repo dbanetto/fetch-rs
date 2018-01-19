@@ -46,10 +46,13 @@ pages:
   stage: deploy
   script:
     - rustc --version && cargo --version && rustup --version
-    - cargo doc
+    - CARGO_HOME=$CI_PROJECT_DIR/cargo cargo doc
     - rm -rf public
     - mv target/doc public
     - echo "<meta http-equiv=refresh content=1;url=fetch_rs/index.html>" > public/index.html
+  cache:
+    paths:
+      - cargo/
   artifacts:
     paths:
     - public
