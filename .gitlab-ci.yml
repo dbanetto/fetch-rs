@@ -45,6 +45,7 @@ rustfmt:
 pages:
   stage: deploy
   script:
+    - du -hs cargo || true
     - rustc --version && cargo --version && rustup --version
     - CARGO_HOME=$CI_PROJECT_DIR/cargo cargo doc
     - rm -rf public
