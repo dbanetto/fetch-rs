@@ -21,7 +21,11 @@ extern crate serde;
 extern crate serde_derive;
 extern crate serde_json;
 extern crate staticfile;
+extern crate structopt;
+#[macro_use]
+extern crate structopt_derive;
 extern crate time;
+extern crate toml;
 
 #[cfg(test)]
 extern crate iron_test;
@@ -34,17 +38,30 @@ pub mod models;
 pub mod routes;
 pub mod schema;
 pub mod util;
+pub mod config;
 
 use iron::prelude::*;
+use dotenv::dotenv;
 
 fn main() {
+    dotenv().ok();
+
+    let config = match config::get_config() {
+        Ok(config) => config,
+        Err(err) => {
+            println!("Config error: {}", err);
+            std::process::exit(1);
+        }
+    };
+    println!("{:?}", config);
+
     let mut chain = Chain::new(routes::routes());
 
     chain.link_before(middleware::Timer);
-    chain.link_before(db::get_pool());
+    chain.link_before(db::get_pool(config.database_url));
     chain.link_after(middleware::ErrorLog);
 
-    let addr = "127.0.0.1:3000";
+    let addr = format!("{}:{}", config.bind, config.port);
     println!("Starting server on {}", addr);
     Iron::new(chain).http(addr).unwrap();
 }

@@ -18,6 +18,9 @@ filetime = "^0.1.14"
 time = "^0.1.39"
 iron-test = "^0.6.0"
 durationfmt = "^0.1.1"
+structopt = "0.1.6"
+structopt-derive = "0.1.6"
+toml = "0.4.5"
 
 [dependencies.staticfile]
 features = ["cache"]
