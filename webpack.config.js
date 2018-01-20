@@ -67,6 +67,7 @@ module.exports = {
     ] : [
       // development plugins
       new webpack.SourceMapDevToolPlugin({
+        test: /jsx?$/,
         filename: '[name].js.map',
         exclude: ['vendor.js']
       })
