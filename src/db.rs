@@ -1,7 +1,6 @@
 use std::env;
 
 use iron::typemap;
-use dotenv::dotenv;
 use diesel::pg::PgConnection;
 use diesel::r2d2::ConnectionManager;
 use r2d2::Pool;

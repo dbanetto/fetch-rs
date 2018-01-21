@@ -2,7 +2,6 @@ use std::io::prelude::*;
 use std::fs::File;
 use std::env;
 use structopt::StructOpt;
-use serde::{Deserialize, Serialize};
 use toml;
 use error::*;
 
@@ -28,8 +27,14 @@ pub struct Config {
 }
 
 impl Config {
+    /// Checks if the configuration has enough settings to
+    /// start an instance
     pub fn is_complete(&self) -> bool {
-        if self.database_url == None {
+        if self.bind == String::default() {
+            false
+        } else if self.port == u16::default() {
+            false
+        } else if self.database_url == None {
             env::var("DATABASE_URL").is_ok()
         } else {
             true
@@ -93,11 +98,19 @@ pub fn get_config() -> Result<Config> {
     let options = Config::from_args();
 
     // no need to merge if CLI is complete
-    if !options.is_complete() {
-        let config = read_config_file(&options.config_path);
-        config.map(|config| options.merge(config))
+    let options = if !options.is_complete() {
+        match read_config_file(&options.config_path) {
+            Ok(c) => c.merge(options),
+            Err(err) => return Err(err),
+        }
     } else {
+        options
+    };
+
+    if options.is_complete() {
         Ok(options)
+    } else {
+        Err(ErrorKind::SettingsIncomplete(options).into())
     }
 }
 
