@@ -96,10 +96,11 @@ func NyaaFetch(show Series, provider Provider, config Config) error {
 			_, err := t.Add(item.Link)
 			if err != nil {
 				log.Errorf("ERROR while pushing url to transmission (%v): %v", item.Link, err)
-			}
-
-			if count > maxCount {
-				maxCount = count
+			} else {
+				// only update max count if it was successfully pushed
+				if count > maxCount {
+					maxCount = count
+				}
 			}
 		}
 	}
