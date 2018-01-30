@@ -97,6 +97,7 @@ func MagnetRss(show Series, provider Provider, config Config) error {
 			if err != nil {
 				log.Errorf("ERROR while pushing url to transmission (%v): %v", item.Link, err)
 			} else {
+				log.Infof("Pushed '%v' to transmission", item.Title)
 				// only update max count if it was successfully pushed
 				if count > maxCount {
 					maxCount = count
