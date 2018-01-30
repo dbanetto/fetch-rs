@@ -1,6 +1,10 @@
 {
   "api": "http://localhost:8080",
-  "transmission_rpc": "http://localhost:9091/transmission/rpc",
+  "transmission": {
+    "rpc": "http://localhost:9191/transmission/rpc",
+    "user": "",
+    "password": ""
+  },
   "webui": {
     "enable": true,
     "host": "localhost:8181"

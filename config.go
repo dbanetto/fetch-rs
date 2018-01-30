@@ -23,8 +23,15 @@ func Parse(path string) (Config, error) {
 type Config struct {
 	WebUI WebUIConfig `json:"webui"`
 
-	Api             string `json:"api"`
-	TransmissionRpc string `json:"transmission_rpc"`
+	Api             string             `json:"api"`
+	TransmissionRpc string             `json:"transmission_rpc"`
+	Transmission    TransmissionConfig `json:"transmission"`
+}
+
+type TransmissionConfig struct {
+	Rpc      string `json:"rpc"`
+	User     string `json:"user"`
+	Password string `json:"password"`
 }
 
 type WebUIConfig struct {

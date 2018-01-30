@@ -48,7 +48,12 @@ see [config.json](./config.json) for an example file.
 ```javascript
 {
   "api": "http://localhost:8080", // base location of fetch API
-  "transmission_rpc": "http://localhost:8081/transmission/rpc", // transmission RPC address
+  "transmission_rpc": "http://localhost:8081/transmission/rpc",
+  "transmission": {
+    "rpc": "http://localhost:9191/transmission/rpc", // transmission RPC address
+    "user": "", // RPC user
+    "password": "" // RPC password
+  },
   "webui": {
     "enable": true, // if the web api should be run at all
     "host": "0.0.0.0:8181" // where it should be hosted
