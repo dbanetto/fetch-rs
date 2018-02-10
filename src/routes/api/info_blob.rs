@@ -1,7 +1,7 @@
 use db::DbConnection;
 use models::{InfoBlob, InfoBlobForm, Series};
 use schema::{info_blob, series};
-use util::{api_error, api_success, ApiResult};
+use util::{api_error, api_success, api_response};
 use std::str::FromStr;
 use iron::status::Status;
 use iron::prelude::*;
@@ -11,6 +11,7 @@ use serde_json;
 use router::Router;
 use diesel::pg::PgConnection;
 use diesel::{delete, insert_into, update};
+use ::error::*;
 
 fn all(req: &mut Request) -> IronResult<Response> {
     let series_id: i32 = match req.extensions.get::<Router>().unwrap().find("series_id") {
@@ -107,7 +108,7 @@ fn update_api(req: &mut Request) -> IronResult<Response> {
         Err(err) => return Err(api_error(err, Status::RequestTimeout)),
     };
 
-    Ok(update_blob(&*conn, series_id, blob_update).into())
+    api_response(update_blob(&*conn, series_id, blob_update), Status::InternalServerError)
 }
 
 // #[delete("/<series_id>/blob/<blob_id>")]
@@ -171,7 +172,7 @@ fn new(req: &mut Request) -> IronResult<Response> {
         Err(err) => return Err(api_error(err, Status::RequestTimeout)),
     };
 
-    Ok(new_blob(&*conn, series_id, blob_form).into())
+    api_response(new_blob(&*conn, series_id, blob_form), Status::InternalServerError)
 }
 
 fn primary(req: &mut Request) -> IronResult<Response> {
@@ -204,36 +205,34 @@ pub fn new_blob(
     conn: &PgConnection,
     series_id: i32,
     blob_form: InfoBlobForm,
-) -> ApiResult<InfoBlob, String> {
+) -> Result<InfoBlob> {
     let series: Series = match series::dsl::series
         .filter(series::id.eq(series_id))
         .select(series::all_columns)
         .first(&*conn)
     {
         Ok(s) => s,
-        Err(e) => return ApiResult::err_format(e),
+        Err(e) => return Err(e.into()),
     };
 
     let blob = blob_form.into_insertable(&series);
 
-    match insert_into(info_blob::table)
+    insert_into(info_blob::table)
         .values(&blob)
         .returning(info_blob::all_columns)
         .get_result(&*conn)
-    {
-        Ok(blob) => ApiResult::ok(blob),
-        Err(e) => ApiResult::err_format(e),
-    }
+        .map_err(|err| err.into())
 }
 
 pub fn update_blob(
     conn: &PgConnection,
     series_id: i32,
     blob_update: InfoBlobForm,
-) -> ApiResult<InfoBlob, String> {
+) -> Result<InfoBlob> {
+
     let blob_id = match blob_update.id {
         Some(id) => id,
-        None => return ApiResult::err("id not given".to_owned()),
+        None => return Err("id not given".into()),
     };
 
     let query = update(
@@ -262,7 +261,7 @@ pub fn update_blob(
             .get_result(&*conn)
     };
 
-    ApiResult::new(result.map_err(|e| format!("{}", e)))
+    result.map_err(|e| e.into())
 }
 
 pub fn routes() -> Router {

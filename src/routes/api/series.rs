@@ -2,7 +2,7 @@ use db::DbConnection;
 use models::*;
 use schema::{info_blob, series};
 use super::info_blob::{new_blob, update_blob};
-use util::{api_error, api_success, ApiResult};
+use util::{api_error, api_success, api_response};
 
 use diesel::prelude::*;
 use diesel::{delete, insert_into, update};
@@ -11,7 +11,6 @@ use iron::status::Status;
 use router::Router;
 use serde_json;
 
-use std::error::Error;
 use std::io::Read;
 use std::str::FromStr;
 
@@ -21,11 +20,7 @@ fn all(req: &mut Request) -> IronResult<Response> {
         Err(err) => return Err(api_error(err, Status::BadRequest)),
     };
 
-    let result = series::dsl::series.load::<Series>(&*conn);
-
-    let resp = ApiResult::new(result.map_err(|e| e.description().to_owned())).into();
-
-    Ok(resp)
+    api_response(series::dsl::series.load::<Series>(&*conn), Status::InternalServerError)
 }
 
 

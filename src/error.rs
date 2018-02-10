@@ -4,6 +4,7 @@ error_chain! {
         Fmt(::std::fmt::Error);
         Io(::std::io::Error) #[cfg(unix)];
         TomlDe(::toml::de::Error);
+        Diesel(::diesel::result::Error);
     }
 
     errors {
