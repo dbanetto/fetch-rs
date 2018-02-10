@@ -2,9 +2,10 @@ use db::DbConnection;
 use models::*;
 use schema::{info_blob, series};
 use super::info_blob::{new_blob, update_blob};
-use util::{api_error, api_success, api_response};
+use util::{api_error, api_response, api_success};
 
 use diesel::prelude::*;
+use diesel::dsl::*;
 use diesel::{delete, insert_into, update};
 use iron::prelude::*;
 use iron::status::Status;
@@ -20,7 +21,10 @@ fn all(req: &mut Request) -> IronResult<Response> {
         Err(err) => return Err(api_error(err, Status::BadRequest)),
     };
 
-    api_response(series::dsl::series.load::<Series>(&*conn), Status::InternalServerError)
+    api_response(
+        series::dsl::series.load::<Series>(&*conn),
+        Status::InternalServerError,
+    )
 }
 
 
@@ -152,24 +156,44 @@ fn update_series(req: &mut Request) -> IronResult<Response> {
         Err(err) => return Err(api_error(err, Status::BadRequest)),
     };
 
-    if let Some(blobs) = blobs {
-        for blob in blobs {
+    if let Some(put_blobs) = blobs {
+        // list of blobs to NOT delete
+        let mut seen_blobs: Vec<i32> = vec![];
+
+        for blob in put_blobs {
             if blob.id.is_some() {
                 // update
-                update_blob(&*conn, series_id, blob);
+                match update_blob(&*conn, series_id, blob) {
+                    // register that this blob was seen
+                    Ok(updated_blob) => seen_blobs.push(updated_blob.id),
+                    Err(err) => return Err(api_error(err, Status::BadRequest)),
+                }
             } else {
                 // create
-                new_blob(&*conn, series_id, blob);
+                match new_blob(&*conn, series_id, blob) {
+                    // register that this blob was seen
+                    Ok(updated_blob) => seen_blobs.push(updated_blob.id),
+                    Err(err) => return Err(api_error(err, Status::BadRequest)),
+                }
             }
         }
+
+
+        // delete info_blobs that were not apart of the PUT
+        match delete(info_blob::dsl::info_blob
+                     .filter(not(info_blob::id.eq(any(seen_blobs))))
+                     .filter(info_blob::series_id.eq(series_id)))
+            .execute(&*conn)
+        {
+            Ok(_) => (),
+            Err(err) => return Err(api_error(err, Status::InternalServerError)),
+        };
     }
 
     Ok(api_success(series))
 }
 
 fn delete_series(req: &mut Request) -> IronResult<Response> {
-    // #[delete("/<series_id>")]
-    //db: DB, series_id: i32
     let series_id: i32 = match req.extensions.get::<Router>().unwrap().find("id") {
         Some(id) => match i32::from_str(id) {
             Ok(value) => value,
