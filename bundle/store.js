@@ -1,36 +1,13 @@
 class _Store {
   constructor() {
-    this.cache = {};
-  }
-
-  _update_cache(endpoint, data) {
-    this.cache[endpoint] = {
-      value: data,
-      stamp: Date.now()
-    };
   }
 
   _api_get(endpoint, options) {
     let self = this;
 
-    // option to force fetching new data instead of cache
-    let force = options && options.force ? options.force : false;
-    let storeErrors = options && options.nulls ? options.nulls : false;
-
-    if (this.cache[endpoint] && !force) {
-      // TODO: check cache timeout
-      return new Promise((resolve, reject) => {
-        resolve(this.cache[endpoint].value);
-      });
-    }
-
     return fetch(endpoint)
       .then(r => r.json())
       .then(resp => {
-
-        if (resp.success || storeErrors) {
-          self._update_cache(endpoint, resp.data);
-        }
 
         if (!resp.success) {
           throw resp.error;
@@ -50,7 +27,6 @@ class _Store {
         if (!resp.success) {
           throw resp.error;
         }
-        self.cache[endpoint] = undefined;
         return resp.data;
       });
   }
@@ -70,7 +46,6 @@ class _Store {
         if (!resp.success) {
           throw resp.error;
         }
-        self._update_cache(endpoint, resp.data);
         return resp.data;
       });
   }
@@ -90,14 +65,8 @@ class _Store {
         if (!resp.success) {
           throw resp.error;
         }
-        self._update_cache(endpoint, resp.data);
         return resp.data;
       });
-  }
-
-  getSeriesCache() {
-    const endpoint = '/api/v1/series';
-    return this.cache[endpoint] ? this.cache[endpoint].value : null;
   }
 
   getSeries(options) {

@@ -8,7 +8,7 @@ export default class Home extends Component {
     super();
 
     this.state = {
-      series: Store.getSeriesCache()
+      series: [],
     };
   }
 
