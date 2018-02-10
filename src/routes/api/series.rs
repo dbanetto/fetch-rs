@@ -180,10 +180,11 @@ fn update_series(req: &mut Request) -> IronResult<Response> {
 
 
         // delete info_blobs that were not apart of the PUT
-        match delete(info_blob::dsl::info_blob
-                     .filter(not(info_blob::id.eq(any(seen_blobs))))
-                     .filter(info_blob::series_id.eq(series_id)))
-            .execute(&*conn)
+        match delete(
+            info_blob::dsl::info_blob
+                .filter(not(info_blob::id.eq(any(seen_blobs))))
+                .filter(info_blob::series_id.eq(series_id)),
+        ).execute(&*conn)
         {
             Ok(_) => (),
             Err(err) => return Err(api_error(err, Status::InternalServerError)),

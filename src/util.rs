@@ -39,7 +39,10 @@ where
 }
 
 
-pub fn api_response<T: Serialize, E: 'static + Error + Send>(resp: Result<T, E>, err_status: Status) -> IronResult<Response> {
+pub fn api_response<T: Serialize, E: 'static + Error + Send>(
+    resp: Result<T, E>,
+    err_status: Status,
+) -> IronResult<Response> {
     match resp {
         Ok(data) => Ok(api_success(data)),
         Err(err) => Err(api_error(err, err_status)),
@@ -48,7 +51,9 @@ pub fn api_response<T: Serialize, E: 'static + Error + Send>(resp: Result<T, E>,
 
 pub fn api_error<E: 'static + Error + Send>(error: E, status: Status) -> IronError {
     let description = format!("{}", error);
-    let bytes = serde_json::to_vec(&ApiResult::<String, String>::err(format!("{}", description))).unwrap();
+    let bytes = serde_json::to_vec(&ApiResult::<String, String>::err(
+        format!("{}", description),
+    )).unwrap();
     IronError::new(
         error,
         (

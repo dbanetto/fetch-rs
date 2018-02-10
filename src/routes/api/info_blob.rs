@@ -1,7 +1,7 @@
 use db::DbConnection;
 use models::{InfoBlob, InfoBlobForm, Series};
 use schema::{info_blob, series};
-use util::{api_error, api_success, api_response};
+use util::{api_error, api_response, api_success};
 use std::str::FromStr;
 use iron::status::Status;
 use iron::prelude::*;
@@ -11,7 +11,7 @@ use serde_json;
 use router::Router;
 use diesel::pg::PgConnection;
 use diesel::{delete, insert_into, update};
-use ::error::*;
+use error::*;
 
 fn all(req: &mut Request) -> IronResult<Response> {
     let series_id: i32 = match req.extensions.get::<Router>().unwrap().find("series_id") {
@@ -108,7 +108,10 @@ fn update_api(req: &mut Request) -> IronResult<Response> {
         Err(err) => return Err(api_error(err, Status::RequestTimeout)),
     };
 
-    api_response(update_blob(&*conn, series_id, blob_update), Status::InternalServerError)
+    api_response(
+        update_blob(&*conn, series_id, blob_update),
+        Status::InternalServerError,
+    )
 }
 
 // #[delete("/<series_id>/blob/<blob_id>")]
@@ -172,7 +175,10 @@ fn new(req: &mut Request) -> IronResult<Response> {
         Err(err) => return Err(api_error(err, Status::RequestTimeout)),
     };
 
-    api_response(new_blob(&*conn, series_id, blob_form), Status::InternalServerError)
+    api_response(
+        new_blob(&*conn, series_id, blob_form),
+        Status::InternalServerError,
+    )
 }
 
 fn primary(req: &mut Request) -> IronResult<Response> {
@@ -201,11 +207,7 @@ fn primary(req: &mut Request) -> IronResult<Response> {
     Ok(api_success(blobs))
 }
 
-pub fn new_blob(
-    conn: &PgConnection,
-    series_id: i32,
-    blob_form: InfoBlobForm,
-) -> Result<InfoBlob> {
+pub fn new_blob(conn: &PgConnection, series_id: i32, blob_form: InfoBlobForm) -> Result<InfoBlob> {
     let series: Series = match series::dsl::series
         .filter(series::id.eq(series_id))
         .select(series::all_columns)
@@ -229,7 +231,6 @@ pub fn update_blob(
     series_id: i32,
     blob_update: InfoBlobForm,
 ) -> Result<InfoBlob> {
-
     let blob_id = match blob_update.id {
         Some(id) => id,
         None => return Err("id not given".into()),
