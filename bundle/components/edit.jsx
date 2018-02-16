@@ -1,7 +1,7 @@
 import { h, Component } from 'preact';
 import { Link } from 'preact-router';
-import SeriesForm from './seriesForm.jsx';
-import Store from '../store.js';
+import SeriesForm from './seriesForm';
+import Store from '../store';
 
 export default class SeriesEdit extends Component {
 

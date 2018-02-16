@@ -1,7 +1,7 @@
 import { h, Component } from 'preact';
 import { Link } from 'preact-router';
-import SeriesCard from './seriesCard.jsx';
-import Store from '../store.js';
+import SeriesCard from './seriesCard';
+import Store from '../store';
 
 export default class Home extends Component {
   constructor() {

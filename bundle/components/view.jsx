@@ -1,7 +1,7 @@
 import { h, Component } from 'preact';
 import { route, Link } from 'preact-router';
-import Store from '../store.js';
-import handler from './handler.jsx';
+import Store from '../store';
+import handler from './handler';
 
 export default class View extends Component {
 

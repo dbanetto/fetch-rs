@@ -1,5 +1,5 @@
 import { h, Component } from 'preact';
-import handler from './handler.jsx';
+import handler from './handler';
 
 export default class InfoList extends Component {
 

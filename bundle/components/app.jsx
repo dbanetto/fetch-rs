@@ -1,9 +1,9 @@
 import { h, Component } from 'preact';
 import { Router } from 'preact-router';
-import Home from './home.jsx';
-import View from './view.jsx';
-import SeriesNew from './new.jsx';
-import SeriesEdit from './edit.jsx';
+import Home from './home';
+import View from './view';
+import SeriesNew from './new';
+import SeriesEdit from './edit';
 
 export default class App extends Component {
   render({}, {}) {

@@ -1,6 +1,6 @@
 import { h, Component } from 'preact';
-import UrlHandler from './handlers/url.jsx';
-import ImageHandler from './handlers/image.jsx';
+import UrlHandler from './handlers/url';
+import ImageHandler from './handlers/image';
 
 let typeHandlers = {
   'url': UrlHandler,

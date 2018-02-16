@@ -1,6 +1,6 @@
 import { h, Component } from 'preact';
 import { Link } from 'preact-router';
-import SeriesForm from './seriesForm.jsx';
+import SeriesForm from './seriesForm';
 
 export default class SeriesNew extends Component {
 

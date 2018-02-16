@@ -1,8 +1,8 @@
 import { h, Component } from 'preact';
 import { route } from 'preact-router';
-import InfoList from './infoList.jsx';
-import Store from '../store.js';
-import handler from './handler.jsx';
+import InfoList from './infoList';
+import Store from '../store';
+import handler from './handler';
 
 export default class SeriesForm extends Component {
 

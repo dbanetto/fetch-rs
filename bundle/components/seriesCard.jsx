@@ -1,6 +1,6 @@
 import { h, Component } from 'preact';
 import { Link } from 'preact-router';
-import Store from '../store.js';
+import Store from '../store';
 
 export default class SeriesCard extends Component {
 
