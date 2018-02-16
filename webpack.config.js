@@ -33,6 +33,11 @@ module.exports = {
         loader: 'babel-loader'
       },
       {
+        test: /\.tsx?$/,
+        exclude: /node_modules/,
+        loader: "ts-loader"
+      },
+      {
         test: /\.scss$/,
         use: extractSass.extract({
           use: [{
@@ -75,6 +80,6 @@ module.exports = {
 
   ),
   resolve: {
-    extensions: ['.js', '.jsx', '.css', '.scss']
+    extensions: ['.js', '.jsx','.ts', '.tsx', '.css', '.scss']
   },
 };
