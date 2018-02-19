@@ -20,7 +20,6 @@ export default class UriDefault extends Component {
   }
 
   renderEdit() {
-    console.log(this.props);
     return ( <input
       type="url"
       name={ this.props.name || 'url' }

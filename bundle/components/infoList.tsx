@@ -61,8 +61,6 @@ export default class InfoList extends Component<InfoListProps, void> {
   }
 
   buildElement(ele, index) {
-    console.log("Build element");
-    console.log(ele);
     return (<InfoElement
             handleDelete={ this.handleDelete.bind(this, index) }
             handleUpdate={ this.handleUpdate.bind(this, index) }
@@ -74,7 +72,6 @@ export default class InfoList extends Component<InfoListProps, void> {
   }
 
   render() {
-    console.log(this.props.value);
     return  (
         <div>
           { this.props.value.map((ele, index) => this.buildElement(ele, index)) }
@@ -101,15 +98,7 @@ class InfoElement extends Component<InfoProps, void> {
   handleUri(blob) {
     let value = this.props.value;
 
-    console.log("element update");
-    console.log(value);
-    console.log(blob);
-    console.log("----");
-
     value.blob = blob;
-
-    console.log(value);
-    console.log("done");
 
     this.props.handleUpdate(value);
   }
