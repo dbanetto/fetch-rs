@@ -1,8 +1,17 @@
 import { h, Component } from 'preact';
 import { Link } from 'preact-router';
 import Store from '../store';
+import '../model';
 
-export default class SeriesCard extends Component {
+interface CardProps {
+    series: Series;
+}
+
+interface CardState {
+    primary: InfoBlob;
+}
+
+export default class SeriesCard extends Component<CardProps, CardState> {
 
   constructor() {
     super();
@@ -15,14 +24,14 @@ export default class SeriesCard extends Component {
   componentDidMount() {
     let self = this;
     Store.getSeriesPrimary(this.props.series.id)
-      .then(uri => {
+      .then(blob => {
         self.setState({
-          primary: uri
+          primary: blob
         });
       }).catch(() => null);
   }
 
-  getAiringSate() {
+  getAiringSate(): preact.VNode {
     let series = this.props.series;
 
     let status = 'unknown';
@@ -40,7 +49,7 @@ export default class SeriesCard extends Component {
       <div className="card-body">
         <h1>{ series.title }</h1>
         <p>State: { this.getAiringSate() }</p>
-        { this.state.primary && <a href={ this.state.primary.uri }>link</a> }
+        { this.state.primary && this.state.primary.info_type === "url"  && <a href={ this.state.primary.blob.uri }>link</a> }
         <Link href={`/series/${ series.id }`}>view</Link>
       </div>
     </div>);
