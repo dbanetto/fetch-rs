@@ -1,23 +1,27 @@
 import { h, Component } from 'preact';
 import handler from './handler';
+import '../model';
 
-export default class InfoList extends Component {
+
+interface InfoListProps {
+    value: Array<InfoBlob>;
+    handleUpdate: (key: string, value: InfoBlob[]) => void;
+}
+
+export default class InfoList extends Component<InfoListProps, void> {
 
   getTypes() {
     return handler.listTypes();
   }
 
   handleAdd() {
-
     let elements = this.props.value;
-    let selection = document.getElementById('type-selector');
-    let built = { blob: {}, info_type: selection.value, primary: false };
+    let selection = document.getElementById('type-selector') as HTMLInputElement;
+    let built = {
+        id: null, series_id: null, blob: {},
+        info_type: selection.value.toString(), primary: false };
 
-    console.log("built new handler");
-    console.log(built);
     elements.push(built);
-
-    console.log(elements);
 
     this.props.handleUpdate("info", elements);
   }
@@ -32,20 +36,15 @@ export default class InfoList extends Component {
     this.props.handleUpdate("info", elements);
   }
 
-  handleUpdate(index, value) {
+  handleUpdate(index: number, value: InfoBlob) {
     let blobs = this.props.value;
 
-    // hack
-    console.log("info list update");
-    console.log(blobs[index]);
-    console.log(value);
     blobs[index] = value;
-    console.log(blobs);
 
     this.props.handleUpdate("info", blobs);
   }
 
-  handlePrimary(index, checked) {
+  handlePrimary(index: number, checked: boolean) {
     let elements = this.props.value;
 
     elements.map( (e, i) => {
@@ -58,7 +57,7 @@ export default class InfoList extends Component {
       }
     });
     
-    this.props.handleUpdate(elements);
+    this.props.handleUpdate("info", elements);
   }
 
   buildElement(ele, index) {
@@ -90,7 +89,14 @@ export default class InfoList extends Component {
 }
 
 
-class InfoElement extends Component {
+interface InfoProps {
+    value: InfoBlob;
+    handlePrimary: (checked: boolean) => void;
+    handleUpdate: (value: any) => void;
+    handleDelete: () => void;
+};
+
+class InfoElement extends Component<InfoProps, void> {
 
   handleUri(blob) {
     let value = this.props.value;
@@ -114,7 +120,7 @@ class InfoElement extends Component {
 
   render() {
     return (<div>
-      <input type="hidden" name="id" className="info-element" value={ this.props.value.id } />
+      <input type="hidden" name="id" className="info-element" value={ this.props.value.id.toString() } />
 
       { handler.build(
         this.props.value.blob,
@@ -125,7 +131,8 @@ class InfoElement extends Component {
         })
       }
 
-      <input type="radio" name="primary" className="primary" value={this.props.value.primary} checked={ this.props.value.primary } onChange={ this.handlePrimary.bind(this) }/>
+      <input type="radio" name="primary" className="primary" value={ this.props.value.primary.toString() }
+        checked={ this.props.value.primary } onChange={ this.handlePrimary.bind(this) }/>
 
       <button type="button" onClick={ this.props.handleDelete }>x</button>
     </div>);
