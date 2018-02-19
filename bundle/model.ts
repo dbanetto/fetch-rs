@@ -7,7 +7,9 @@ interface Series {
 interface InfoBlob {
     id: number,
     series_id: number,
-    blob: object,
+    blob: any,
     primary: boolean,
     info_type: string,
 }
+
+type SeriesFull = Series & {info: Array<InfoBlob>; };
