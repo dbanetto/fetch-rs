@@ -49,7 +49,7 @@ export default class SeriesCard extends Component<CardProps, CardState> {
       <div className="card-body">
         <h1>{ series.title }</h1>
         <p>State: { this.getAiringSate() }</p>
-        { this.state.primary && this.state.primary.info_type === "url"  && <a href={ this.state.primary.blob.uri }>link</a> }
+        { this.state.primary && this.state.primary.info_type === "url"  && <a href={ this.state.primary.blob.url }>link</a> }
         <Link href={`/series/${ series.id }`}>view</Link>
       </div>
     </div>);
