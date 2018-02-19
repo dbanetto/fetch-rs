@@ -82,7 +82,7 @@ export default class View extends Component<ViewProps, ViewState> {
               <ul>
                 { this.state.info.map((u, i) =>
                 <li key={i.toString()} >
-                  { handler.build(u.blob, u.info_type) }
+                  { handler.build(u.blob, u.info_type, {}) }
                 </li>
                 ) }
 

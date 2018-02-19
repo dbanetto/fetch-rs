@@ -7,11 +7,18 @@ let typeHandlers = {
   'image': ImageHandler,
 };
 
-function addHandler(protocol, builder) {
-  uriHandlers[protocol] = builder;
+interface HandlerProps {
+    blob: any;
+    edit: boolean;
+    handleUpdate: any;
+    name: string;
 }
 
-function build(blob, type, options) {
+function addHandler(type: string, builder: Component<HandlerProps, void>) {
+  typeHandlers[type] = builder;
+}
+
+function build(blob: any, type: string, options: any) {
   options = options || {};
 
   console.log("selected:" + String(type));
@@ -37,7 +44,7 @@ function build(blob, type, options) {
     });
 }
 
-function listTypes() {
+function listTypes(): Array<{ name: string, type: string }> {
 
   let types = [];
   for (var key in typeHandlers) {
