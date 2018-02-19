@@ -2,8 +2,21 @@ import { h, Component } from 'preact';
 import { route, Link } from 'preact-router';
 import Store from '../store';
 import handler from './handler';
+import '../model';
 
-export default class View extends Component {
+interface ViewState {
+    series: Series;
+    info: Array<InfoBlob>;
+}
+
+interface ViewProps {
+    matches?: {
+        id: number;
+    };
+    path: string;
+}
+
+export default class View extends Component<ViewProps, ViewState> {
 
   constructor() {
     super();
@@ -21,10 +34,12 @@ export default class View extends Component {
   getSeries() {
     let self = this;
 
-    Promise.all([
+    let queries: [Promise<Series>, Promise<Array<InfoBlob>>] = [
       Store.getSeriesId(this.props.matches.id),
       Store.getSeriesInfo(this.props.matches.id)
-    ])
+    ];
+
+    Promise.all(queries)
       .then(result => {
         self.setState({
           series: result[0],
@@ -66,7 +81,7 @@ export default class View extends Component {
             <div>
               <ul>
                 { this.state.info.map((u, i) =>
-                <li key={i}>
+                <li key={i.toString()} >
                   { handler.build(u.blob, u.info_type) }
                 </li>
                 ) }

@@ -5,8 +5,8 @@ import View from './view';
 import SeriesNew from './new';
 import SeriesEdit from './edit';
 
-export default class App extends Component {
-  render({}, {}) {
+export default class App extends Component<any, void> {
+  render() {
     return (<div>
       <h1>App</h1>
       <Router>

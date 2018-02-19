@@ -13,7 +13,7 @@ module.exports = {
   cache: true,
   devtool: production ? '' : 'source-map',
   entry: {
-    main: './bundle/main.jsx',
+    main: './bundle/main.tsx',
     style: './bundle/style.scss',
     vendor: [
       'preact',

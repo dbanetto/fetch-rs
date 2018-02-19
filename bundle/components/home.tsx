@@ -2,8 +2,17 @@ import { h, Component } from 'preact';
 import { Link } from 'preact-router';
 import SeriesCard from './seriesCard';
 import Store from '../store';
+import '../model';
 
-export default class Home extends Component {
+interface HomeState {
+    series: Array<Series>;
+}
+
+interface HomeProps {
+    path: string;
+}
+
+export default class Home extends Component<HomeProps, HomeState> {
   constructor() {
     super();
 
@@ -16,7 +25,7 @@ export default class Home extends Component {
     this.loadSeries();
   }
 
-  loadSeries(useCache) {
+  loadSeries() {
     let self = this;
     Store.getSeries()
       .then(series => {
