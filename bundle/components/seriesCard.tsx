@@ -48,7 +48,7 @@ export default class SeriesCard extends Component<CardProps, CardState> {
                   <img class="image" src={ series.poster_url } />
               </div>
               <div class="card-body">
-                  <h1>{ series.title }</h1>
+                  <h2 class="subtitle">{ series.title }</h2>
                   <div>
                       &nbsp;
                       <div class="is-pulled-right">
