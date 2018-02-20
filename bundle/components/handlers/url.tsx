@@ -1,13 +1,9 @@
 import { h, Component } from 'preact';
+import '../../model';
 
+export default class UriDefault extends Component<HandlerProps, void> {
 
-export default class UriDefault extends Component {
-
-  constructor() {
-    super();
-  }
-
-  static name() {
+  static TypeName(): string {
     return "Link";
   }
 

@@ -12,4 +12,11 @@ interface InfoBlob {
     info_type: string,
 }
 
+interface HandlerProps {
+    blob: any;
+    edit: boolean;
+    handleUpdate: any;
+    name: string;
+}
+
 type SeriesFull = Series & {info: Array<InfoBlob>; };

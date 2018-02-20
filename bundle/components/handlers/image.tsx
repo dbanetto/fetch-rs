@@ -1,13 +1,10 @@
 import { h, Component } from 'preact';
+import '../../model';
 
 
-export default class ImageHandler extends Component {
+export default class ImageHandler extends Component<HandlerProps, void> {
 
-  constructor() {
-    super();
-  }
-
-  static name() {
+  static TypeName(): string {
     return "Image";
   }
 

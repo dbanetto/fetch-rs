@@ -1,18 +1,12 @@
 import { h, Component } from 'preact';
 import UrlHandler from './handlers/url';
 import ImageHandler from './handlers/image';
+import '../model';
 
 let typeHandlers = {
   'url': UrlHandler,
   'image': ImageHandler,
 };
-
-interface HandlerProps {
-    blob: any;
-    edit: boolean;
-    handleUpdate: any;
-    name: string;
-}
 
 function addHandler(type: string, builder: Component<HandlerProps, void>) {
   typeHandlers[type] = builder;
