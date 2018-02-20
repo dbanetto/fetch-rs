@@ -38,7 +38,7 @@ module.exports = {
         loader: "ts-loader"
       },
       {
-        test: /\.scss$/,
+        test: /\.(sass|scss)$/,
         use: extractSass.extract({
           use: [{
             loader: "css-loader"
