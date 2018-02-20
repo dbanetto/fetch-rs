@@ -20,8 +20,8 @@ export default class SeriesForm extends Component<FormProps, FormState> {
 
         var series = {
             id: null,
-            title: null,
-            poster_url: null,
+            title: '',
+            poster_url: '',
             info: [],
         };
         if (props &&  props.series) {
@@ -92,13 +92,21 @@ export default class SeriesForm extends Component<FormProps, FormState> {
         this.handleUpdate('poster_url', blob.src);
     }
 
+    renderId(): preact.VNode {
+        if (this.state.series.id) {
+            return (<div>
+                <input name="id" id="id" type="hidden" value={ this.state.series.id.toString() } />
+            </div>);
+        } else{
+            return (<div></div>);
+        }
+    }
+
     render() {
         let series = this.state.series;
         return (
             <form onSubmit={this.handleSubmit.bind(this)}>
-                <div>
-                    <input name="id" id="id" type="hidden" value={series.id.toString()} />
-                </div>
+                { this.renderId() }
                 <div>
                     <label for="title">Title</label>
                     <input name="title" id="title" type="text" value={series.title.toString()} required
