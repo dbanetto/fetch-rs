@@ -20,8 +20,6 @@ function build(blob: any, type: string, options: any) {
   // use registered handler or default link handler
   var element = typeHandlers[type] || UrlHandler;
 
-  console.log("created handler with " + element.name() + " for " + String(type));
-
   // a reminder that handleUpdate should be set if editting
   if (options.edit && typeof(options.handleUpdate) !== "function") {
     throw 'Uri built to be edited but handleUpdate function is not defined'
@@ -43,7 +41,7 @@ function listTypes(): Array<{ name: string, type: string }> {
   let types = [];
   for (var key in typeHandlers) {
     types.push({
-      name: typeHandlers[key].name(),
+      name: typeHandlers[key].TypeName(),
       type: key
     });
   }
