@@ -1,84 +1,40 @@
-body {
-    font-family: 'Open Sans', serif;
-    margin: 5px;
-}
+// 1. Import the initial variables
+@import "node_modules/bulma/sass/utilities/initial-variables";
+@import "node_modules/bulma/sass/utilities/functions";
 
-.card-box {
-   display: flex;  
-   flex-direction: row;
-   flex-wrap: wrap;
-}
+// 2. Set your own initial variables
+// Update blue
+$blue: #72d0eb;
+$blue-invert: findColorInvert($blue);
 
-.card {
-    flex: auto;
-}
+// Add a serif family
+$family-serif: "Open Sans", "Georgia", serif;
 
+// 3. Set the derived variables
+// Use the new pink as the primary color
+$primary: $blue;
+$primary-invert: $blue-invert;
+// Use the existing orange as the danger color
+$danger: $orange;
+// Use the new serif family
+$family-primary: $family-serif;
 
-.status {
-    padding: 0.2em;
-    border-radius: 0.2em;
-}
+// 4. Setup your Custom Colors
+$linkedin: #0077b5;
+$linkedin-invert: findColorInvert($linkedin);
+$twitter: #55acee;
+$twitter-invert: findColorInvert($twitter);
+$github: #333;
+$github-invert: findColorInvert($github);
 
-.status-unknown {
-    @extend .status;
-    background-color: #5b5b5b;
-    color: white;
-}
-.status-soon {
-    @extend .status;
-    background-color: #2b8594;
-    color: white;
-}
-.status-airing {
-    @extend .status;
-    background-color: #328632;
-    color: white;
-}
-.status-finished {
-    @extend .status;
-    background-color: #bf3030;
-    color: white;
-}
+// 5. Add new color variables to the color map.
+@import "node_modules/bulma/sass/utilities/derived-variables.sass";
+$addColors: (
+  "twitter":($twitter, $twitter-invert),
+  "linkedin": ($linkedin, $linkedin-invert),
+  "github": ($github, $github-invert)
+);
+$colors: map-merge($colors, $addColors);
 
-.card-box {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    // justify-content: space-around;
-    border: thick solid #550055;
-    align-items: baseline;
-justify-content: space-around;
-}
-
-.card {
-    border: thick solid #005555;
-    flex-grow: 1;
-
-    max-width: 100vw;
-    max-height: 100vh;
-
-    display: flex;
-    flex-direction: column;
-    // flex-wrap: wrap;
-    // justify-content: flex-start;
-
-    .poster img {
-        max-width: 250px;
-        height: 100%;
-    }
-
-    .card-body {
-        border: thick solid #555500;
-    }
-
-}
-
-.preview {
-    border: medium dashed #555;
-    max-width: 100vw;
-    max-height: 100vh;
-    
-    img {
-        max-width: 250px;
-    }
-}
+// 6. Import the rest of Bulma
+@import "node_modules/bulma/bulma";
