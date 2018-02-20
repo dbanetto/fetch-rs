@@ -1,6 +1,6 @@
 import { h, Component } from 'preact';
 import { route, Link } from 'preact-router';
-import SeriesForm from './seriesForm';
+import SeriesForm from '../components/seriesForm';
 import Store from '../store';
 import '../model';
 
@@ -16,7 +16,7 @@ interface EditProps {
     };
 }
 
-export default class SeriesEdit extends Component<EditProps, EditState> {
+export default class Edit extends Component<EditProps, EditState> {
 
     constructor() {
         super();

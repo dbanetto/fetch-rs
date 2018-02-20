@@ -1,7 +1,7 @@
 import { h, Component } from 'preact';
 import { route, Link } from 'preact-router';
 import Store from '../store';
-import handler from './handler';
+import handler from '../components/handler';
 import '../model';
 
 interface ViewState {

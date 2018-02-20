@@ -1,6 +1,6 @@
 import { h, Component } from 'preact';
 import { Link } from 'preact-router';
-import SeriesCard from './seriesCard';
+import SeriesCard from '../components/seriesCard';
 import Store from '../store';
 import '../model';
 
