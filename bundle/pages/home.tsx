@@ -38,9 +38,15 @@ export default class Home extends Component<HomeProps, HomeState> {
 
   renderSeries() {
     if (this.state && this.state.series) {
-      return (<div className="tile is-parent">
-        { this.state.series.map(i => <SeriesCard key={i.id} series={i} />) }
-      </div>);
+        return (
+            <div className="columns tile is-parent">
+                <ul class="card-list">
+                    { this.state.series.map(i => <li class="has-gap">
+                        <SeriesCard key={i.id} series={i} />
+                        </li>) }
+                </ul>
+            </div>
+        );
     } else {
       return (<span>loading...</span>);
     }
@@ -49,10 +55,7 @@ export default class Home extends Component<HomeProps, HomeState> {
     render() {
         return (
             <div>
-                <h2>Series List</h2>
                 { this.renderSeries() }
-                <Link class="button is-success" href="/series/new">Create</Link>
-                <button class="button" onClick={this.loadSeries.bind(this)}>Reload</button>
             </div>
         );
   }

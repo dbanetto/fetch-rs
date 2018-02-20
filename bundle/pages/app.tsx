@@ -14,7 +14,7 @@ export default class App extends Component<any, void> {
                   <div class="navbar-brand">
 
                       <div class="navbar-item">
-                          ICON
+                          <h1 class="title">ICON</h1>
                       </div>
 
                       <label class="navbar-burger" data-target="navbar-menu-target">

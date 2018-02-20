@@ -103,7 +103,7 @@ export default class View extends Component<ViewProps, ViewState> {
     let series = this.state.series;
 
     return (
-        <div>
+        <div class="container box">
           <div>
             <h1>{ series.title }</h1>
             <p><img src={ series.poster_url }/></p>

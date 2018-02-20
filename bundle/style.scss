@@ -38,3 +38,36 @@ $colors: map-merge($colors, $addColors);
 
 // 6. Import the rest of Bulma
 @import "node_modules/bulma/bulma";
+
+html {
+    background: $white-ter;
+}
+
+.card-list {
+    display: flex;
+    flex-flow: row;
+    flex-wrap: wrap;
+}
+
+.card {
+    min-width: 360px;
+}
+
+.poster img {
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: auto;
+    height: 360px;
+}
+
+.navbar {
+    margin-bottom: 1rem;
+}
+
+.is-full {
+    width: 100%;
+}
+
+.has-gap {
+    margin: 0.5rem;
+}

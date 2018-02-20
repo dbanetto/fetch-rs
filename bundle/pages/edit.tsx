@@ -66,7 +66,7 @@ export default class Edit extends Component<EditProps, EditState> {
         series.info = this.state.info;
 
         return (
-            <div>
+            <div class="container box">
             <SeriesForm series={ series } />
             <Link class="button" href={ `/series/${ this.state.series.id }` }>back</Link>
             </div>
