@@ -44,9 +44,11 @@ export default class SeriesCard extends Component<CardProps, CardState> {
     var series = this.props.series;
       return (
           <div class="is-full box">
-              <div class="poster">
-                  <img class="image" src={ series.poster_url } />
-              </div>
+              <Link href={`/series/${ series.id }`} >
+                  <div class="poster">
+                      <img class="image" src={ series.poster_url } />
+                  </div>
+              </Link>
               <div class="card-body">
                   <h2 class="subtitle">{ series.title }</h2>
                   <div>
