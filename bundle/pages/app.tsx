@@ -36,14 +36,14 @@ export default class App extends Component<any, void> {
                   </div>
               </nav>
 
-
-
-              <Router>
-                  <Home path="/" />
-                  <New path="/series/new" />
-                  <View path="/series/:id" />
-                  <Edit path="/series/:id/edit" />
-              </Router>
+              <div class="container is-fluid">
+                  <Router>
+                      <Home path="/" />
+                      <New path="/series/new" />
+                      <View path="/series/:id" />
+                      <Edit path="/series/:id/edit" />
+                  </Router>
+              </div>
           </div>
       );
   }

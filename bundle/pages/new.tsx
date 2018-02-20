@@ -13,7 +13,7 @@ export default class New extends Component<NewProps, void> {
     return (
         <div>
           <SeriesForm />
-          <Link href="/">back</Link>
+          <Link class="button" href="/">back</Link>
         </div>
         );
   }

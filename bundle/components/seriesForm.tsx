@@ -123,7 +123,7 @@ export default class SeriesForm extends Component<FormProps, FormState> {
                         handleUpdate={ this.handleInfoUpdate.bind(this) } />
                 </div>
                 <div>
-                    <input type="submit" />
+                    <input class="button" type="submit" />
                 </div>
             </form>
         );

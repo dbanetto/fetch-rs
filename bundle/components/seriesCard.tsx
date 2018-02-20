@@ -42,15 +42,15 @@ export default class SeriesCard extends Component<CardProps, CardState> {
 
   render() {
     var series = this.props.series;
-    return (<div className="card">
+    return (<div className="tile is-vertical">
       <div className="poster">
         <img src={ series.poster_url } />
       </div>
       <div className="card-body">
         <h1>{ series.title }</h1>
         <p>State: { this.getAiringSate() }</p>
-        { this.state.primary && this.state.primary.info_type === "url"  && <a href={ this.state.primary.blob.url }>link</a> }
-        <Link href={`/series/${ series.id }`}>view</Link>
+        { this.state.primary && this.state.primary.info_type === "url"  && <a class="button" href={ this.state.primary.blob.url }>link</a> }
+        <Link class="button" href={`/series/${ series.id }`}>View</Link>
       </div>
     </div>);
   }

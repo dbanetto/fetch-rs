@@ -111,13 +111,13 @@ export default class View extends Component<ViewProps, ViewState> {
           </div>
           <div>
             <span>
-              <Link href={ `/series/${ series.id }/edit` }>edit</Link>
+              <Link class="button is-warning" href={ `/series/${ series.id }/edit` }>Edit</Link>
             </span>
             <span>
-              <a href="javascript:void(0)" onClick={ this.handleDelete.bind(this) }>delete</a>
+              <a class="button is-danger" href="javascript:void(0)" onClick={ this.handleDelete.bind(this) }>Delete</a>
             </span>
             <span>
-              <Link href='/'>back</Link>
+              <Link class="button" href='/'>Back</Link>
             </span>
           </div>
         </div>

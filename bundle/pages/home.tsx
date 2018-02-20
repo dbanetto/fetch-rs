@@ -38,7 +38,7 @@ export default class Home extends Component<HomeProps, HomeState> {
 
   renderSeries() {
     if (this.state && this.state.series) {
-      return (<div className="card-box">
+      return (<div className="tile is-parent">
         { this.state.series.map(i => <SeriesCard key={i.id} series={i} />) }
       </div>);
     } else {
@@ -46,14 +46,14 @@ export default class Home extends Component<HomeProps, HomeState> {
     }
   }
 
-  render() {
-    return (
-        <div>
-          <h2>Series List</h2>
-            { this.renderSeries() }
-            <Link href="/series/new">create</Link>
-          <button onClick={this.loadSeries.bind(this)}>Reload</button>
-        </div>
+    render() {
+        return (
+            <div>
+                <h2>Series List</h2>
+                { this.renderSeries() }
+                <Link class="button is-success" href="/series/new">Create</Link>
+                <button class="button" onClick={this.loadSeries.bind(this)}>Reload</button>
+            </div>
         );
   }
 }
