@@ -2,21 +2,13 @@
 @import "node_modules/bulma/sass/utilities/initial-variables";
 @import "node_modules/bulma/sass/utilities/functions";
 
-// 2. Set your own initial variables
-// Update blue
-$blue: #72d0eb;
-$blue-invert: findColorInvert($blue);
-
-// Add a serif family
+// fonts
 $family-serif: "Open Sans", "Georgia", serif;
 
-// 3. Set the derived variables
-// Use the new pink as the primary color
-$primary: $blue;
-$primary-invert: $blue-invert;
-// Use the existing orange as the danger color
-$danger: $orange;
-// Use the new serif family
+// set primary colour
+$primary: #4fd5b9;
+$primary-invert: findColorInvert($primary);
+
 $family-primary: $family-serif;
 
 // 4. Setup your Custom Colors
@@ -63,6 +55,8 @@ html {
 }
 
 .navbar {
+    background: $primary;
+    color: $primary-invert;
     margin-bottom: 1rem;
 }
 
