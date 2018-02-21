@@ -104,22 +104,30 @@ export default class View extends Component<ViewProps, ViewState> {
 
     return (
         <div class="container box">
-          <div>
-            <h1>{ series.title }</h1>
-            <p><img src={ series.poster_url }/></p>
-            { this.renderInfoList() }
-          </div>
-          <div>
-            <span>
-              <Link class="button is-warning" href={ `/series/${ series.id }/edit` }>Edit</Link>
-            </span>
-            <span>
-              <a class="button is-danger" href="javascript:void(0)" onClick={ this.handleDelete.bind(this) }>Delete</a>
-            </span>
-            <span>
-              <Link class="button" href='/'>Back</Link>
-            </span>
-          </div>
+            <div>
+                <div>
+                    <h1 class="title">{ series.title }</h1>
+                </div>
+                <div class="columns">
+                    <div class="column">
+                        { this.renderInfoList() }
+                    </div>
+                    <div class="column">
+                        <img class="image" src={ series.poster_url }/>
+                    </div>
+                </div>
+            </div>
+            <div class="is-flex">
+                <div class="has-gap">
+                    <Link class="button is-warning" href={ `/series/${ series.id }/edit` }>Edit</Link>
+                </div>
+                <div class="has-gap">
+                    <a class="button is-danger" href="javascript:void(0)" onClick={ this.handleDelete.bind(this) }>Delete</a>
+                </div>
+                <div class="has-gap">
+                    <Link class="button" href='/'>Back</Link>
+                </div>
+            </div>
         </div>
         );
   }
