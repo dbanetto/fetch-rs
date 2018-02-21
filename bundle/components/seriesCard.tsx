@@ -56,8 +56,8 @@ export default class SeriesCard extends Component<CardProps, CardState> {
                       <div class="is-pulled-right">
                           { this.state.primary && this.state.primary.info_type === "url"  && <a class="button" href={ this.state.primary.blob.url }>link</a> }
                           <Link class="button" href={`/series/${ series.id }`}>View</Link>
-    </div>
-</div>
+                      </div>
+                  </div>
               </div>
           </div>);
   }
