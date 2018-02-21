@@ -118,7 +118,7 @@ export default class SeriesForm extends Component<FormProps, FormState> {
                     handleUpdate: this.handleUpdatePoster.bind(this) }) }
                 </div>
                 <div>
-                    <h3 class="subtitle">Info</h3>.
+                    <h3 class="subtitle">Info</h3>
                     <InfoList value={series.info || []}
                         handleUpdate={ this.handleInfoUpdate.bind(this) } />
                 </div>

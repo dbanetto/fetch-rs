@@ -74,12 +74,14 @@ export default class InfoList extends Component<InfoListProps, void> {
   render() {
     return  (
         <div>
-          { this.props.value.map((ele, index) => this.buildElement(ele, index)) }
+            { this.props.value.map((ele, index) => this.buildElement(ele, index)) }
 
-          <select id="type-selector">
-            { this.getTypes().map((t) => <option value={ t.type }>{ t.name }</option> ) }
-          </select>
-          <button type="button" onClick={ this.handleAdd.bind(this) }>add</button>
+            <div class="select">
+                <select  id="type-selector">
+                    { this.getTypes().map((t) => <option value={ t.type }>{ t.name }</option> ) }
+                </select>
+            </div>
+            <button class="button" type="button" onClick={ this.handleAdd.bind(this) }>add</button>
         </div>
         );
   }
@@ -129,10 +131,10 @@ class InfoElement extends Component<InfoProps, void> {
         })
       }
 
-      <input type="radio" name="primary" className="primary" value={ this.props.value.primary.toString() }
+      <input type="radio" name="primary" class="radio primary" value={ this.props.value.primary.toString() }
         checked={ this.props.value.primary } onChange={ this.handlePrimary.bind(this) }/>
 
-      <button type="button" onClick={ this.props.handleDelete }>x</button>
+      <button class="button is-danger" type="button" onClick={ this.props.handleDelete }>x</button>
     </div>);
   }
 
