@@ -107,9 +107,18 @@ class InfoElement extends Component<InfoProps, void> {
     this.props.handlePrimary(event.target.checked);
   }
 
+  renderId() {
+      if (this.props.value.id) {
+          return (<input type="hidden" name="id" className="info-element" value={ this.props.value.id.toString() } />);
+      } else {
+          return (<div></div>);
+      }
+  }
+
   render() {
     return (<div>
-      <input type="hidden" name="id" className="info-element" value={ this.props.value.id.toString() } />
+
+        { this.renderId() }
 
       { handler.build(
         this.props.value.blob,
