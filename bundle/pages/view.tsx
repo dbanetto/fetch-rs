@@ -119,13 +119,13 @@ export default class View extends Component<ViewProps, ViewState> {
             </div>
             <div class="is-flex">
                 <div class="has-gap">
+                    <Link class="button" href='/'>Back</Link>
+                </div>
+                <div class="has-gap">
                     <Link class="button is-warning" href={ `/series/${ series.id }/edit` }>Edit</Link>
                 </div>
-                <div class="has-gap">
+                <div class="has-gap margin-right">
                     <a class="button is-danger" href="javascript:void(0)" onClick={ this.handleDelete.bind(this) }>Delete</a>
-                </div>
-                <div class="has-gap">
-                    <Link class="button" href='/'>Back</Link>
                 </div>
             </div>
         </div>
