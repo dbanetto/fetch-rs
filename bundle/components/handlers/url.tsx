@@ -16,7 +16,7 @@ export default class UriDefault extends Component<HandlerProps, void> {
   }
 
   renderEdit() {
-    return ( <input
+    return ( <input class="input"
       type="url"
       name={ this.props.name || 'url' }
       value={ this.props.blob.url }

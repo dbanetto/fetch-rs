@@ -108,22 +108,25 @@ export default class SeriesForm extends Component<FormProps, FormState> {
             <form onSubmit={this.handleSubmit.bind(this)}>
                 { this.renderId() }
                 <div>
-                    <label for="title">Title</label>
-                    <input name="title" id="title" type="text" value={series.title.toString()} required
+                    <label class="label" for="title">Title</label>
+                    <input class="input" name="title" id="title" type="text" value={series.title.toString()} required
                         onChange={ this.handleUpdate.bind(this, 'title') } />
                 </div>
                 <div>
-                    <label for="poster_url">Poster URL</label>
+                    <label class="label" for="poster_url">Poster URL</label>
                     { handler.build({ src: series.poster_url }, 'image', { edit: true, name: 'poster_url',
                     handleUpdate: this.handleUpdatePoster.bind(this) }) }
                 </div>
                 <div>
-                    <h3>Info</h3>.
+                    <h3 class="subtitle">Info</h3>.
                     <InfoList value={series.info || []}
                         handleUpdate={ this.handleInfoUpdate.bind(this) } />
                 </div>
+                <br />
                 <div>
-                    <input class="button" type="submit" />
+                    <button class={ 'button ' + (this.state.series.id ? 'is-warning' : 'is-success') } type="submit">
+                        { this.state.series.id ? "Update" : "Create" }
+                    </button>
                 </div>
             </form>
         );
