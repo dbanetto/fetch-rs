@@ -81,7 +81,8 @@ export default class InfoList extends Component<InfoListProps, void> {
                     { this.getTypes().map((t) => <option value={ t.type }>{ t.name }</option> ) }
                 </select>
             </div>
-            <button class="button" type="button" onClick={ this.handleAdd.bind(this) }>add</button>
+            <span>&nbsp;</span>
+            <button class="button" type="button" onClick={ this.handleAdd.bind(this) }>Add</button>
         </div>
         );
   }

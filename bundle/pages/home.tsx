@@ -40,9 +40,7 @@ export default class Home extends Component<HomeProps, HomeState> {
     if (this.state && this.state.series) {
         return (
             <div class="card-list tile is-parent">
-                    { this.state.series.map(i => <div class="has-gap">
-                        <SeriesCard key={i.id} series={i} />
-                        </div>) }
+                    { this.state.series.map(i => <SeriesCard key={i.id} series={i} />) }
             </div>
         );
     } else {

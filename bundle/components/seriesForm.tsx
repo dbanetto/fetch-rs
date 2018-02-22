@@ -1,5 +1,5 @@
 import { h, Component } from 'preact';
-import { route } from 'preact-router';
+import { route, Link } from 'preact-router';
 import InfoList from './infoList';
 import Store from '../store';
 import handler from './handler';
@@ -7,6 +7,7 @@ import '../model';
 
 interface FormProps {
     series?: SeriesFull;
+    back: string;
 }
 
 interface FormState {
@@ -124,7 +125,8 @@ export default class SeriesForm extends Component<FormProps, FormState> {
                 </div>
                 <br />
                 <div>
-                    <button class={ 'button ' + (this.state.series.id ? 'is-warning' : 'is-success') } type="submit">
+                    <Link class="button" href={ this.props.back }>Back</Link>
+                    <button class={ 'is-pulled-right button ' + (this.state.series.id ? 'is-warning' : 'is-success') } type="submit">
                         { this.state.series.id ? "Update" : "Create" }
                     </button>
                 </div>

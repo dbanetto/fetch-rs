@@ -12,8 +12,7 @@ export default class New extends Component<NewProps, void> {
   render() {
     return (
         <div class="container box">
-            <SeriesForm />
-            <Link class="button" href="/">back</Link>
+            <SeriesForm back="/" />
         </div>
         );
   }

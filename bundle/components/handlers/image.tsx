@@ -25,9 +25,9 @@ export default class ImageHandler extends Component<HandlerProps, void> {
                   value={ this.props.blob.src }
                   onChange={ this.handleUpdate.bind(this) }  />
           </div>
-        <div class="preview column">
-          <span>Preview</span>
-          <div>
+        <div class="column">
+          <h3 class="subtitle">Preview</h3>
+          <div class="poster preview">
             <img class="image" src={ this.props.blob.src } />
           </div>
         </div>
