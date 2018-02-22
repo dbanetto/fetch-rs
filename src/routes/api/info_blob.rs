@@ -32,7 +32,7 @@ fn all(req: &mut Request) -> IronResult<Response> {
         .get_results(&*conn)
     {
         Ok(blobs) => blobs,
-        Err(err) => return Err(api_error(err, Status::BadRequest)),
+        Err(err) => return Err(api_error(err, Status::NotFound)),
     };
 
 
@@ -67,7 +67,7 @@ fn select(req: &mut Request) -> IronResult<Response> {
         .first(&*conn)
     {
         Ok(blob) => blob,
-        Err(err) => return Err(api_error(err, Status::BadRequest)),
+        Err(err) => return Err(api_error(err, Status::NotFound)),
     };
 
     Ok(api_success(blob))
@@ -114,7 +114,6 @@ fn update_api(req: &mut Request) -> IronResult<Response> {
     )
 }
 
-// #[delete("/<series_id>/blob/<blob_id>")]
 fn delete_api(req: &mut Request) -> IronResult<Response> {
     let series_id: i32 = match req.extensions.get::<Router>().unwrap().find("series_id") {
         Some(id) => match i32::from_str(id) {
@@ -144,7 +143,7 @@ fn delete_api(req: &mut Request) -> IronResult<Response> {
     ).get_result(&*conn)
     {
         Ok(blob) => blob,
-        Err(err) => return Err(api_error(err, Status::BadRequest)),
+        Err(err) => return Err(api_error(err, Status::NotFound)),
     };
 
     Ok(api_success(blob))
@@ -201,7 +200,39 @@ fn primary(req: &mut Request) -> IronResult<Response> {
         .first(&*conn)
     {
         Ok(blob) => blob,
-        Err(err) => return Err(api_error(err, Status::BadRequest)),
+        Err(err) => return Err(api_error(err, Status::NotFound)),
+    };
+
+    Ok(api_success(blobs))
+}
+
+
+fn select_type(req: &mut Request) -> IronResult<Response> {
+    let series_id: i32 = match req.extensions.get::<Router>().unwrap().find("series_id") {
+        Some(id) => match i32::from_str(id) {
+            Ok(value) => value,
+            Err(err) => return Err(api_error(err, Status::BadRequest)),
+        },
+        None => unreachable!(),
+    };
+
+    let select_type = match req.extensions.get::<Router>().unwrap().find("type") {
+        Some(select_type) => select_type,
+        None => unreachable!(),
+    };
+
+    let conn = match req.extensions.get::<DbConnection>().unwrap().get() {
+        Ok(conn) => conn,
+        Err(err) => return Err(api_error(err, Status::RequestTimeout)),
+    };
+
+    let blobs: InfoBlob = match info_blob::dsl::info_blob
+        .filter(info_blob::series_id.eq(series_id))
+        .filter(info_blob::info_type.eq(select_type))
+        .first(&*conn)
+    {
+        Ok(blob) => blob,
+        Err(err) => return Err(api_error(err, Status::NotFound)),
     };
 
     Ok(api_success(blobs))
@@ -269,6 +300,7 @@ pub fn routes() -> Router {
     router!(
         all: get "/:series_id" => all,
         primary: get "/:series_id/primary" => primary,
+        select_type: get "/:series_id/type/:type" => select_type,
         select: get "/:series_id/:blob_id" => select,
         update: put "/:series_id/:blob_id" => update_api,
         delete: delete "/:series_id/:blob_id" => delete_api,
