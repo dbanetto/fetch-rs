@@ -10,14 +10,12 @@ pub struct Series {
     pub poster_url: Option<String>,
 }
 
-
 #[derive(Insertable, Serialize, Deserialize, Debug, Default)]
 #[table_name = "series"]
 pub struct NewSeries {
     pub title: String,
     pub poster_url: Option<String>,
 }
-
 
 #[derive(Serialize, Deserialize, Debug, Default)]
 pub struct SeriesForm {

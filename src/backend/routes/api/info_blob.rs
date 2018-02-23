@@ -35,7 +35,6 @@ fn all(req: &mut Request) -> IronResult<Response> {
         Err(err) => return Err(api_error(err, Status::NotFound)),
     };
 
-
     Ok(api_success(blobs))
 }
 
@@ -205,7 +204,6 @@ fn primary(req: &mut Request) -> IronResult<Response> {
 
     Ok(api_success(blobs))
 }
-
 
 fn select_type(req: &mut Request) -> IronResult<Response> {
     let series_id: i32 = match req.extensions.get::<Router>().unwrap().find("series_id") {

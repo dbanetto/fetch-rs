@@ -27,7 +27,6 @@ fn all(req: &mut Request) -> IronResult<Response> {
     )
 }
 
-
 fn select(req: &mut Request) -> IronResult<Response> {
     let series_id: i32 = match req.extensions.get::<Router>().unwrap().find("id") {
         Some(id) => match i32::from_str(id) {
@@ -178,7 +177,6 @@ fn update_series(req: &mut Request) -> IronResult<Response> {
             }
         }
 
-
         // delete info_blobs that were not apart of the PUT
         match delete(
             info_blob::dsl::info_blob
@@ -216,7 +214,6 @@ fn delete_series(req: &mut Request) -> IronResult<Response> {
         Err(err) => Err(api_error(err, Status::BadRequest)),
     }
 }
-
 
 pub fn routes() -> Router {
     router!(
