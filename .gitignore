@@ -1,4 +1,4 @@
-public/bundle/
+public/
 node_modules/
 target/
 .env

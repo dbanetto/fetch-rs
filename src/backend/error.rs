@@ -17,5 +17,10 @@ error_chain! {
            description("Not enough settings are set to start")
            display("Not enough settings are set: {:?}", config)
        }
+
+        ConfigReadFailed {
+            description("Failed to read config of request")
+           display("Failed to read config of request")
+        }
     }
 }

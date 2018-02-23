@@ -10,6 +10,7 @@ extern crate durationfmt;
 #[macro_use]
 extern crate error_chain;
 extern crate filetime;
+extern crate handlebars_iron as hbs;
 extern crate hyper;
 extern crate iron;
 extern crate mount;
@@ -19,6 +20,7 @@ extern crate router;
 extern crate serde;
 #[macro_use]
 extern crate serde_derive;
+#[macro_use]
 extern crate serde_json;
 extern crate staticfile;
 extern crate structopt;
@@ -32,7 +34,6 @@ extern crate iron_test;
 
 pub mod db;
 pub mod error;
-pub mod handlers;
 pub mod middleware;
 pub mod models;
 pub mod routes;
@@ -54,14 +55,17 @@ fn main() {
         }
     };
     println!("{:?}", config);
+    let addr = { format!("{}:{}", config.bind, config.port) };
 
     let mut chain = Chain::new(routes::routes());
 
     chain.link_before(middleware::Timer);
-    chain.link_before(db::get_pool(config.database_url));
+    chain.link_before(db::get_pool(&config.database_url));
+    chain.link_before(config);
+
+    chain.link_after(middleware::handlebars());
     chain.link_after(middleware::ErrorLog);
 
-    let addr = format!("{}:{}", config.bind, config.port);
     println!("Starting server on {}", addr);
     Iron::new(chain).http(addr).unwrap();
 }

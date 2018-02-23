@@ -1,19 +1,37 @@
 use staticfile::Static;
 use mount::Mount;
-use std::time::Duration;
+use iron::prelude::*;
+use iron::status::Status;
+use hbs::Template;
+
+use config::Config;
+use error::*;
 
 pub mod api;
-
-use handlers::CachedFile;
 
 pub fn routes() -> Mount {
     let mut mount = Mount::new();
 
-    mount.mount(
-        "/",
-        CachedFile::new("public/index.html", Duration::from_secs(60 * 60)),
-    );
-    mount.mount("/public/", Static::new("public/"));
+    // static files
+    mount.mount("/", index);
+    mount.mount("/public/", Static::new(""));
+
+    // endpoints
     mount.mount("/api/v1/", api::routes());
+
     mount
+}
+
+fn index(req: &mut Request) -> IronResult<Response> {
+    let config = match req.extensions.get::<Config>() {
+        Some(config) => config,
+        None => {
+            return Err(IronError::new(
+                Error::from(ErrorKind::ConfigReadFailed),
+                Status::InternalServerError,
+            ));
+        }
+    };
+
+    Ok(Response::with((Template::new("index", config), Status::Ok)))
 }

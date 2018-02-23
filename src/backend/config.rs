@@ -4,6 +4,7 @@ use std::env;
 use structopt::StructOpt;
 use toml;
 use error::*;
+use serde_json::Value;
 
 #[derive(Default, Debug, StructOpt, Serialize, Deserialize)]
 /// Configuration options
@@ -80,13 +81,16 @@ impl Config {
             self.database_url
         };
 
-
         Config {
             port: port,
             bind: bind,
             config_path: config_path,
             database_url: database_url,
         }
+    }
+
+    pub fn template_config(&self) -> Value {
+        json!({})
     }
 }
 

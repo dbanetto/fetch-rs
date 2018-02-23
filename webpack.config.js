@@ -21,7 +21,7 @@ module.exports = {
     ]
   },
   output: {
-    path: path.resolve(__dirname, 'public', 'bundle'),
+    path: path.resolve(__dirname, 'public'),
     filename: '[name].js',
     chunkFilename: '[chunkhash].js'
   },
