@@ -3,6 +3,10 @@ authors = ["David Barnett <david@barnett.net.nz>"]
 name = "fetch-rs"
 version = "0.1.0"
 
+[[bin]]
+name = "fetch-web"
+path = "src/backend/main.rs"
+
 [dependencies]
 dotenv = "^0.8.0"
 error-chain = "^0.8.1"

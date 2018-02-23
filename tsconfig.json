@@ -10,7 +10,7 @@
     "jsxFactory": "h"
   },
   "include": [
-    "./bundle/**/*.tsx",
-    "./bundle/**/*.ts"
+    "./src/frontend/**/*.tsx",
+    "./src/frontend/**/*.ts"
   ]
 }
