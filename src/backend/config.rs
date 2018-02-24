@@ -101,14 +101,9 @@ impl Config {
 pub fn get_config() -> Result<Config> {
     let options = Config::from_args();
 
-    // no need to merge if CLI is complete
-    let options = if !options.is_complete() {
-        match read_config_file(&options.config_path) {
-            Ok(c) => c.merge(options),
-            Err(err) => return Err(err),
-        }
-    } else {
-        options
+    let options = match read_config_file(&options.config_path) {
+        Ok(c) => c.merge(options),
+        Err(err) => return Err(err),
     };
 
     if options.is_complete() {
