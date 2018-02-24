@@ -1,0 +1,17 @@
+version: "2"
+
+services:
+  web:
+    build: .
+    ports:
+      - "3000:3000"
+    volumes:
+      - "./config.toml:/opt/config.toml"
+    links:
+      - db
+    environment:
+      DATABASE_URL: "postgres://postgres:djhfg8923q4tyleaf@db/postgres"
+  db:
+    image: postgres:10
+    environment:
+      POSTGRES_PASSWORD: "djhfg8923q4tyleaf"
