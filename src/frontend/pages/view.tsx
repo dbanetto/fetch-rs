@@ -94,9 +94,9 @@ export default class View extends Component<ViewProps, ViewState> {
   render() {
     if (this.state.series === null) {
       return (
-          <div>
-            <p>loading...</p>
-            <Link href='/'>back</Link>
+          <div class="container box">
+            <p>Loading...</p>
+            <Link class="button" href='/'>Back</Link>
           </div>);
     }
 
