@@ -14,7 +14,7 @@ pub fn routes() -> Mount {
 
     // static files
     mount.mount("/", index);
-    mount.mount("/public/", Static::new(""));
+    mount.mount("/public/", Static::new("public/"));
 
     // endpoints
     mount.mount("/api/v1/", api::routes());
