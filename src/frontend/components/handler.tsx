@@ -1,9 +1,11 @@
 import { h, Component } from 'preact';
 import UrlHandler from './handlers/url';
 import ImageHandler from './handlers/image';
+import JsonHandler from './handlers/json';
 import '../model';
 
 let typeHandlers = {
+  'json': JsonHandler,
   'url': UrlHandler,
   'image': ImageHandler,
 };
@@ -18,7 +20,7 @@ function build(blob: any, type: string, options: any) {
   console.log("selected:" + String(type));
 
   // use registered handler or default link handler
-  var element = typeHandlers[type] || UrlHandler;
+  var element = typeHandlers[type] || JsonHandler;
 
   // a reminder that handleUpdate should be set if editting
   if (options.edit && typeof(options.handleUpdate) !== "function") {
