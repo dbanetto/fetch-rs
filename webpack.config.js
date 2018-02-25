@@ -29,11 +29,6 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.jsx?$/,
-        exclude: /node_modules/,
-        loader: 'babel-loader'
-      },
-      {
         test: /\.tsx?$/,
         exclude: /node_modules/,
         loader: "ts-loader"
@@ -63,7 +58,7 @@ module.exports = {
     [
       // production plugins
       new UglifyJsPlugin({
-        test: /.jsx?$/,
+        test: /.js$/,
         sourceMap: true,
         uglifyOptions: {
           compress: true,
@@ -72,15 +67,18 @@ module.exports = {
       })
     ] : [
       // development plugins
-      new webpack.SourceMapDevToolPlugin({
-        test: /jsx?$/,
-        filename: '[name].js.map',
-        exclude: ['vendor.js']
-      })
     ]
 
   ),
   resolve: {
-    extensions: ['.js', '.jsx','.ts', '.tsx', '.css', '.scss']
+    extensions: ['.js','.ts', '.tsx', '.css', '.scss']
   },
+  watchOptions: {
+    ignored: [
+      /node_modules/,
+      "src/backend/*",
+      /target/,
+      /.git/
+    ],
+  }
 };

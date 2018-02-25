@@ -35,7 +35,6 @@ RUN npm install
 
 COPY webpack.config.js /code/webpack.config.js
 COPY tsconfig.json /code/tsconfig.json
-COPY .babelrc /code/.babelrc
 
 COPY src/frontend /code/src/frontend
 

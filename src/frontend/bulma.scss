@@ -1,5 +1,5 @@
-@import "node_modules/bulma/sass/utilities/initial-variables";
-@import "node_modules/bulma/sass/utilities/functions";
+@import "~bulma/sass/utilities/initial-variables";
+@import "~bulma/sass/utilities/functions";
 
 // fonts
 $family-serif: "Noto Sans", "Open Sans", sans-serif;
@@ -19,7 +19,7 @@ $github: #333;
 $github-invert: findColorInvert($github);
 
 // 5. Add new color variables to the color map.
-@import "node_modules/bulma/sass/utilities/derived-variables.sass";
+@import "~bulma/sass/utilities/derived-variables.sass";
 $addColors: (
   "twitter":($twitter, $twitter-invert),
   "linkedin": ($linkedin, $linkedin-invert),
@@ -28,5 +28,5 @@ $addColors: (
 $colors: map-merge($colors, $addColors);
 
 // 6. Import the rest of Bulma
-@import "node_modules/bulma/bulma";
+@import "~bulma/bulma";
 

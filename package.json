@@ -1,13 +1,9 @@
 {
   "scripts": {
-    "build": "ENV='production' ./node_modules/.bin/webpack",
-    "dev": "./node_modules/.bin/webpack --watch"
+    "build": "ENV='production' webpack",
+    "watch": "webpack --watch --progress"
   },
   "dependencies": {
-    "babel-core": "^6.23.1",
-    "babel-loader": "^7.0.0",
-    "babel-plugin-transform-react-jsx": "^6.24.1",
-    "babel-preset-env": "^1.6.1",
     "bulma": "^0.6.2",
     "css-loader": "^0.28.0",
     "extract-text-webpack-plugin": "^3.0.0",
