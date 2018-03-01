@@ -8,7 +8,7 @@ interface CardProps {
 }
 
 interface CardState {
-    primary: InfoBlob;
+    link: InfoBlob;
 }
 
 export default class SeriesCard extends Component<CardProps, CardState> {
@@ -17,28 +17,20 @@ export default class SeriesCard extends Component<CardProps, CardState> {
     super();
 
     this.state = {
-      primary: null
+      link: null
     }
   }
 
   componentDidMount() {
     let self = this;
-    Store.getSeriesPrimary(this.props.series.id)
-      .then(blob => {
+    Store.getInfoType(this.props.series.id, ["url"])
+      .then(blobs => {
+        let link = blobs.find((b) => b.info_type === "url");
         self.setState({
-          primary: blob
+          link: link
         });
       }).catch(() => null);
   }
-
-  getAiringSate(): preact.VNode {
-    let series = this.props.series;
-
-    let status = 'unknown';
-
-    return (<span className={`status status-${status}` }>{status}</span>);
-  }
-
 
   render() {
     var series = this.props.series;
@@ -56,7 +48,7 @@ export default class SeriesCard extends Component<CardProps, CardState> {
                   <div>
                       &nbsp;
                       <div class="is-pulled-right">
-                          { this.state.primary && this.state.primary.info_type === "url"  && <a class="button" href={ this.state.primary.blob.url }>link</a> }
+                          { this.state.link && <a class="button" href={ this.state.link.blob.url }>link</a> }
                           <Link class="button" href={`/series/${ series.id }`}>View</Link>
                       </div>
                   </div>

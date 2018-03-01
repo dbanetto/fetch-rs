@@ -11,7 +11,6 @@ table! {
        id -> Integer,
        series_id -> Integer,
        blob -> Jsonb,
-       primary -> Bool,
        info_type -> VarChar,
     }
 }

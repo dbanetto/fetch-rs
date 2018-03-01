@@ -19,7 +19,7 @@ export default class InfoList extends Component<InfoListProps, void> {
     let selection = document.getElementById('type-selector') as HTMLInputElement;
     let built = {
         id: null, series_id: null, blob: {},
-        info_type: selection.value.toString(), primary: false };
+        info_type: selection.value.toString() };
 
     elements.push(built);
 
@@ -44,27 +44,10 @@ export default class InfoList extends Component<InfoListProps, void> {
     this.props.handleUpdate("info", blobs);
   }
 
-  handlePrimary(index: number, checked: boolean) {
-    let elements = this.props.value;
-
-    elements.map( (e, i) => {
-      if (i === index) {
-        e.primary = checked;
-        return e;
-      } else {
-        e.primary = false;
-        return e;
-      }
-    });
-    
-    this.props.handleUpdate("info", elements);
-  }
-
   buildElement(ele, index) {
     return (<InfoElement
             handleDelete={ this.handleDelete.bind(this, index) }
             handleUpdate={ this.handleUpdate.bind(this, index) }
-            handlePrimary={ this.handlePrimary.bind(this, index) }
             value={ ele }
             key={ index }
             />
@@ -91,7 +74,6 @@ export default class InfoList extends Component<InfoListProps, void> {
 
 interface InfoProps {
     value: InfoBlob;
-    handlePrimary: (checked: boolean) => void;
     handleUpdate: (value: any) => void;
     handleDelete: () => void;
 };
@@ -104,10 +86,6 @@ class InfoElement extends Component<InfoProps, void> {
     value.blob = blob;
 
     this.props.handleUpdate(value);
-  }
-
-  handlePrimary(event) {
-    this.props.handlePrimary(event.target.checked);
   }
 
   renderId() {
@@ -131,9 +109,6 @@ class InfoElement extends Component<InfoProps, void> {
           handleUpdate: this.handleUri.bind(this)
         })
       }
-
-      <input type="radio" name="primary" class="radio primary" value={ this.props.value.primary.toString() }
-        checked={ this.props.value.primary } onChange={ this.handlePrimary.bind(this) }/>
 
       <button class="button is-danger" type="button" onClick={ this.props.handleDelete }>x</button>
     </div>);

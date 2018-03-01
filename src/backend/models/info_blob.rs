@@ -9,7 +9,6 @@ pub struct InfoBlob {
     pub id: i32,
     pub series_id: i32,
     pub blob: Value,
-    pub primary: bool,
     pub info_type: String,
 }
 
@@ -18,7 +17,6 @@ pub struct InfoBlob {
 pub struct NewInfoBlob {
     pub series_id: i32,
     pub blob: Value,
-    pub primary: bool,
     pub info_type: String,
 }
 
@@ -26,7 +24,6 @@ pub struct NewInfoBlob {
 pub struct InfoBlobForm {
     pub id: Option<i32>,
     pub blob: Value,
-    pub primary: Option<bool>,
     pub info_type: String,
 }
 
@@ -36,10 +33,6 @@ impl InfoBlobForm {
             series_id: series.id,
             blob: self.blob,
             info_type: self.info_type,
-            primary: match self.primary {
-                Some(p) => p,
-                None => false,
-            },
         }
     }
 }

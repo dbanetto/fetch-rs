@@ -8,7 +8,6 @@ interface InfoBlob {
     id: number,
     series_id: number,
     blob: any,
-    primary: boolean,
     info_type: string,
 }
 
