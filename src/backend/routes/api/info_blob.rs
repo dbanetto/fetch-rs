@@ -205,7 +205,7 @@ fn primary(req: &mut Request) -> IronResult<Response> {
     Ok(api_success(blobs))
 }
 
-fn select_type(req: &mut Request) -> IronResult<Response> {
+fn select_types(req: &mut Request) -> IronResult<Response> {
     let series_id: i32 = match req.extensions.get::<Router>().unwrap().find("series_id") {
         Some(id) => match i32::from_str(id) {
             Ok(value) => value,
@@ -214,8 +214,10 @@ fn select_type(req: &mut Request) -> IronResult<Response> {
         None => unreachable!(),
     };
 
-    let select_type = match req.extensions.get::<Router>().unwrap().find("type") {
-        Some(select_type) => select_type,
+    let select_types: Vec<&str> = match req.extensions.get::<Router>().unwrap().find("types") {
+        Some(select_type) => {
+            select_type.split("+").collect()
+        },
         None => unreachable!(),
     };
 
@@ -224,10 +226,10 @@ fn select_type(req: &mut Request) -> IronResult<Response> {
         Err(err) => return Err(api_error(err, Status::RequestTimeout)),
     };
 
-    let blobs: InfoBlob = match info_blob::dsl::info_blob
+    let blobs: Vec<InfoBlob> = match info_blob::dsl::info_blob
         .filter(info_blob::series_id.eq(series_id))
-        .filter(info_blob::info_type.eq(select_type))
-        .first(&*conn)
+        .filter(info_blob::info_type.eq_any(select_types))
+        .get_results(&*conn)
     {
         Ok(blob) => blob,
         Err(err) => return Err(api_error(err, Status::NotFound)),
@@ -298,7 +300,7 @@ pub fn routes() -> Router {
     router!(
         all: get "/:series_id" => all,
         primary: get "/:series_id/primary" => primary,
-        select_type: get "/:series_id/type/:type" => select_type,
+        select_types: get "/:series_id/types/:types" => select_types,
         select: get "/:series_id/:blob_id" => select,
         update: put "/:series_id/:blob_id" => update_api,
         delete: delete "/:series_id/:blob_id" => delete_api,
