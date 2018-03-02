@@ -1,5 +1,8 @@
 @import './bulma';
 
+$mdi-font-path: '~mdi/fonts';
+@import '~mdi/scss/materialdesignicons';
+
 html {
     background: #f0f0f0;
 }

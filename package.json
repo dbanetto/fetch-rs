@@ -7,6 +7,8 @@
     "bulma": "^0.6.2",
     "css-loader": "^0.28.0",
     "extract-text-webpack-plugin": "^3.0.0",
+    "file-loader": "^1.1.10",
+    "mdi": "^2.1.19",
     "node-sass": "^4.5.2",
     "preact": "^8.2.6",
     "preact-router": "^2.5.7",
