@@ -45,19 +45,23 @@ export default class InfoList extends Component<InfoListProps, void> {
   }
 
   buildElement(ele, index) {
-    return (<InfoElement
-            handleDelete={ this.handleDelete.bind(this, index) }
-            handleUpdate={ this.handleUpdate.bind(this, index) }
-            value={ ele }
-            key={ index }
-            />
-            );
+      return (<div class="info-list-item">
+          <InfoElement
+              handleDelete={ this.handleDelete.bind(this, index) }
+              handleUpdate={ this.handleUpdate.bind(this, index) }
+              value={ ele }
+              key={ index }
+          />
+      </div>
+      );
   }
 
   render() {
     return  (
         <div>
-            { this.props.value.map((ele, index) => this.buildElement(ele, index)) }
+            <div class="info-list">
+                { this.props.value.map((ele, index) => this.buildElement(ele, index)) }
+            </div>
 
             <div class="select">
                 <select  id="type-selector">
@@ -97,21 +101,29 @@ class InfoElement extends Component<InfoProps, void> {
   }
 
   render() {
-    return (<div>
+      return (<div>
 
-        { this.renderId() }
+          { this.renderId() }
 
-      { handler.build(
-        this.props.value.blob,
-        this.props.value.info_type,
-        {
-          edit: true,
-          handleUpdate: this.handleUri.bind(this)
-        })
-      }
+          <div class="columns">
+              <div class="column">
+                  { handler.build(
+                      this.props.value.blob,
+                      this.props.value.info_type,
+                      {
+                          edit: true,
+                          handleUpdate: this.handleUri.bind(this)
+                      }
+                    )
+                  }
+              </div>
 
-      <button class="button is-danger" type="button" onClick={ this.props.handleDelete }>x</button>
-    </div>);
+          <div class="column is-one-fifth">
+              <button class="button is-danger" type="button"
+                  onClick={ this.props.handleDelete }>x</button>
+          </div>
+          </div>
+      </div>);
   }
 
 }

@@ -79,11 +79,11 @@ export default class View extends Component<ViewProps, ViewState> {
 
     return (
             <div>
-              <ul>
+              <div class="info-list">
                 { this.state.info.map((u, i) =>
-                <li key={i.toString()} >
+                <div key={i.toString()} class="info-list-item" >
                   { handler.build(u.blob, u.info_type, {}) }
-                </li>
+                </div>
                 ) }
 
               </ul>
