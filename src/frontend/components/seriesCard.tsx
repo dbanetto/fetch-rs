@@ -42,6 +42,8 @@ export default class SeriesCard extends Component<CardProps, CardState> {
                   </span>
               </a>
           );
+      } else {
+          return (<div />)
       }
   }
 
@@ -57,7 +59,10 @@ export default class SeriesCard extends Component<CardProps, CardState> {
                   </Link>
               </div>
               <div class="card-body">
-                  <h2 class="subtitle">{ series.title } { this.renderLink() }</h2>
+                      <div class="card-title">
+                          <h2 class="subtitle is-truncated">{ series.title }</h2>
+                          { this.renderLink() }
+                      </div>
                   <div>
                       &nbsp;
                       <div class="is-pulled-right">

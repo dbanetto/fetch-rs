@@ -33,6 +33,17 @@ html {
     border-bottom-right-radius: 5px;
 }
 
+.card-title {
+    display: flex;
+}
+
+.is-truncated {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 .poster {
     height: 360px;
     padding: 0.75rem;
@@ -65,3 +76,4 @@ html {
 .preview {
     border: 2px dashed;
 }
+
