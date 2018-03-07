@@ -36,7 +36,7 @@ export default class App extends Component<any, void> {
                   </div>
               </nav>
 
-              <div class="container is-fluid">
+              <div class="container is-fluid app-main">
                   <Router>
                       <Home path="/" />
                       <New path="/series/new" />

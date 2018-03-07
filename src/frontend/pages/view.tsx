@@ -85,8 +85,7 @@ export default class View extends Component<ViewProps, ViewState> {
                   { handler.build(u.blob, u.info_type, {}) }
                 </div>
                 ) }
-
-              </ul>
+              </div>
             </div>
         );
   }
