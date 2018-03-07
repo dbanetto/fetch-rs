@@ -2,12 +2,14 @@ import { h, Component } from 'preact';
 import UrlHandler from './handlers/url';
 import ImageHandler from './handlers/image';
 import JsonHandler from './handlers/json';
+import CountHandler from './handlers/count';
 import '../model';
 
 let typeHandlers = {
   'json': JsonHandler,
   'url': UrlHandler,
   'image': ImageHandler,
+  'count': CountHandler,
 };
 
 function addHandler(type: string, builder: Component<HandlerProps, void>) {
