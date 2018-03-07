@@ -32,6 +32,19 @@ export default class SeriesCard extends Component<CardProps, CardState> {
       }).catch(() => null);
   }
 
+  renderLink() {
+
+      if (this.state.link) {
+          return (
+              <a href={ this.state.link.blob.url }>
+                  <span class="icon is-small">
+                      <i class=" mdi mdi-open-in-new" />
+                  </span>
+              </a>
+          );
+      }
+  }
+
   render() {
     var series = this.props.series;
       return (
@@ -44,11 +57,10 @@ export default class SeriesCard extends Component<CardProps, CardState> {
                   </Link>
               </div>
               <div class="card-body">
-                  <h2 class="subtitle">{ series.title }</h2>
+                  <h2 class="subtitle">{ series.title } { this.renderLink() }</h2>
                   <div>
                       &nbsp;
                       <div class="is-pulled-right">
-                          { this.state.link && <a class="button" href={ this.state.link.blob.url }>link</a> }
                           <Link class="button" href={`/series/${ series.id }`}>View</Link>
                       </div>
                   </div>
