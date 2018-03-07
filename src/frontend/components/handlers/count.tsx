@@ -20,11 +20,11 @@ export default class CountHandler extends Component<HandlerProps, void> {
         return (
             <div class="columns">
                 <div class="column">
-                    <label for="current">Current count</label>
+                    <label class="label" for="current">Current count</label>
                     <input label="current" disabled class="input" type="number" value={ this.props.blob.current } />
                 </div>
                 <div class="column">
-                    <label for="total">Total count</label>
+                    <label class="label" for="total">Total count</label>
                     <input label="total" disabled class="input" type="number" value={ this.props.blob.total } />
                 </div>
             </div>);
@@ -34,7 +34,7 @@ export default class CountHandler extends Component<HandlerProps, void> {
         return (
             <div class="columns">
                 <div class="column">
-                    <label for="current">Current count</label>
+                    <label class="label" for="current">Current count</label>
                     <input label="current" class="input" type="number"
                         value={ this.props.blob.current }
                         min="0"
@@ -42,7 +42,7 @@ export default class CountHandler extends Component<HandlerProps, void> {
                         onChange={ this.handleUpdate.bind(this) } />
                 </div>
                 <div class="column">
-                    <label for="total">Total count</label>
+                    <label class="label" for="total">Total count</label>
                     <input label="total" class="input" type="number"
                         value={ this.props.blob.total }
                         min={ this.props.blob.current }
