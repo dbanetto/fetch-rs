@@ -45,7 +45,7 @@ export default class CountHandler extends Component<HandlerProps, void> {
                     <label class="label" for="total">Total count</label>
                     <input label="total" class="input" type="number"
                         value={ this.props.blob.total }
-                        min={ this.props.blob.current }
+                        min={ this.props.blob.total > 0 ? this.props.blob.current : false }
                         onChange={ this.handleUpdate.bind(this) } />
                 </div>
             </div>);
