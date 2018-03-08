@@ -1,4 +1,4 @@
-image: "rust:1.23"
+image: "rust:stable"
 
 services:
   - postgres:10
@@ -33,6 +33,17 @@ cargo:
     paths:
       - target/
       - cargo/
+
+npm:
+  stage: test
+  image: node:8
+  script:
+    - du -hs node_modules || true
+    - node --version && npm --version
+    - npm run build
+  cache:
+    paths:
+      - node_modules/
 
 rustfmt:
   stage: style
