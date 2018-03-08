@@ -36,9 +36,9 @@ export default class SeriesCard extends Component<CardProps, CardState> {
 
       if (this.state.link) {
           return (
-              <a href={ this.state.link.blob.url }>
+              <a href={ this.state.link.blob.url } target="_blank" rel="noopener noreferrer">
                   <span class="icon is-small">
-                      <i class=" mdi mdi-open-in-new" />
+                      <i class="mdi mdi-open-in-new" />
                   </span>
               </a>
           );

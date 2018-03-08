@@ -8,7 +8,7 @@ export default class UriDefault extends Component<HandlerProps, void> {
   }
 
   renderView() {
-    return ( <a href={ this.props.blob.url }>{ this.props.blob.url }</a>);
+      return (<a href={ this.props.blob.url } target="_blank" rel="noopener noreferrer">{ this.props.blob.url } <i class="mdi mdi-open-in-new" /></a>);
   }
 
   handleUpdate(event) {
