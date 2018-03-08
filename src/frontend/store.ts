@@ -81,7 +81,7 @@ class _Store {
         return this._api_get(endpoint);
     }
 
-    getInfoType(id: number, types: [string]): Promise<Array<InfoBlob>> {
+    getInfoType(id: number, types: Array<string>): Promise<Array<InfoBlob>> {
         const typeQuery = types.join("+");
         const endpoint = `/api/v1/info/${ id }/types/${ typeQuery }`;
         // prevents repeat calls to the API for non-existing data

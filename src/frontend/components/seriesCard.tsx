@@ -18,7 +18,8 @@ export default class SeriesCard extends Component<CardProps, CardState> {
     super();
 
     this.state = {
-      link: null
+      link: null,
+      count: null,
     }
   }
 
