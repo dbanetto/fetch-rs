@@ -85,7 +85,7 @@ export default class SeriesCard extends Component<CardProps, CardState> {
               </div>
               <div class="card-body">
                       <div class="is-flex" >
-                          <Link href={`/series/${ series.id }`} class="card-subtitle is-truncated">
+                          <Link href={`/series/${ series.id }`} class="card-subtitle is-truncated" title={ series.title }>
                               <h2 class="subtitle is-truncated">{ series.title }</h2>
                           </Link>
                           { this.renderLink() }
