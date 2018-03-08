@@ -1,12 +1,12 @@
 image: "rust:latest"
 
-# services:
-#   - postgres:10
+services:
+  - postgres:10
 
-# variables:
-#   POSTGRES_DB: fetch_test
-#   POSTGRES_USER: fetch
-#   POSTGRES_PASSWORD: "adfjkv389gqyh39gheilfgeuj"
+variables:
+  POSTGRES_DB: fetch_test
+  POSTGRES_USER: fetch
+  POSTGRES_PASSWORD: "adfjkv389gqyh39gheilfgeuj"
 
 
 stages:
