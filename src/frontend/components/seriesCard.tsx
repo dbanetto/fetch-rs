@@ -9,6 +9,7 @@ interface CardProps {
 
 interface CardState {
     link: InfoBlob;
+    count: InfoBlob;
 }
 
 export default class SeriesCard extends Component<CardProps, CardState> {
@@ -23,11 +24,13 @@ export default class SeriesCard extends Component<CardProps, CardState> {
 
   componentDidMount() {
     let self = this;
-    Store.getInfoType(this.props.series.id, ["url"])
+    Store.getInfoType(this.props.series.id, ["url", "count"])
       .then(blobs => {
         let link = blobs.find((b) => b.info_type === "url");
+        let count = blobs.find((b) => b.info_type === "count");
         self.setState({
-          link: link
+            link,
+            count,
         });
       }).catch(() => null);
   }
@@ -44,6 +47,28 @@ export default class SeriesCard extends Component<CardProps, CardState> {
           );
       } else {
           return (<div />)
+      }
+  }
+
+  renderProgressBar() {
+      if (this.state.count) {
+          let value = this.state.count.blob.current;
+          let max = this.state.count.blob.total > 0 ? this.state.count.blob.total : value * 2;
+
+          let currentStatus = 'is-success';
+          if (this.state.count.blob.total <= 0) {
+              currentStatus = "is-warning";
+          } else if (this.state.count.blob.current === this.state.count.blob.total) {
+              currentStatus = "is-link";
+          }
+
+          return (
+              <div>
+                  <progress class={`progress ${currentStatus}`}  value={ value } max={ max } />
+              </div>
+          );
+      } else {
+          return (<div />);
       }
   }
 
@@ -65,8 +90,9 @@ export default class SeriesCard extends Component<CardProps, CardState> {
                           </Link>
                           { this.renderLink() }
                       </div>
+                      <br />
                   <div>
-                      &nbsp;
+                      { this.renderProgressBar() }
                   </div>
               </div>
           </div>);
