@@ -51,7 +51,7 @@ export default class SeriesCard extends Component<CardProps, CardState> {
     var series = this.props.series;
       return (
           <div class="card has-gap">
-              <div >
+              <div class="card-head" >
                   <Link href={`/series/${ series.id }`} >
                       <div class="poster">
                           <img class="image" src={ series.poster_url } />
@@ -60,7 +60,7 @@ export default class SeriesCard extends Component<CardProps, CardState> {
               </div>
               <div class="card-body">
                       <div class="is-flex" >
-                          <Link href={`/series/${ series.id }`} class="card-title is-truncated">
+                          <Link href={`/series/${ series.id }`} class="card-subtitle is-truncated">
                               <h2 class="subtitle is-truncated">{ series.title }</h2>
                           </Link>
                           { this.renderLink() }
