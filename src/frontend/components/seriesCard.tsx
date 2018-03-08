@@ -59,15 +59,14 @@ export default class SeriesCard extends Component<CardProps, CardState> {
                   </Link>
               </div>
               <div class="card-body">
-                      <div class="card-title">
-                          <h2 class="subtitle is-truncated">{ series.title }</h2>
+                      <div class="is-flex" >
+                          <Link href={`/series/${ series.id }`} class="card-title is-truncated">
+                              <h2 class="subtitle is-truncated">{ series.title }</h2>
+                          </Link>
                           { this.renderLink() }
                       </div>
                   <div>
                       &nbsp;
-                      <div class="is-pulled-right">
-                          <Link class="button" href={`/series/${ series.id }`}>View</Link>
-                      </div>
                   </div>
               </div>
           </div>);
