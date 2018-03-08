@@ -3,6 +3,7 @@ import UrlHandler from './handlers/url';
 import ImageHandler from './handlers/image';
 import JsonHandler from './handlers/json';
 import CountHandler from './handlers/count';
+import MalHandler from './handlers/mal';
 import '../model';
 
 let typeHandlers = {
@@ -10,6 +11,7 @@ let typeHandlers = {
   'url': UrlHandler,
   'image': ImageHandler,
   'count': CountHandler,
+  'mal': MalHandler,
 };
 
 function addHandler(type: string, builder: Component<HandlerProps, void>) {
