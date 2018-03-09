@@ -19,13 +19,12 @@ export default class MalHandler extends Component<HandlerProps, void> {
         return (
             <div class="columns">
                 <div class="column">
-                    <span>
-                        <strong>MAL ID:</strong>
-                        <a href={ `https://myanimelist.net/anime/${ this.props.blob.id }` } target="_blank" rel="noopener noreferrer">{ this.props.blob.id } <span class="icon is-small"><i class="mdi mdi-open-in-new" /></span></a>
-                    </span>
+                    <label class="label">MAL ID:</label>
+                    <a href={ `https://myanimelist.net/anime/${ this.props.blob.id }` } target="_blank" rel="noopener noreferrer">{ this.props.blob.id } <span class="icon is-small"><i class="mdi mdi-open-in-new" /></span></a>
                 </div>
                 <div class="column">
-                    <span><strong>Episode Offset:</strong> { this.props.blob.offset }</span>
+                    <label class="label">Episode Offset</label>
+                    <input disabled class="input" type="number" value={ this.props.blob.offset } />
                 </div>
             </div>);
     }
