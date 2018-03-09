@@ -19,7 +19,7 @@ cargo:
     - du -hs target || true
     - du -hs cargo || true
     - rustc --version && cargo --version && rustup --version
-    - CARGO_HOME=$CI_PROJECT_DIR/cargo cargo install diesel_cli --no-default-features --features postgres
+    - which diesel || CARGO_HOME=$CI_PROJECT_DIR/cargo cargo install diesel_cli --no-default-features --features postgres
     - echo "DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres/${POSTGRES_DB}" > .env
     - cat .env
     - $CI_PROJECT_DIR/cargo/bin/diesel migration run
@@ -80,7 +80,7 @@ pages:
     - CARGO_HOME=$CI_PROJECT_DIR/cargo cargo doc
     - rm -rf public
     - mv target/doc public
-    - echo "<meta http-equiv=refresh content=1;url=fetch_rs/index.html>" > public/index.html
+    - echo "<meta http-equiv=refresh content=1;url=fetch_web/index.html>" > public/index.html
   cache:
     paths:
       - cargo/
