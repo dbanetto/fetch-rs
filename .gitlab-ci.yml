@@ -58,7 +58,7 @@ tslint:
   script:
     - node --version && npm --version
     - npm install tslint tslint-react typescript
-    - ./node_modules/.bin/tslint -c .tslint.json 'src/frontend/**/*.{ts,tsx}'
+    - ./node_modules/.bin/tslint -c tslint.json 'src/frontend/**/*.{ts,tsx}'
 
 clippy:
   stage: style

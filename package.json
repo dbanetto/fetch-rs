@@ -1,22 +1,27 @@
 {
   "scripts": {
     "build": "ENV='production' webpack",
-    "watch": "webpack --watch --progress"
+    "watch": "webpack --watch --progress",
+    "cargo": "cargo watch -x run --ignore 'src/frontend/*'"
   },
   "dependencies": {
     "bulma": "^0.6.2",
     "css-loader": "^0.28.0",
     "extract-text-webpack-plugin": "^3.0.0",
-    "file-loader": "^1.1.10",
-    "mdi": "^2.1.19",
+    "file-loader": "^1.1.11",
+    "mdi": "^2.1.99",
     "node-sass": "^4.5.2",
     "preact": "^8.2.6",
     "preact-router": "^2.5.7",
-    "sass-loader": "^6.0.3",
+    "sass-loader": "^6.0.7",
     "style-loader": "^0.16.1",
     "ts-loader": "^3.3.0",
     "typescript": "^2.6.2",
     "uglifyjs-webpack-plugin": "^1.2.2",
     "webpack": "^3.10.0"
+  },
+  "devDependencies": {
+    "tslint": "^5.9.1",
+    "tslint-react": "^3.5.1"
   }
 }
