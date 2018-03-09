@@ -4,6 +4,7 @@ import ImageHandler from './handlers/image';
 import JsonHandler from './handlers/json';
 import CountHandler from './handlers/count';
 import MalHandler from './handlers/mal';
+import NyaaHandler from './handlers/nyaa';
 import '../model';
 
 let typeHandlers = {
@@ -12,6 +13,7 @@ let typeHandlers = {
   'image': ImageHandler,
   'count': CountHandler,
   'mal': MalHandler,
+  'nyaa': NyaaHandler,
 };
 
 function addHandler(type: string, builder: Component<HandlerProps, void>) {
