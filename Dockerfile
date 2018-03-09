@@ -1,4 +1,4 @@
-FROM rust:1.24 AS backend
+FROM rust:latest AS backend
 
 # static setup
 RUN mkdir -p /code/src/backend && \
