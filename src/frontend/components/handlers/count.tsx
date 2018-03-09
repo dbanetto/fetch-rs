@@ -9,10 +9,8 @@ export default class CountHandler extends Component<HandlerProps, void> {
 
     handleUpdate(event) {
         let state = this.props.blob;
-        state[event.target.attributes['label'].value] = event.target.value;
+        state[event.target.attributes['label'].value] = parseInt(event.target.value, 10);
 
-        console.log(event.target);
-        console.log(state);
         this.props.handleUpdate(state);
     }
 

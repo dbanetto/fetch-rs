@@ -10,7 +10,7 @@ export default class MalHandler extends Component<HandlerProps, void> {
     handleUpdate(event) {
         let state = this.props.blob;
 
-        state[event.target.attributes['label'].value] = event.target.value;
+        state[event.target.attributes['label'].value] = parseInt(event.target.value, 10);
 
         this.props.handleUpdate(state);
     }
@@ -19,7 +19,7 @@ export default class MalHandler extends Component<HandlerProps, void> {
         return (
             <div class="columns">
                 <div class="column">
-                    <label class="label">MAL ID:</label>
+                    <label class="label">MAL ID</label>
                     <a href={ `https://myanimelist.net/anime/${ this.props.blob.id }` } target="_blank" rel="noopener noreferrer">{ this.props.blob.id } <span class="icon is-small"><i class="mdi mdi-open-in-new" /></span></a>
                 </div>
                 <div class="column">
