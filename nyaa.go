@@ -12,7 +12,7 @@ import (
 	"strings"
 )
 
-func NyaaFetch(show Series, provider Provider, config Config) error {
+func NyaaFetch(show Series, config Config) error {
 
 	// type def for later
 	type Nyaa struct {
@@ -22,28 +22,46 @@ func NyaaFetch(show Series, provider Provider, config Config) error {
 		} `xml:"channel>item"`
 	}
 
+	api := Init(config.Api)
+	blobs, err := api.GetInfoBlob(show.ID, []string{"count", "nyaa"})
+	if err != nil {
+		return err
+	}
+
+	nyaaBlob, err := blobs.GetType("nyaa")
+	if err != nil {
+		return err
+	}
+
+	countBlob, err := blobs.GetType("count")
+	if err != nil {
+		return err
+	}
+
 	t, err := buildTransmission(config)
 	if err != nil {
 		return err
 	}
 
-	search_title := resolveSearchTitle(show)
+	searchTitle := resolveSearchTitle(show, nyaaBlob)
 
 	// Supported  media type option
-	quality := url.PathEscape(show.MediaTypeOptions["quality"])
+	query := url.PathEscape(nyaaBlob.Blob["query"].(string))
+
+	userID := url.PathEscape(nyaaBlob.Blob["user_id"].(string))
 
 	// build the url
-	search_url := fmt.Sprintf("https://www.nyaa.si/?page=rss&user=%v&term=%v+%v",
-		provider.BaseProviderOptions["id"],
-		quality,
-		url.QueryEscape(search_title))
+	searchURL := fmt.Sprintf("https://www.nyaa.si/?page=rss&user=%v&term=%v+%v",
+		userID,
+		query,
+		url.QueryEscape(searchTitle))
 
 	// logs the resulting URL
-	log.WithField("url", search_url).Info("Searching for ", search_title)
+	log.WithField("url", searchURL).Info("Searching for ", searchTitle)
 
 	// Build the request
 	client := &http.Client{}
-	req, err := http.NewRequest("GET", search_url, nil)
+	req, err := http.NewRequest("GET", searchURL, nil)
 	if err != nil {
 		log.WithField("err", err).Errorf("Error during request building")
 		return err
@@ -72,24 +90,25 @@ func NyaaFetch(show Series, provider Provider, config Config) error {
 		return err
 	}
 
-	maxCount := show.CurrentCount
+	current := int(countBlob.Blob["current"].(float64))
+	newCurrent := current
 
 	// Use found items in XML
 	for _, item := range res.Items {
 		// strip out title to ensure no missmatches
-		epi := strings.Replace(item.Title, search_title, "", 1)
+		epi := strings.Replace(item.Title, searchTitle, "", 1)
 
 		// find count using given regexp
-		find_count := regexp.MustCompile(provider.RegexFindCount)
-		count_match := strings.TrimLeft(find_count.FindString(epi), "0")
+		findCount := regexp.MustCompile("\\d+")
+		countMatch := strings.TrimLeft(findCount.FindString(epi), "0")
 
-		count, err := strconv.Atoi(count_match)
+		count, err := strconv.Atoi(countMatch)
 		if err != nil {
-			log.Errorf("ERROR parsing episode count (%v): %v", count_match, err)
+			log.Errorf("ERROR parsing episode count (%v): %v", countMatch, err)
 		}
 
 		// check if this is a new episode found
-		if count > show.CurrentCount {
+		if count > current {
 			log.Infof("Found episode %v of %v", count, show.Title)
 
 			// push episode to transmission
@@ -99,18 +118,18 @@ func NyaaFetch(show Series, provider Provider, config Config) error {
 			} else {
 				log.Infof("Pushed '%v' to transmission", item.Title)
 				// only update max count if it was successfully pushed
-				if count > maxCount {
-					maxCount = count
+				if count > newCurrent {
+					newCurrent = count
 				}
 			}
 		}
 	}
 
-	if maxCount > show.CurrentCount {
+	if newCurrent > current {
 		// push update to API
-		log.Infof("Update episode of %v to %v", show.Title, maxCount)
-		api := Init(config.Api)
-		return api.PostEpisodeCount(show.ID, maxCount)
+		log.WithField("old_count", current).WithField("new_count", newCurrent).Infof("Update episode of %v to %v", show.Title, newCurrent)
+		countBlob.Blob["currnet"] = newCurrent
+		return api.PutEpisodeCount(show.ID, *countBlob)
 	}
 
 	// everything must of been ffiinnee

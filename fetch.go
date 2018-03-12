@@ -15,24 +15,13 @@ func Fetch(config Config) error {
 		return err
 	}
 
-	supportedProviders, err := GetSupportedProviders(client)
-	if err != nil {
-		log.Printf("Error while getting supported providers: %v", err)
-		return err
-	}
-
 	var wg sync.WaitGroup
 
 	for _, show := range series {
+		wg.Add(1)
 
-		if val, ok := supportedProviders[show.ProviderID]; ok {
-			wg.Add(1)
-
-			log.WithField("name", val.Name).WithField("base", val.BaseProvider).Printf("Starting search for %v", show.Title)
-			go handleShow(show, val, config, &wg)
-		} else {
-			log.WithField("id", show.ProviderID).Warnf("Unsupported series %v ", show.Title)
-		}
+		log.WithField("title", show.Title).WithField("id", show.ID).Printf("Starting search for %v", show.Title)
+		go handleShow(show, config, &wg)
 	}
 
 	wg.Wait()
@@ -40,13 +29,13 @@ func Fetch(config Config) error {
 	return nil
 }
 
-func handleShow(show Series, provider Provider, config Config, wg *sync.WaitGroup) {
+func handleShow(show Series, config Config, wg *sync.WaitGroup) {
 	defer wg.Done()
 
-	handle := GetProvider(provider.BaseProvider)
+	handle := GetProvider("nyaa") // FIXME: hard coded
 
 	for i := 1; i < 4; i++ {
-		err := handle(show, provider, config)
+		err := handle(show, config)
 		if err != nil {
 			log.Printf("Error in %v: %v", show.Title, err)
 			log.Printf("Retry search for %v #%v", show.Title, i)

@@ -2,6 +2,7 @@ package fetcher
 
 import (
 	"crypto/tls"
+	"errors"
 	"github.com/odwrtw/transmission"
 	log "github.com/sirupsen/logrus"
 	"net/http"
@@ -30,17 +31,28 @@ func buildTransmission(config Config) (*transmission.Client, error) {
 	return transmission.New(conf)
 }
 
-func resolveSearchTitle(show Series) string {
-	// Resolve the search title ti use
-	// by default use the title
-	search_title := strings.TrimSpace(show.Title)
-	if show.SearchTitle != "" {
-		// otherwise if 'search_title' is defined use that
-		search := strings.TrimSpace(show.SearchTitle)
-		if search != "" {
-			search_title = search
+func (blobs InfoBlobs) GetType(infoType string) (*InfoBlob, error) {
+	for _, blob := range blobs {
+		if blob.InfoType == infoType {
+			return &blob, nil
 		}
 	}
 
-	return search_title
+	return nil, errors.New("Info type not found")
+}
+
+func resolveSearchTitle(show Series, blob *InfoBlob) string {
+	// Resolve the search title to use
+	// by default use the title
+	searchTitle := strings.TrimSpace(show.Title)
+
+	if v, ok := blob.Blob["search_title"].(string); ok && v != "" {
+		// otherwise if 'search_title' is defined use that
+		search := strings.TrimSpace(v)
+		if search != "" {
+			searchTitle = search
+		}
+	}
+
+	return searchTitle
 }

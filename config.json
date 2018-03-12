@@ -1,5 +1,5 @@
 {
-  "api": "http://localhost:8080",
+  "api": "http://localhost:3000",
   "transmission": {
     "rpc": "http://localhost:9191/transmission/rpc",
     "user": "",
@@ -7,6 +7,6 @@
   },
   "webui": {
     "enable": true,
-    "host": "localhost:8181"
+    "host": "0.0.0.0:8181"
   }
 }

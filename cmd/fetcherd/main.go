@@ -13,7 +13,7 @@ func main() {
 	config, err := fetcher.Parse(options.ConfigPath)
 
 	fetcher.RegisterFetchProvider("nyaa", fetcher.NyaaFetch)
-	fetcher.RegisterFetchProvider("magnetrss", fetcher.MagnetRss)
+	// fetcher.RegisterFetchProvider("magnetrss", fetcher.MagnetRss)
 
 	if err != nil {
 		log.WithField("args", options).Fatal("Error while loading config:", err)
