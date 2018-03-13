@@ -6,8 +6,6 @@ RUN mkdir -p /code/src/backend && \
 
 WORKDIR /code
 
-RUN cargo install diesel_cli --no-default-features --features postgres
-
 # copy across dependencies
 COPY Cargo.toml /code/Cargo.toml
 COPY Cargo.lock /code/Cargo.lock
@@ -48,7 +46,6 @@ RUN apt update && \
 WORKDIR /opt
 
 COPY --from=backend /code/target/release/fetch-web /opt/fetch
-COPY --from=backend /usr/local/cargo/bin/diesel /usr/local/bin
 COPY --from=frontend /code/public /opt/public
 COPY migrations /opt/migrations
 
