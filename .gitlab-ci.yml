@@ -6,25 +6,26 @@ stages:
 cargo:
   stage: test
   image: "rust:latest"
-  services:
-    - postgres:10
+  # services:
+  #   - postgres:10
   variables:
-    POSTGRES_DB: fetch_test
-    POSTGRES_USER: fetch
-    POSTGRES_PASSWORD: "$CI_COMMIT_SHA"
+    # POSTGRES_DB: fetch_test
+    # POSTGRES_USER: fetch
+    # POSTGRES_PASSWORD: "$CI_COMMIT_SHA"
+    CARGO_HOME: "$CI_PROJECT_DIR/cargo"
   before_script:
     - apt-get update -yqq
-    - apt-get install -yqq --no-install-recommends build-essential libclang-dev libpq-dev
+    - apt-get install -yqq --no-install-recommends libpq-dev
   script:
     - du -hs target || true
     - du -hs cargo || true
-    - rustc --version && cargo --version && rustup --version
-    - which $CI_PROJECT_DIR/cargo/bin/diesel || CARGO_HOME=$CI_PROJECT_DIR/cargo cargo install diesel_cli --no-default-features --features postgres
-    - echo "DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres/${POSTGRES_DB}" > .env
-    - cat .env
-    - $CI_PROJECT_DIR/cargo/bin/diesel migration run
-    - CARGO_HOME=$CI_PROJECT_DIR/cargo cargo build --verbose
-    - CARGO_HOME=$CI_PROJECT_DIR/cargo cargo test --verbose --jobs 1
+    - echo "$CARGO_HOME" && rustc --version && cargo --version && rustup --version
+    # - which $CARGO_HOME/cargo/bin/diesel || cargo install diesel_cli --no-default-features --features postgres
+    # - echo "DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres/${POSTGRES_DB}" > .env
+    # - cat .env
+    # - $CARGO_HOME/cargo/bin/diesel migration run
+    - cargo build --verbose
+    - cargo test --verbose --jobs 1
   cache:
     paths:
       - target/
@@ -64,35 +65,43 @@ clippy:
   stage: style
   image: rust:latest
   allow_failure: true
+    CARGO_HOME: "$CI_PROJECT_DIR/cargo-clippy"
   script:
-    - rustup --version
+    - du -hs "$CARGO_HOME" || true
+    - echo "$CARGO_HOME" && rustup --version
     - rustup install nightly
     - cargo +nightly install clippy
     - cargo +nightly clippy
-
-pages:
-  stage: deploy
-  image: rust:latest
-  allow_failure: true
-  script:
-    - du -hs cargo || true
-    - rustc --version && cargo --version && rustup --version
-    - CARGO_HOME=$CI_PROJECT_DIR/cargo cargo doc
-    - rm -rf public
-    - mv target/doc public
-    - echo "<meta http-equiv=refresh content=1;url=fetch_web/index.html>" > public/index.html
   cache:
     paths:
-      - cargo/
-  artifacts:
-    paths:
-    - public
-  only:
-    - master
+      - cargo-clippy/
+
+# Continual errors with pages:deploy
+# pages:
+#   stage: deploy
+#   image: rust:latest
+#   allow_failure: true
+#   script:
+#     - du -hs cargo || true
+#     - rustc --version && cargo --version && rustup --version
+#     - CARGO_HOME=$CI_PROJECT_DIR/cargo cargo doc
+#     - rm -rf public
+#     - mv target/doc public
+#     - echo "<meta http-equiv=refresh content=1;url=fetch_web/index.html>" > public/index.html
+#   cache:
+#     paths:
+#       - cargo/
+#   artifacts:
+#     paths:
+#     - public
+#   only:
+#     - master
 
 docker:
   stage: deploy
   image: docker:latest
+  variables:
+    DOCKER_DRIVER: overlay2
   services:
     - docker:dind
   before_script:
