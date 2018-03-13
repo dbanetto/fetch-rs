@@ -63,19 +63,10 @@ tslint:
 
 clippy:
   stage: style
-  image: rust:latest
+  image: nrdmn/clippy:latest
   allow_failure: true
-  variables:
-    CARGO_HOME: "$CI_PROJECT_DIR/cargo-clippy"
   script:
-    - du -hs "$CARGO_HOME" || true
-    - echo "$CARGO_HOME" && rustup --version
-    - rustup install nightly
-    - cargo +nightly install clippy
-    - cargo +nightly clippy
-  cache:
-    paths:
-      - cargo-clippy/
+    - cargo clippy
 
 # Continual errors with pages:deploy
 # pages:
