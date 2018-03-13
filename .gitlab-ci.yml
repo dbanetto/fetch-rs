@@ -65,6 +65,7 @@ clippy:
   stage: style
   image: rust:latest
   allow_failure: true
+  variables:
     CARGO_HOME: "$CI_PROJECT_DIR/cargo-clippy"
   script:
     - du -hs "$CARGO_HOME" || true
