@@ -52,6 +52,13 @@ func (api *API) get(endpoint string) ([]byte, error) {
 	return body, nil
 }
 
+// GetStatus checks if the API endpoint is accessible
+func (api *API) GetStatus() error {
+	_, err := api.get("/api/v1")
+
+	return err
+}
+
 // GetSeries returns a list of all series from the API
 func (api *API) GetSeries() ([]Series, error) {
 	body, err := api.get("/api/v1/series/")

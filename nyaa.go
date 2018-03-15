@@ -128,7 +128,7 @@ func NyaaFetch(show Series, config Config) error {
 	if newCurrent > current {
 		// push update to API
 		log.WithField("old_count", current).WithField("new_count", newCurrent).Infof("Update episode of %v to %v", show.Title, newCurrent)
-		countBlob.Blob["currnet"] = newCurrent
+		countBlob.Blob["current"] = newCurrent
 		return api.PutEpisodeCount(show.ID, *countBlob)
 	}
 
