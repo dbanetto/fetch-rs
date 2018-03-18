@@ -11,4 +11,5 @@ FROM alpine
 
 COPY --from=build /usr/local/bin/fetcherd /usr/local/bin/fetcherd
 
+HEALTHCHECK CMD wget http://localhost:8181/api/v1/healthcheck -q -O /dev/null
 CMD ["/usr/local/bin/fetcherd", "-config", "/etc/fetcherd.json"]
