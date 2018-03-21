@@ -1,7 +1,7 @@
 FROM golang:1.10 AS build
 
-RUN mkdir -p /go/src/github.com/zyphrus/fetcherd-go
-WORKDIR /go/src/github.com/zyphrus/fetcherd-go
+RUN mkdir -p /go/src/gitlab.com/zyphrus/fetcherd-go
+WORKDIR /go/src/gitlab.com/zyphrus/fetcherd-go
 COPY . .
 
 RUN go get -v -d ./ && \

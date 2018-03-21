@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 	log "github.com/sirupsen/logrus"
-	"github.com/zyphrus/fetcherd-go"
+	"gitlab.com/zyphrus/fetcherd-go"
 )
 
 func main() {
