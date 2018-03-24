@@ -1,62 +1,100 @@
-import { h, Component } from 'preact';
-import '../../model';
+import { Component, h } from "preact";
+import "../../model";
 
-export default class NyaaHandler extends Component<HandlerProps, void> {
+export default class NyaaHandler extends Component<IHandlerProps, void> {
 
-    static TypeName(): string {
+    public static TypeName(): string {
         return "Nyaa";
     }
 
-    handleUpdate(event) {
-        let state = this.props.blob;
+    constructor(props) {
+        super(props);
 
-        state[event.target.attributes['label'].value] = event.target.value;
+        this.handleUpdate = this.handleUpdate.bind(this);
+    }
+
+    public render() {
+        return this.props.edit ? this.renderEdit() : this.renderView();
+    }
+
+    private handleUpdate(event) {
+        const state = this.props.blob;
+
+        state[event.target.attributes.label.value] = event.target.value;
 
         this.props.handleUpdate(state);
     }
 
-    renderView() {
+    private renderView() {
         return (
             <div class="columns">
                 <div class="column">
                     <label class="label" >Nyaa ID</label>
-                    <a href={ `https://nyaa.si/user/${ this.props.blob.user_id }` } target="_blank" rel="noopener noreferrer">{ this.props.blob.user_id } <span class="icon is-small"><i class="mdi mdi-open-in-new" /></span></a>
+                    <a
+                        href={`https://nyaa.si/user/${ this.props.blob.user_id }`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        {this.props.blob.user_id}
+                        <span class="icon is-small">
+                            <i class="mdi mdi-open-in-new" />
+                        </span>
+                    </a>
                 </div>
                 <div class="column">
                     <label class="label">Query</label>
-                    <input disabled class="input" type="text" value={ this.props.blob.query } />
+                    <input
+                        disabled={true}
+                        class="input"
+                        type="text"
+                        value={this.props.blob.query}
+                    />
                 </div>
                 <div class="column">
                     <label class="label">Search Title</label>
-                    <input disabled class="input" type="text" value={ this.props.blob.search_title } />
+                    <input
+                        disabled={true}
+                        class="input"
+                        type="text"
+                        value={this.props.blob.search_title}
+                    />
                 </div>
             </div>);
     }
 
-    renderEdit() {
+    private renderEdit() {
         return (
         <div class="columns">
             <div class="column">
-                <label class="label" for="user_id">Nyaa ID</label> <input label="user_id" class="input" type="text"
-                    value={ this.props.blob.user_id }
-                    onChange={ this.handleUpdate.bind(this) } />
+                <label class="label" for="user_id">Nyaa ID</label>
+                <input
+                    label="user_id"
+                    class="input"
+                    type="text"
+                    value={this.props.blob.user_id}
+                    onChange={this.handleUpdate}
+                />
             </div>
             <div class="column">
                 <label class="label" for="query">Query</label>
-                <input label="query" class="input" type="text"
-                    value={ this.props.blob.query }
-                    onChange={ this.handleUpdate.bind(this) } />
+                <input
+                    label="query"
+                    class="input"
+                    type="text"
+                    value={this.props.blob.query}
+                    onChange={this.handleUpdate}
+                />
             </div>
             <div class="column">
                 <label class="label" for="search_title">Search Title</label>
-                <input label="search_title" class="input" type="text"
-                    value={ this.props.blob.search_title }
-                    onChange={ this.handleUpdate.bind(this) } />
+                <input
+                    label="search_title"
+                    class="input"
+                    type="text"
+                    value={this.props.blob.search_title}
+                    onChange={this.handleUpdate}
+                />
             </div>
         </div>);
-    }
-
-    render() {
-        return this.props.edit ? this.renderEdit() : this.renderView();
     }
 }

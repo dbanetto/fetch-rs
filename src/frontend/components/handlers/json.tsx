@@ -1,12 +1,16 @@
-import { h, Component } from 'preact';
-import '../../model';
+import { Component, h } from "preact";
+import "../../model";
 
-interface JsonHandlerState {
+interface IJsonHandlerState {
     isValid: boolean;
-    text: string,
-};
+    text: string;
+}
 
-export default class JsonHandler extends Component<HandlerProps, JsonHandlerState> {
+export default class JsonHandler extends Component<IHandlerProps, IJsonHandlerState> {
+
+    public static TypeName(): string {
+        return "JSON";
+    }
 
     constructor(props) {
         super(props);
@@ -14,57 +18,51 @@ export default class JsonHandler extends Component<HandlerProps, JsonHandlerStat
         this.state = {
             isValid: true,
             text: JSON.stringify(props.blob),
-        }
+        };
+
+        this.handleUpdate = this.handleUpdate.bind(this);
     }
 
-    static TypeName(): string {
-        return "JSON";
+    public render() {
+        return this.props.edit ? this.renderEdit() : this.renderView();
     }
 
-    textareaClass() {
-        var className ="textarea";
-        if (this.state.isValid === true) {
-            className = className + " is-success";
-        } else {
-            className = className + " is-danger";
-        }
-
-        return className;
+    private textareaClass() {
+        return "textarea" + this.state.isValid ? " is-success" : " is-danger";
     }
 
-    renderView() {
-        return ( <textarea class="textarea"
-            disabled
-            name={ this.props.name }
-            value={ JSON.stringify(this.props.blob) }
-            onChange={ this.handleUpdate.bind(this) }
+    private renderView() {
+        return (<textarea
+            class="textarea"
+            disabled={true}
+            name={this.props.name}
+            value={JSON.stringify(this.props.blob)}
+            onChange={this.handleUpdate}
         />);
     }
 
-    handleUpdate(event) {
-        var isValid = true;
+    private handleUpdate(event) {
+        let isValid = true;
         try {
-            let value = JSON.parse(event.target.value);
+            const value = JSON.parse(event.target.value);
             this.props.handleUpdate(value);
-        } catch(err) {
+        } catch (err) {
             isValid = false;
         }
 
         this.setState({
-            isValid: isValid,
+            isValid,
             text: event.target.value,
-        })
+        });
     }
 
-    renderEdit() {
-        return ( <textarea class={ this.textareaClass() }
-            name={ this.props.name }
-            value={ this.state.text }
-            onChange={ this.handleUpdate.bind(this) }
+    private renderEdit() {
+        return (<textarea
+            class={this.textareaClass()}
+            name={this.props.name}
+            value={this.state.text}
+            onChange={this.handleUpdate}
         />);
     }
 
-    render() {
-        return this.props.edit ? this.renderEdit() : this.renderView();
-    }
 }

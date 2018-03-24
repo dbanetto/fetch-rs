@@ -1,62 +1,73 @@
-import { h, Component } from 'preact';
-import { Link } from 'preact-router';
-import Store from '../store';
-import '../model';
+import { Component, h } from "preact";
+import { Link } from "preact-router";
+import "../model";
+import Store from "../store";
 
-interface CardProps {
-    series: Series;
+interface ICardProps {
+    series: ISeries;
 }
 
-interface CardState {
-    link: InfoBlob;
-    count: InfoBlob;
+interface ICardState {
+    link: IInfoBlob;
+    count: IInfoBlob;
 }
 
-export default class SeriesCard extends Component<CardProps, CardState> {
+export default class SeriesCard extends Component<ICardProps, ICardState> {
 
   constructor() {
     super();
 
     this.state = {
-      link: null,
       count: null,
-    }
+      link: null,
+    };
   }
 
-  componentDidMount() {
-    let self = this;
+  public componentDidMount() {
+
     Store.getInfoType(this.props.series.id, ["url", "count"])
-      .then(blobs => {
-        let link = blobs.find((b) => b.info_type === "url");
-        let count = blobs.find((b) => b.info_type === "count");
-        self.setState({
-            link,
+      .then((blobs) => {
+        const link = blobs.find((b) => b.info_type === "url");
+        const count = blobs.find((b) => b.info_type === "count");
+        this.setState({
             count,
+            link,
         });
       }).catch(() => null);
   }
 
-  renderLink() {
-
-      if (this.state.link) {
-          return (
-              <a href={ this.state.link.blob.url } target="_blank" rel="noopener noreferrer">
-                  <span class="icon is-small">
-                      <i class="mdi mdi-open-in-new" />
-                  </span>
-              </a>
-          );
-      } else {
-          return (<div />)
-      }
+  public render() {
+      const series = this.props.series;
+      return (
+          <div class="card has-gap">
+              <div class="card-head" >
+                  <Link href={`/series/${ series.id }`} >
+                      <div class="poster">
+                          <img class="image" src={series.poster_url} />
+                      </div>
+                  </Link>
+              </div>
+              <div class="card-body">
+                  <div class="is-flex" >
+                      <Link href={`/series/${ series.id }`} class="card-subtitle is-truncated" title={series.title}>
+                          <h2 class="subtitle is-truncated">{series.title}</h2>
+                      </Link>
+                      {this.renderLink()}
+                  </div>
+                  <br />
+                  <div>
+                      {this.renderProgressBar()}
+                  </div>
+              </div>
+          </div>);
   }
 
-  renderProgressBar() {
+  private renderProgressBar() {
       if (this.state.count) {
-          let value = this.state.count.blob.current;
-          let max = this.state.count.blob.total > 0 ? this.state.count.blob.total : value * 2;
+          const value = this.state.count.blob.current;
+          const max = this.state.count.blob.total > 0 ? this.state.count.blob.total : value * 2;
 
-          let currentStatus = 'is-success';
+          let currentStatus = "is-success";
           if (this.state.count.blob.total <= 0) {
               currentStatus = "is-warning";
           } else if (this.state.count.blob.current === this.state.count.blob.total) {
@@ -65,7 +76,7 @@ export default class SeriesCard extends Component<CardProps, CardState> {
 
           return (
               <div>
-                  <progress class={`progress ${currentStatus}`}  value={ value } max={ max } />
+                  <progress class={`progress ${currentStatus}`}  value={value} max={max} />
               </div>
           );
       } else {
@@ -73,29 +84,18 @@ export default class SeriesCard extends Component<CardProps, CardState> {
       }
   }
 
-  render() {
-    var series = this.props.series;
-      return (
-          <div class="card has-gap">
-              <div class="card-head" >
-                  <Link href={`/series/${ series.id }`} >
-                      <div class="poster">
-                          <img class="image" src={ series.poster_url } />
-                      </div>
-                  </Link>
-              </div>
-              <div class="card-body">
-                      <div class="is-flex" >
-                          <Link href={`/series/${ series.id }`} class="card-subtitle is-truncated" title={ series.title }>
-                              <h2 class="subtitle is-truncated">{ series.title }</h2>
-                          </Link>
-                          { this.renderLink() }
-                      </div>
-                      <br />
-                  <div>
-                      { this.renderProgressBar() }
-                  </div>
-              </div>
-          </div>);
+  private renderLink() {
+
+      if (this.state.link) {
+          return (
+              <a href={this.state.link.blob.url} target="_blank" rel="noopener noreferrer">
+                  <span class="icon is-small">
+                      <i class="mdi mdi-open-in-new" />
+                  </span>
+              </a>
+          );
+      } else {
+          return (<div />);
+      }
   }
 }

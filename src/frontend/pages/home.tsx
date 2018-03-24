@@ -1,58 +1,58 @@
-import { h, Component } from 'preact';
-import { Link } from 'preact-router';
-import SeriesCard from '../components/seriesCard';
-import Store from '../store';
-import '../model';
+import { Component, h } from "preact";
+import { Link } from "preact-router";
+import SeriesCard from "../components/seriesCard";
+import "../model";
+import Store from "../store";
 
-interface HomeState {
-    series: Array<Series>;
+interface IHomeState {
+    series: ISeries[];
 }
 
-interface HomeProps {
+interface IHomeProps {
     path: string;
 }
 
-export default class Home extends Component<HomeProps, HomeState> {
-  constructor() {
-    super();
+export default class Home extends Component<IHomeProps, IHomeState> {
 
-    this.state = {
-      series: [],
-    };
-  }
+    constructor() {
+        super();
 
-  componentDidMount() {
-    this.loadSeries();
-  }
-
-  loadSeries() {
-    let self = this;
-    Store.getSeries()
-      .then(series => {
-        self.setState({
-          series: series
-        });
-      })
-      .catch(alert);
-  }
-
-  renderSeries() {
-    if (this.state && this.state.series) {
-        return (
-            <div class="card-list tile is-parent">
-                    { this.state.series.map(i => <SeriesCard key={i.id} series={i} />) }
-            </div>
-        );
-    } else {
-      return (<span>loading...</span>);
+        this.state = {
+            series: [],
+        };
     }
-  }
 
-    render() {
+    public componentDidMount() {
+        this.loadSeries();
+    }
+
+    public render() {
         return (
             <div>
-                { this.renderSeries() }
+                {this.renderSeries()}
             </div>
         );
-  }
+    }
+
+    private loadSeries() {
+        Store.getSeries()
+            .then((series) => {
+                this.setState({
+                    series,
+                });
+            })
+            .catch(alert);
+    }
+
+    private renderSeries() {
+        if (this.state && this.state.series) {
+            return (
+                <div class="card-list tile is-parent">
+                    {this.state.series.map((i) => <SeriesCard key={i.id} series={i} />)}
+                </div>
+            );
+        } else {
+            return (<span>loading...</span>);
+        }
+    }
 }

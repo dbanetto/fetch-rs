@@ -1,41 +1,48 @@
-import { h, Component } from 'preact';
-import '../../model';
+import { Component, h } from "preact";
+import "../../model";
 
+export default class ImageHandler extends Component<IHandlerProps, void> {
 
-export default class ImageHandler extends Component<HandlerProps, void> {
+    public static TypeName(): string {
+        return "Image";
+    }
 
-  static TypeName(): string {
-    return "Image";
-  }
+    constructor(props) {
+        super(props);
 
-  renderView() {
-    return ( <img src={ this.props.blob.src } />);
-  }
+        this.handleUpdate = this.handleUpdate.bind(this);
+    }
 
-  handleUpdate(event) {
-    this.props.handleUpdate({ src: event.target.value });
-  }
+    public render() {
+        return this.props.edit ? this.renderEdit() : this.renderView();
+    }
 
-  renderEdit() {
-    return (
-      <div class="columns">
-        <div class="column">
-          <input type="url" class="input"
-            name={ this.props.name || '' }
-            value={ this.props.blob.src }
-            onChange={ this.handleUpdate.bind(this) }  />
-        </div>
-        <div class="column">
-          <h3 class="subtitle">Preview</h3>
-          <div class="poster preview">
-            <img class="image" src={ this.props.blob.src } />
-          </div>
-        </div>
-      </div>
-    );
-  }
+    private renderView() {
+        return (<img src={this.props.blob.src}/>);
+    }
 
-  render() {
-    return this.props.edit ? this.renderEdit() : this.renderView();
-  }
+    private handleUpdate(event) {
+        this.props.handleUpdate({ src: event.target.value });
+    }
+
+    private renderEdit() {
+        return (
+            <div class="columns">
+                <div class="column">
+                    <input
+                        type="url"
+                        class="input"
+                        name={this.props.name || ""}
+                        value={this.props.blob.src}
+                        onChange={this.handleUpdate}
+                    />
+                </div>
+                <div class="column">
+                    <h3 class="subtitle">Preview</h3>
+                    <div class="poster preview">
+                        <img class="image" src={this.props.blob.src}/>
+                    </div>
+                </div>
+            </div>);
+    }
 }
