@@ -1,63 +1,95 @@
-import { h, Component } from 'preact';
-import { route, Link } from 'preact-router';
-import InfoList from './infoList';
-import Store from '../store';
-import handler from './handler';
-import '../model';
+import { Component, h } from "preact";
+import { Link, route } from "preact-router";
+import { upsertSeries } from "../api";
+import "../model";
+import handler from "./handler";
+import InfoList from "./infoList";
 
-interface FormProps {
+interface IFormProps {
     series?: SeriesFull;
     back: string;
 }
 
-interface FormState {
+interface IFormState {
     series: SeriesFull;
 }
 
-export default class SeriesForm extends Component<FormProps, FormState> {
+export default class SeriesForm extends Component<IFormProps, IFormState> {
 
     constructor(props) {
         super();
 
-        var series = {
+        let series = {
             id: null,
-            title: '',
-            poster_url: '',
             info: [],
+            poster_url: "",
+            title: "",
         };
         if (props &&  props.series) {
             series = props.series;
         }
 
         this.state = {
-            series: series
-        }
+            series,
+        };
+
+        this.handleSubmit = this.handleSubmit.bind(this);
+        this.handleTitleUpdate = this.handleTitleUpdate.bind(this);
+        this.handleUpdatePoster = this.handleUpdatePoster.bind(this);
+        this.handleInfoUpdate = this.handleInfoUpdate.bind(this);
     }
 
-    validate(formData) {
-        let errors = [];
+    public render() {
 
-        let blobs = formData.blobs ? formData.blobs : [];
+        const series = this.state.series;
+        const poster = handler.build({ src: series.poster_url },
+            "image",
+            { edit: true, name: "poster_url", handleUpdate: this.handleUpdatePoster});
 
-        return errors;
+        const submitText = this.state.series.id ? "Update" : "Create";
+        const submitClass = "is-pulled-right button " + (this.state.series.id ? "is-warning" : "is-success");
+
+        return (
+            <form onSubmit={this.handleSubmit}>
+                {this.renderId()}
+                <div>
+                    <label class="label" for="title">Title</label>
+                    <input
+                        class="input"
+                        name="title"
+                        id="title"
+                        type="text"
+                        value={series.title.toString()}
+                        required={true}
+                        onChange={this.handleTitleUpdate}
+                    />
+                </div>
+                <div>
+                    <label class="label" for="poster_url">Poster URL</label>
+                    {}
+                </div>
+                <div>
+                    <h3 class="subtitle">Info</h3>
+                    <InfoList value={series.info || []} handleUpdate={this.handleInfoUpdate} />
+                </div>
+                <br />
+                <div>
+                    <Link class="button" href={this.props.back}>Back</Link>
+                    <button class={submitClass} type="submit">
+                        {submitText}
+                    </button>
+                </div>
+            </form>
+        );
     }
 
-    handleSubmit(event) {
+    private handleSubmit(event) {
         event.preventDefault();
 
-        let formData = this.state.series;
+        const formData = this.state.series;
 
-        let errors = this.validate(formData);
-        if (errors.length > 0) {
-            console.log(errors);
-            // TODO: report errors
-            return;
-        }
-
-        let self = this;
-
-        Store.upsertSeries(formData)
-            .then(resp => {
+        upsertSeries(formData)
+            .then((resp) => {
                 // redirect to view
                 route(`/series/${ resp.id }`, true);
             })
@@ -67,70 +99,43 @@ export default class SeriesForm extends Component<FormProps, FormState> {
         return false;
     }
 
-    handleUpdate(key, value) {
-        let series = this.state.series;
+    private handleUpdate(key, value) {
+        const series = this.state.series;
 
         value = value.target ? value.target.value : value;
 
         series[key] = value;
 
         this.setState({
-            series: series
+            series,
         });
     }
 
-    handleInfoUpdate(key, value) {
-        let series = this.state.series;
+    private handleTitleUpdate(value) {
+        this.handleUpdate("title", value);
+    }
+
+    private handleInfoUpdate(key, value) {
+        const series = this.state.series;
 
         series.info = value;
 
         this.setState({
-            series: series
+            series,
         });
     }
 
-    handleUpdatePoster(blob) {
-        this.handleUpdate('poster_url', blob.src);
+    private handleUpdatePoster(blob) {
+        this.handleUpdate("poster_url", blob.src);
     }
 
-    renderId(): preact.VNode {
+    private renderId(): preact.VNode {
         if (this.state.series.id) {
             return (<div>
-                <input name="id" id="id" type="hidden" value={ this.state.series.id.toString() } />
+                <input name="id" id="id" type="hidden" value={this.state.series.id.toString()} />
             </div>);
-        } else{
-            return (<div></div>);
+        } else {
+            return (<div />);
         }
     }
-
-    render() {
-        let series = this.state.series;
-        return (
-            <form onSubmit={this.handleSubmit.bind(this)}>
-                { this.renderId() }
-                <div>
-                    <label class="label" for="title">Title</label>
-                    <input class="input" name="title" id="title" type="text" value={series.title.toString()} required
-                        onChange={ this.handleUpdate.bind(this, 'title') } />
-                </div>
-                <div>
-                    <label class="label" for="poster_url">Poster URL</label>
-                    { handler.build({ src: series.poster_url }, 'image', { edit: true, name: 'poster_url',
-                    handleUpdate: this.handleUpdatePoster.bind(this) }) }
-                </div>
-                <div>
-                    <h3 class="subtitle">Info</h3>
-                    <InfoList value={series.info || []}
-                        handleUpdate={ this.handleInfoUpdate.bind(this) } />
-                </div>
-                <br />
-                <div>
-                    <Link class="button" href={ this.props.back }>Back</Link>
-                    <button class={ 'is-pulled-right button ' + (this.state.series.id ? 'is-warning' : 'is-success') } type="submit">
-                        { this.state.series.id ? "Update" : "Create" }
-                    </button>
-                </div>
-            </form>
-        );
-}
 }

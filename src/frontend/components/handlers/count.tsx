@@ -1,55 +1,82 @@
-import { h, Component } from 'preact';
-import '../../model';
+import { Component,  h } from "preact";
+import "../../model";
 
-export default class CountHandler extends Component<HandlerProps, void> {
+export default class CountHandler extends Component<IHandlerProps, void> {
 
-    static TypeName(): string {
+    public static TypeName(): string {
         return "Count";
     }
 
-    handleUpdate(event) {
-        let state = this.props.blob;
-        state[event.target.attributes['label'].value] = parseInt(event.target.value, 10);
+    constructor(props) {
+        super(props);
+
+        this.handleUpdate = this.handleUpdate.bind(this);
+    }
+
+    public render() {
+        return this.props.edit ? this.renderEdit() : this.renderView();
+    }
+
+    private handleUpdate(event) {
+        const state = this.props.blob;
+        state[event.target.attributes.label.value] = parseInt(event.target.value, 10);
 
         this.props.handleUpdate(state);
     }
 
-    renderView() {
+    private renderView() {
         return (
             <div class="columns">
                 <div class="column">
                     <label class="label" for="current">Current count</label>
-                    <input label="current" disabled class="input" type="number" value={ this.props.blob.current } />
+                    <input
+                        label="current"
+                        disabled={true}
+                        class="input"
+                        type="number"
+                        value={this.props.blob.current}
+                    />
                 </div>
                 <div class="column">
                     <label class="label" for="total">Total count</label>
-                    <input label="total" disabled class="input" type="number" value={ this.props.blob.total } />
+                    <input
+                        label="total"
+                        disabled={true}
+                        class="input"
+                        type="number"
+                        value={this.props.blob.total}
+                    />
                 </div>
             </div>);
     }
 
-    renderEdit() {
+    private renderEdit() {
         return (
             <div class="columns">
                 <div class="column">
                     <label class="label" for="current">Current count</label>
-                    <input label="current" class="input" type="number"
-                        value={ this.props.blob.current }
+                    <input
+                        label="current"
+                        class="input"
+                        type="number"
+                        value={this.props.blob.current}
                         min="0"
-                        max={ this.props.blob.total > 0 ?  this.props.blob.total : false }
-                        onChange={ this.handleUpdate.bind(this) } />
+                        max={this.props.blob.total > 0 ?  this.props.blob.total : false}
+                        onChange={this.handleUpdate}
+                    />
                 </div>
                 <div class="column">
                     <label class="label" for="total">Total count</label>
-                    <input label="total" class="input" type="number"
-                        value={ this.props.blob.total }
-                        min={ this.props.blob.total > 0 ? this.props.blob.current : false }
-                        onChange={ this.handleUpdate.bind(this) } />
+                    <input
+                        label="total"
+                        class="input"
+                        type="number"
+                        value={this.props.blob.total}
+                        min={this.props.blob.total > 0 ? this.props.blob.current : false}
+                        onChange={this.handleUpdate}
+                    />
                 </div>
             </div>);
     }
 
-    render() {
-        return this.props.edit ? this.renderEdit() : this.renderView();
-    }
 }

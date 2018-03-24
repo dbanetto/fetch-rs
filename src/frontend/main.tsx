@@ -1,5 +1,5 @@
-import App from './pages/app';
-import { h, render } from 'preact';
-import './bulma.js';
+import { h, render } from "preact";
+import "./bulma.js";
+import App from "./pages/app";
 
-render(<App />, document.getElementById('root'));
+render(<App />, document.getElementById("root"));

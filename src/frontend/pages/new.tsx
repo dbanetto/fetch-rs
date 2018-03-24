@@ -1,15 +1,15 @@
-import { h, Component } from 'preact';
-import { Link, Router } from 'preact-router';
-import SeriesForm from '../components/seriesForm';
+import { Component, h } from "preact";
+import { Link, Router } from "preact-router";
+import SeriesForm from "../components/seriesForm";
 
-interface NewProps {
+interface INewProps {
     router?: Router;
     path: string;
 }
 
-export default class New extends Component<NewProps, void> {
+export default class New extends Component<INewProps, void> {
 
-  render() {
+  public render() {
     return (
         <div class="container box">
             <SeriesForm back="/" />

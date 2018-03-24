@@ -1,74 +1,69 @@
-import { h, Component } from 'preact';
-import { route, Link } from 'preact-router';
-import SeriesForm from '../components/seriesForm';
-import Store from '../store';
-import '../model';
+import { Component, h } from "preact";
+import { Link, route } from "preact-router";
+import { getSeriesId, getSeriesInfo } from "../api";
+import SeriesForm from "../components/seriesForm";
+import "../model";
 
-interface EditState {
-    series: Series;
-    info: Array<InfoBlob>;
+interface IEditState {
+    series: ISeries;
+    info: IInfoBlob[];
 }
 
-interface EditProps {
+interface IEditProps {
     path: string;
     matches?: {
         id: number;
     };
 }
 
-export default class Edit extends Component<EditProps, EditState> {
+export default class Edit extends Component<IEditProps, IEditState> {
 
     constructor() {
         super();
 
         this.state = {
-            series: null,
             info: null,
-        }
+            series: null,
+        };
     }
 
-    componentDidMount() {
+    public componentDidMount() {
         this.getSeries();
     }
 
-    getSeries() {
-        let self = this;
-
-        Promise.all([
-            Store.getSeriesId(this.props.matches.id),
-            Store.getSeriesInfo(this.props.matches.id)
-        ])
-            .then(result => {
-
-                self.setState({
-                    series: result[0],
-                    info: result[1],
-                });
-            })
-            .catch(err => {
-                console.log(err);
-                route('/');
-            });
-    }
-
-
-    render() {
+    public render() {
         if (this.state.series === null) {
             return (
                 <div>
-                <p>loading...</p>
-                <Link href='/'>back</Link>
+                    <p>loading...</p>
+                    <Link href="/">back</Link>
                 </div>
             );
         }
 
-        let series: any = this.state.series;
+        const series: any = this.state.series;
         series.info = this.state.info;
 
         return (
             <div class="container box">
-                <SeriesForm series={ series } back={ `/series/${ this.state.series.id }` } />
+                <SeriesForm series={series} back={`/series/${ this.state.series.id }`} />
             </div>
         );
+    }
+
+    private getSeries() {
+        Promise.all([
+            getSeriesId(this.props.matches.id),
+            getSeriesInfo(this.props.matches.id),
+        ]).then((result) => {
+
+            this.setState({
+                info: result[1],
+                series: result[0],
+            });
+        }).catch((err) => {
+            console.log(err);
+            route("/");
+        });
     }
 }

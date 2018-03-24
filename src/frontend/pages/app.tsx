@@ -1,12 +1,12 @@
-import { h, Component } from 'preact';
-import { Router, Link } from 'preact-router';
-import Home from './home';
-import View from './view';
-import New from './new';
-import Edit from './edit';
+import { Component, h } from "preact";
+import { Link, Router  } from "preact-router";
+import Edit from "./edit";
+import Home from "./home";
+import New from "./new";
+import View from "./view";
 
 export default class App extends Component<any, void> {
-  render() {
+  public render() {
       return (
           <div>
 
@@ -18,9 +18,9 @@ export default class App extends Component<any, void> {
                       </div>
 
                       <label class="navbar-burger" data-target="navbar-menu-target">
-                          <span></span>
-                          <span></span>
-                          <span></span>
+                          <span />
+                          <span />
+                          <span />
                       </label>
                   </div>
                   <div id="navbar-menu-target" class="navbar-menu">
