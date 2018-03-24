@@ -1,7 +1,7 @@
 import { Component, h } from "preact";
 import { Link } from "preact-router";
+import { getInfoType } from "../api";
 import "../model";
-import Store from "../store";
 
 interface ICardProps {
     series: ISeries;
@@ -25,7 +25,7 @@ export default class SeriesCard extends Component<ICardProps, ICardState> {
 
   public componentDidMount() {
 
-    Store.getInfoType(this.props.series.id, ["url", "count"])
+    getInfoType(this.props.series.id, ["url", "count"])
       .then((blobs) => {
         const link = blobs.find((b) => b.info_type === "url");
         const count = blobs.find((b) => b.info_type === "count");

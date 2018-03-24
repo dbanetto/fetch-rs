@@ -1,8 +1,8 @@
 import { Component, h } from "preact";
 import { Link } from "preact-router";
+import { getSeries } from "../api";
 import SeriesCard from "../components/seriesCard";
 import "../model";
-import Store from "../store";
 
 interface IHomeState {
     series: ISeries[];
@@ -35,7 +35,7 @@ export default class Home extends Component<IHomeProps, IHomeState> {
     }
 
     private loadSeries() {
-        Store.getSeries()
+        getSeries()
             .then((series) => {
                 this.setState({
                     series,

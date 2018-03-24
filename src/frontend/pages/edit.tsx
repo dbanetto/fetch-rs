@@ -1,8 +1,8 @@
 import { Component, h } from "preact";
 import { Link, route } from "preact-router";
+import { getSeriesId, getSeriesInfo } from "../api";
 import SeriesForm from "../components/seriesForm";
 import "../model";
-import Store from "../store";
 
 interface IEditState {
     series: ISeries;
@@ -53,8 +53,8 @@ export default class Edit extends Component<IEditProps, IEditState> {
 
     private getSeries() {
         Promise.all([
-            Store.getSeriesId(this.props.matches.id),
-            Store.getSeriesInfo(this.props.matches.id),
+            getSeriesId(this.props.matches.id),
+            getSeriesInfo(this.props.matches.id),
         ]).then((result) => {
 
             this.setState({

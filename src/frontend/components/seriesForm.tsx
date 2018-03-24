@@ -1,7 +1,7 @@
 import { Component, h } from "preact";
 import { Link, route } from "preact-router";
+import { upsertSeries } from "../api";
 import "../model";
-import Store from "../store";
 import handler from "./handler";
 import InfoList from "./infoList";
 
@@ -88,7 +88,7 @@ export default class SeriesForm extends Component<IFormProps, IFormState> {
 
         const formData = this.state.series;
 
-        Store.upsertSeries(formData)
+        upsertSeries(formData)
             .then((resp) => {
                 // redirect to view
                 route(`/series/${ resp.id }`, true);

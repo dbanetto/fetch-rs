@@ -1,8 +1,8 @@
 import { Component, h } from "preact";
 import { Link, route } from "preact-router";
+import { deleteSeriesId, getSeriesId, getSeriesInfo } from "../api";
 import handler from "../components/handler";
 import "../model";
-import Store from "../store";
 
 interface IViewState {
     series: ISeries;
@@ -78,8 +78,8 @@ export default class View extends Component<IViewProps, IViewState> {
 
     private getSeries() {
         const queries: [Promise<ISeries>, Promise<IInfoBlob[]>] = [
-            Store.getSeriesId(this.props.matches.id),
-            Store.getSeriesInfo(this.props.matches.id),
+            getSeriesId(this.props.matches.id),
+            getSeriesInfo(this.props.matches.id),
         ];
 
         Promise.all(queries)
@@ -101,7 +101,7 @@ export default class View extends Component<IViewProps, IViewState> {
             return;
         }
 
-        Store.deleteSeriesId(this.props.matches.id)
+        deleteSeriesId(this.props.matches.id)
             .then(() => {
                 route("/");
             })
