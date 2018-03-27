@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	log "github.com/sirupsen/logrus"
+	fetchapi "gitlab.com/zyphrus/fetch-api-go"
 	"net/http"
 	"os/exec"
 	"strings"
@@ -65,7 +66,7 @@ func handleHealthCheck(w http.ResponseWriter, r *http.Request, config Config) {
 	var res = make(map[string]interface{})
 
 	// check if API is assessible
-	api := Init(config.Api)
+	api := fetchapi.Init(config.Api)
 	apiStatus := true
 	err := api.GetStatus()
 	if err != nil {

@@ -2,9 +2,9 @@ package fetcher
 
 import (
 	"crypto/tls"
-	"errors"
 	"github.com/odwrtw/transmission"
 	log "github.com/sirupsen/logrus"
+	fetchapi "gitlab.com/zyphrus/fetch-api-go"
 	"net/http"
 	"strings"
 )
@@ -31,17 +31,7 @@ func buildTransmission(config Config) (*transmission.Client, error) {
 	return transmission.New(conf)
 }
 
-func (blobs InfoBlobs) GetType(infoType string) (*InfoBlob, error) {
-	for _, blob := range blobs {
-		if blob.InfoType == infoType {
-			return &blob, nil
-		}
-	}
-
-	return nil, errors.New("Info type not found")
-}
-
-func resolveSearchTitle(show Series, blob *InfoBlob) string {
+func resolveSearchTitle(show fetchapi.Series, blob *fetchapi.InfoBlob) string {
 	// Resolve the search title to use
 	// by default use the title
 	searchTitle := strings.TrimSpace(show.Title)

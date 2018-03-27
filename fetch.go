@@ -2,12 +2,13 @@ package fetcher
 
 import (
 	log "github.com/sirupsen/logrus"
+	fetchapi "gitlab.com/zyphrus/fetch-api-go"
 	"sync"
 )
 
 func Fetch(config Config) error {
 
-	client := Init(config.Api)
+	client := fetchapi.Init(config.Api)
 
 	series, err := client.GetSeries()
 	if err != nil {
@@ -29,7 +30,7 @@ func Fetch(config Config) error {
 	return nil
 }
 
-func handleShow(show Series, config Config, wg *sync.WaitGroup) {
+func handleShow(show fetchapi.Series, config Config, wg *sync.WaitGroup) {
 	defer wg.Done()
 
 	handle := GetProvider("nyaa") // FIXME: hard coded

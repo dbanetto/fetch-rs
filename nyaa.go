@@ -4,6 +4,7 @@ import (
 	"encoding/xml"
 	"fmt"
 	log "github.com/sirupsen/logrus"
+	fetchapi "gitlab.com/zyphrus/fetch-api-go"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -12,7 +13,7 @@ import (
 	"strings"
 )
 
-func NyaaFetch(show Series, config Config) error {
+func NyaaFetch(show fetchapi.Series, config Config) error {
 
 	// type def for later
 	type Nyaa struct {
@@ -22,7 +23,7 @@ func NyaaFetch(show Series, config Config) error {
 		} `xml:"channel>item"`
 	}
 
-	api := Init(config.Api)
+	api := fetchapi.Init(config.Api)
 	blobs, err := api.GetInfoBlob(show.ID, []string{"count", "nyaa"})
 	if err != nil {
 		return err
@@ -129,7 +130,7 @@ func NyaaFetch(show Series, config Config) error {
 		// push update to API
 		log.WithField("old_count", current).WithField("new_count", newCurrent).Infof("Update episode of %v to %v", show.Title, newCurrent)
 		countBlob.Blob["current"] = newCurrent
-		return api.PutEpisodeCount(show.ID, *countBlob)
+		return api.PutInfoBlob(show.ID, *countBlob)
 	}
 
 	// everything must of been ffiinnee

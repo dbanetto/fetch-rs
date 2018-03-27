@@ -1,6 +1,10 @@
 package fetcher
 
-type FetchProvider func(show Series, config Config) error
+import (
+	fetchapi "gitlab.com/zyphrus/fetch-api-go"
+)
+
+type FetchProvider func(show fetchapi.Series, config Config) error
 
 var baseProviders map[string]FetchProvider
 
