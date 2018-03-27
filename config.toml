@@ -1,0 +1,10 @@
+[Kitsu]
+username = "kitsu"
+password = "test"
+
+[MAL]
+username = "mal"
+password = "test"
+
+[FetchAPI]
+url = "http://localhost:3000"
