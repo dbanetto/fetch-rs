@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	log "github.com/sirupsen/logrus"
 	fetchapi "gitlab.com/zyphrus/fetch-api-go"
 	sitesync "gitlab.com/zyphrus/sitesync"
@@ -18,8 +17,6 @@ func main() {
 		return
 	}
 
-	fmt.Printf("Config %s\n", config)
-
 	fetch := fetchapi.Init(config.FetchAPI.URL)
 
 	series, err := fetch.GetSeries()
@@ -29,51 +26,56 @@ func main() {
 		return
 	}
 
+	err = sitesync.CheckMALCreds(config.Mal)
+	if err != nil {
+		log.
+			WithField("err", err).
+			WithField("mal_user", config.Mal.Username).
+			Errorf("Could not verify credentials for MAL")
+	}
+
 	var wg sync.WaitGroup
 
 	for _, show := range series {
 		wg.Add(1)
 
-		go handleShow(config, show, fetch, &wg)
+		go handleShow(config.Mal, config.Kitsu, show, fetch, &wg)
 	}
 
 	wg.Wait()
 }
 
-func handleShow(config sitesync.Config, show fetchapi.Series, api *fetchapi.API, wg *sync.WaitGroup) {
+func handleShow(
+	malCred sitesync.SiteConfig,
+	kistuCred sitesync.SiteConfig,
+	show fetchapi.Series,
+	api *fetchapi.API,
+	wg *sync.WaitGroup) {
+
 	defer wg.Done()
 
 	blobs, err := api.GetInfoBlob(show.ID, []string{"count", "mal", "kitsu"})
+	logTitle := log.WithField("title", show.Title).WithField("id", show.ID)
+
 	if err != nil {
-		log.
-			WithField("title", show.Title).
-			WithField("id", show.ID).
-			Errorf("error recieveing info blobs: %v", err)
+		logTitle.Errorf("error recieveing info blobs: %v", err)
 		return
 	}
 
 	count, err := blobs.GetType("count")
 	if err != nil {
-		log.
-			WithField("title", show.Title).
-			WithField("id", show.ID).
-			Warnf("count blob not present")
+		logTitle.Warnf("count blob not present")
 		return
 	}
 
 	mal, err := blobs.GetType("mal")
 	if err != nil {
-		log.
-			WithField("title", show.Title).
-			WithField("id", show.ID).
-			Warnf("mal blob not present")
+		logTitle.Warnf("mal blob not present")
 	} else {
 		// sync to MAL
-		err := sitesync.SyncMAL(config.Mal, count, mal)
+		err := sitesync.SyncMAL(logTitle, malCred, count, mal)
 		if err != nil {
-			log.
-				WithField("title", show.Title).
-				WithField("id", show.ID).
+			logTitle.
 				WithField("mal", mal.Blob).
 				WithField("count", count.Blob).
 				Errorf("error during MAL sync: %v", err)
@@ -82,27 +84,19 @@ func handleShow(config sitesync.Config, show fetchapi.Series, api *fetchapi.API,
 
 	kitsu, err := blobs.GetType("kitsu")
 	if err != nil {
-		log.
-			WithField("title", show.Title).
-			WithField("id", show.ID).
-			Warnf("kitsu blob not present")
+		logTitle.Warnf("kitsu blob not present")
 	} else {
 		// sync to kitsu
-		err := sitesync.SyncKitsu(config.Mal, count, mal)
+		err := sitesync.SyncKitsu(logTitle, kistuCred, count, mal)
 		if err != nil {
-			log.
-				WithField("title", show.Title).
-				WithField("id", show.ID).
+			logTitle.
 				WithField("kitsu", kitsu.Blob).
 				WithField("count", count.Blob).
 				Errorf("error during Kitsu sync: %v", err)
 		}
 	}
 
-	log.
-		WithField("title", show.Title).
-		WithField("id", show.ID).
-		Info("Successfully completed sync")
+	logTitle.Info("Successfully completed sync")
 }
 
 func cli() Options {
