@@ -27,11 +27,13 @@ func main() {
 	}
 
 	err = sitesync.CheckMALCreds(config.Mal)
+
+	kitsuSession, err := sitesync.GetKitsuToken(config.Kitsu)
 	if err != nil {
 		log.
 			WithField("err", err).
-			WithField("mal_user", config.Mal.Username).
-			Errorf("Could not verify credentials for MAL")
+			WithField("kitsu_user", config.Kitsu.Username).
+			Errorf("Could get Kitsu token: %v", err)
 	}
 
 	var wg sync.WaitGroup
@@ -39,7 +41,7 @@ func main() {
 	for _, show := range series {
 		wg.Add(1)
 
-		go handleShow(config.Mal, config.Kitsu, show, fetch, &wg)
+		go handleShow(config.Mal, kitsuSession, show, fetch, &wg)
 	}
 
 	wg.Wait()
@@ -47,7 +49,7 @@ func main() {
 
 func handleShow(
 	malCred sitesync.SiteConfig,
-	kistuCred sitesync.SiteConfig,
+	kitsuSession sitesync.KitsuSession,
 	show fetchapi.Series,
 	api *fetchapi.API,
 	wg *sync.WaitGroup) {
@@ -87,7 +89,7 @@ func handleShow(
 		logTitle.Warnf("kitsu blob not present")
 	} else {
 		// sync to kitsu
-		err := sitesync.SyncKitsu(logTitle, kistuCred, count, mal)
+		err := sitesync.SyncKitsu(logTitle, kitsuSession, count, mal)
 		if err != nil {
 			logTitle.
 				WithField("kitsu", kitsu.Blob).
