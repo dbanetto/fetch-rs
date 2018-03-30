@@ -20,7 +20,7 @@ var planningStatus = 6
 var xmlTemplate = `<?xml version="1.0" encoding="utf-8"?> <entry><episode>%v</episode><status>%v</status>%v</entry>`
 
 // SyncMAL updates MAL with the current status of the series
-func SyncMAL(logger *log.Entry, creds SiteConfig, count *fetchapi.InfoBlob, mal *fetchapi.InfoBlob) error {
+func SyncMAL(logger *log.Entry, creds *SiteConfig, count *fetchapi.InfoBlob, mal *fetchapi.InfoBlob) error {
 
 	current := int(count.Blob["current"].(float64))
 	total := int(count.Blob["total"].(float64))
@@ -28,7 +28,7 @@ func SyncMAL(logger *log.Entry, creds SiteConfig, count *fetchapi.InfoBlob, mal 
 	offset := int(mal.Blob["offset"].(float64))
 	status := watchingStatus
 
-	if current == 0 {
+	if current <= 0 {
 		status = planningStatus
 	} else if total != 0 && current >= total {
 		status = completedStatus
@@ -36,23 +36,24 @@ func SyncMAL(logger *log.Entry, creds SiteConfig, count *fetchapi.InfoBlob, mal 
 
 	current = current - offset
 
-	logger.
+	logger = logger.
 		WithField("current", current).
 		WithField("status", status).
-		WithField("mal_id", id).
-		Info("syncing show to MAL")
+		WithField("mal_id", id)
+
+	logger.Info("syncing show to MAL")
 
 	xml := buildXML(status, current)
 
 	// ignore error for add, it happens a lot
-	_ = malPost(fmt.Sprintf("/animelist/add/%v.xml", id), xml, creds)
-	err := malPost(fmt.Sprintf("/animelist/update/%v.xml", id), xml, creds)
+	_ = malPost(fmt.Sprintf("/animelist/add/%v.xml", id), xml, creds, logger)
+	err := malPost(fmt.Sprintf("/animelist/update/%v.xml", id), xml, creds, logger)
 
 	return err
 }
 
 // CheckMALCreds ensures that the given credentials are valid
-func CheckMALCreds(creds SiteConfig) error {
+func CheckMALCreds(creds *SiteConfig) error {
 	return malGet("/account/verify_credentials.xml", creds)
 }
 
@@ -65,7 +66,7 @@ func buildXML(status int, count int) string {
 	return fmt.Sprintf(xmlTemplate, count, status, tags)
 }
 
-func malGet(endpoint string, creds SiteConfig) error {
+func malGet(endpoint string, creds *SiteConfig) error {
 	client := &http.Client{}
 
 	uri := fmt.Sprint(malAPIURL, endpoint)
@@ -97,7 +98,7 @@ func malGet(endpoint string, creds SiteConfig) error {
 	return nil
 }
 
-func malPost(endpoint string, body string, creds SiteConfig) error {
+func malPost(endpoint string, body string, creds *SiteConfig, logger *log.Entry) error {
 	client := &http.Client{}
 
 	uri := fmt.Sprint(malAPIURL, endpoint)
@@ -119,16 +120,18 @@ func malPost(endpoint string, body string, creds SiteConfig) error {
 	defer resp.Body.Close()
 
 	bytes, err := ioutil.ReadAll(resp.Body)
-	if err == nil {
-		log.
-			WithField("status", resp.StatusCode).
-			WithField("uri", uri).
-			Infof("%s", bytes)
-	} else {
-		log.
-			WithField("status", resp.StatusCode).
-			WithField("uri", uri).
-			Info("")
+	if logger != nil {
+		if err == nil {
+			logger.
+				WithField("status", resp.StatusCode).
+				WithField("uri", uri).
+				Infof("%s", bytes)
+		} else {
+			logger.
+				WithField("status", resp.StatusCode).
+				WithField("uri", uri).
+				Info("")
+		}
 	}
 
 	if resp.StatusCode > 400 {

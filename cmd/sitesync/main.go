@@ -26,14 +26,24 @@ func main() {
 		return
 	}
 
-	err = sitesync.CheckMALCreds(config.Mal)
+	malCreds := &config.Mal
+	err = sitesync.CheckMALCreds(&config.Mal)
+	if err != nil {
+		log.
+			WithField("err", err).
+			WithField("mal_user", config.Mal.Username).
+			Errorf("Could not verify credentials for MAL")
+		malCreds = nil
+	}
 
 	kitsuSession, err := sitesync.GetKitsuToken(config.Kitsu)
+	kitsuToken := &kitsuSession
 	if err != nil {
 		log.
 			WithField("err", err).
 			WithField("kitsu_user", config.Kitsu.Username).
 			Errorf("Could get Kitsu token: %v", err)
+		kitsuToken = nil
 	}
 
 	var wg sync.WaitGroup
@@ -41,15 +51,15 @@ func main() {
 	for _, show := range series {
 		wg.Add(1)
 
-		go handleShow(config.Mal, kitsuSession, show, fetch, &wg)
+		go handleShow(malCreds, kitsuToken, show, fetch, &wg)
 	}
 
 	wg.Wait()
 }
 
 func handleShow(
-	malCred sitesync.SiteConfig,
-	kitsuSession sitesync.KitsuSession,
+	malCred *sitesync.SiteConfig,
+	kitsuSession *sitesync.KitsuSession,
 	show fetchapi.Series,
 	api *fetchapi.API,
 	wg *sync.WaitGroup) {
@@ -70,35 +80,47 @@ func handleShow(
 		return
 	}
 
-	mal, err := blobs.GetType("mal")
-	if err != nil {
-		logTitle.Warnf("mal blob not present")
-	} else {
-		// sync to MAL
-		err := sitesync.SyncMAL(logTitle, malCred, count, mal)
+	if malCred != nil {
+		mal, err := blobs.GetType("mal")
 		if err != nil {
-			logTitle.
-				WithField("mal", mal.Blob).
-				WithField("count", count.Blob).
-				Errorf("error during MAL sync: %v", err)
+			logTitle.Warnf("mal blob not present")
+		} else {
+			// sync to MAL
+			err := sitesync.SyncMAL(logTitle, malCred, count, mal)
+			if err != nil {
+				logTitle.
+					WithField("mal", mal.Blob).
+					WithField("count", count.Blob).
+					Errorf("error during MAL sync: %v", err)
+			}
 		}
+	} else {
+		logTitle.Warn("Skipped MAL due to lack of valid credentials")
 	}
 
-	kitsu, err := blobs.GetType("kitsu")
-	if err != nil {
-		logTitle.Warnf("kitsu blob not present")
-	} else {
-		// sync to kitsu
-		err := sitesync.SyncKitsu(logTitle, kitsuSession, count, mal)
+	if kitsuSession != nil {
+		kitsu, err := blobs.GetType("kitsu")
 		if err != nil {
+			logTitle.Warnf("kitsu blob not present")
+		} else {
+			// sync to kitsu
 			logTitle.
 				WithField("kitsu", kitsu.Blob).
 				WithField("count", count.Blob).
-				Errorf("error during Kitsu sync: %v", err)
+				Info("starting to sync")
+			err := sitesync.SyncKitsu(logTitle, kitsuSession, count, kitsu)
+			if err != nil {
+				logTitle.
+					WithField("kitsu", kitsu.Blob).
+					WithField("count", count.Blob).
+					Errorf("error during Kitsu sync: %v", err)
+			}
 		}
+	} else {
+		logTitle.Warn("Skipped Kitsu due to lack of valid credentials")
 	}
 
-	logTitle.Info("Successfully completed sync")
+	logTitle.Info("Completed")
 }
 
 func cli() Options {
