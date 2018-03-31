@@ -3,6 +3,7 @@ import "../model";
 import CountHandler from "./handlers/count";
 import ImageHandler from "./handlers/image";
 import JsonHandler from "./handlers/json";
+import KitsuHandler from "./handlers/kitsu";
 import MalHandler from "./handlers/mal";
 import NyaaHandler from "./handlers/nyaa";
 import UrlHandler from "./handlers/url";
@@ -11,6 +12,7 @@ const typeHandlers = {
   count: CountHandler,
   image: ImageHandler,
   json: JsonHandler,
+  kitsu: KitsuHandler,
   mal: MalHandler,
   nyaa: NyaaHandler,
   url: UrlHandler,
@@ -22,8 +24,6 @@ function addHandler(type: string, builder: Component<IHandlerProps, void>) {
 
 function build(blob: any, type: string, options: any) {
   options = options || {};
-
-  console.log("selected:" + String(type));
 
   // use registered handler or default link handler
   const element = typeHandlers[type] || JsonHandler;
