@@ -62,7 +62,7 @@ export default class Edit extends Component<IEditProps, IEditState> {
                 series: result[0],
             });
         }).catch((err) => {
-            console.log(err);
+            // FIXME: should show an error modal
             route("/");
         });
     }
