@@ -1,39 +1,23 @@
 import { Component, h } from "preact";
+import { connect } from "preact-redux";
 import { Link } from "preact-router";
-import { getInfoType } from "../api";
+import { getInfoBlobType } from "../actions";
 import "../model";
 
 interface ICardProps {
     series: ISeries;
-}
-
-interface ICardState {
     link: IInfoBlob;
     count: IInfoBlob;
 }
 
-export default class SeriesCard extends Component<ICardProps, ICardState> {
+class SeriesCard extends Component<any, ICardProps> {
 
-  constructor() {
-    super();
-
-    this.state = {
-      count: null,
-      link: null,
-    };
+  constructor(props) {
+    super(props);
   }
 
-  public componentDidMount() {
-
-    getInfoType(this.props.series.id, ["url", "count"])
-      .then((blobs) => {
-        const link = blobs.find((b) => b.info_type === "url");
-        const count = blobs.find((b) => b.info_type === "count");
-        this.setState({
-            count,
-            link,
-        });
-      }).catch(() => null);
+  public componentWillMount() {
+      this.props.dispatch(getInfoBlobType(this.props.series.id, ["count", "url"]));
   }
 
   public render() {
@@ -99,3 +83,19 @@ export default class SeriesCard extends Component<ICardProps, ICardState> {
       }
   }
 }
+
+export default connect((state, props: any) => {
+    const blobs = state.infoBlob.blobs[props.series.id];
+    let link;
+    let count;
+    if (blobs) {
+        link = blobs.find((b) => b.info_type === "link");
+        count = blobs.find((b) => b.info_type === "count");
+    }
+
+    return {
+        count,
+        link,
+        loading: state.infoBlob.loading,
+    };
+})(SeriesCard);

@@ -1,40 +1,36 @@
 import { Component, h } from "preact";
+import { connect } from "preact-redux";
 import { Link, route } from "preact-router";
-import { deleteSeriesId, getSeriesId, getSeriesInfo } from "../api";
+import { deleteSeries, getInfoBlobs, getSeries, showError } from "../actions";
 import handler from "../components/handler";
 import "../model";
-
-interface IViewState {
-    series: ISeries;
-    info: IInfoBlob[];
-}
+import store from "../store";
 
 interface IViewProps {
     matches?: {
         id: number;
     };
+    loading: boolean;
     path: string;
+    series: ISeries;
+    info: IInfoBlob[];
 }
 
-export default class View extends Component<IViewProps, IViewState> {
+class View extends Component<any, IViewProps> {
 
     constructor(props) {
         super(props);
 
-        this.state = {
-            info: null,
-            series: null,
-        };
-
         this.handleDelete = this.handleDelete.bind(this);
     }
 
-    public componentDidMount() {
-        this.getSeries();
+    public componentWillMount() {
+        store.dispatch(getSeries(this.props.matches.id));
+        store.dispatch(getInfoBlobs(this.props.matches.id));
     }
 
     public render() {
-        if (this.state.series === null) {
+        if (this.props.loading || !this.props.series || !this.props.info) {
             return (
                 <div class="container box">
                     <p>Loading...</p>
@@ -42,7 +38,7 @@ export default class View extends Component<IViewProps, IViewState> {
                 </div>);
         }
 
-        const series = this.state.series;
+        const series = this.props.series;
 
         return (
             <div class="container box">
@@ -76,48 +72,23 @@ export default class View extends Component<IViewProps, IViewState> {
         );
   }
 
-    private getSeries() {
-        const queries: [Promise<ISeries>, Promise<IInfoBlob[]>] = [
-            getSeriesId(this.props.matches.id),
-            getSeriesInfo(this.props.matches.id),
-        ];
-
-        Promise.all(queries)
-            .then((result) => {
-                this.setState({
-                    info: result[1],
-                    series: result[0],
-                });
-            })
-            .catch((err) => {
-                console.log(err);
-                route("/");
-            });
-    }
-
     private handleDelete() {
-        const confirmed = confirm(`Are you sure you want to delete ${ this.state.series.title }?`);
+        // TODO: make this into a modal
+        const confirmed = confirm(`Are you sure you want to delete ${ this.props.series.title }?`);
         if (!confirmed) {
             return;
         }
 
-        deleteSeriesId(this.props.matches.id)
-            .then(() => {
-                route("/");
-            })
-            .catch((err) => {
-                console.log(err);
-                route("/");
-            });
-
+        store.dispatch(deleteSeries(this.props.matches.id));
+        route("/");
     }
 
     private renderInfoList() {
-
-        if (this.state.info === undefined) {
+        if (this.props.loading) {
             return (<div />);
         }
-        const infoItems = this.state.info.map((u, i) =>
+
+        const infoItems = this.props.info.map((u, i) =>
             <div key={i.toString()} class="info-list-item" >
                 {handler.build(u.blob, u.info_type, {})}
             </div>);
@@ -131,3 +102,22 @@ export default class View extends Component<IViewProps, IViewState> {
         );
   }
 }
+
+export default connect((state, props: any) => {
+
+    let series;
+    if (state.series && state.series.items && Array.isArray(state.series.items)) {
+        series = state.series.items.find((s) => s.id.toString() === props.matches.id);
+    }
+
+    let info = [];
+    if (state.infoBlob && state.infoBlob.blobs) {
+        info = state.infoBlob.blobs[props.matches.id];
+    }
+
+    return {
+        info,
+        loading: state.series.loading,
+        series,
+    };
+})(View);

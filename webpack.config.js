@@ -18,7 +18,9 @@ module.exports = {
     style: './src/frontend/style.scss',
     vendor: [
       'preact',
+      'preact-redux',
       'preact-router',
+      'redux',
     ]
   },
   output: {
