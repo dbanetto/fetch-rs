@@ -23,7 +23,7 @@ func NyaaFetch(show fetchapi.Series, config Config) error {
 		} `xml:"channel>item"`
 	}
 
-	api := fetchapi.Init(config.Api)
+	api := fetchapi.Init(config.FetchApi)
 	blobs, err := api.GetInfoBlob(show.ID, []string{"count", "nyaa"})
 	if err != nil {
 		return err

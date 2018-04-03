@@ -14,10 +14,13 @@ func main() {
 
 	fetcher.RegisterFetchProvider("nyaa", fetcher.NyaaFetch)
 	// fetcher.RegisterFetchProvider("magnetrss", fetcher.MagnetRss)
-
 	if err != nil {
 		log.WithField("args", options).Fatal("Error while loading config:", err)
 		return
+	}
+
+	if config.Log.ToJSON {
+		log.SetFormatter(&log.JSONFormatter{})
 	}
 
 	log.WithFields(log.Fields{
@@ -37,7 +40,7 @@ func main() {
 func cli() Options {
 
 	fetch := flag.Bool("fetch", false, "Force fetch")
-	config := flag.String("config", "config.json", "Path to configuration file")
+	config := flag.String("config", "config.toml", "Path to configuration file")
 
 	flag.Parse()
 

@@ -1,7 +1,9 @@
 package fetcher
 
-import "encoding/json"
-import "io/ioutil"
+import (
+	toml "github.com/pelletier/go-toml"
+	"io/ioutil"
+)
 
 func Parse(path string) (Config, error) {
 	var config Config
@@ -11,7 +13,7 @@ func Parse(path string) (Config, error) {
 		return config, err
 	}
 
-	err = json.Unmarshal(bytes, &config)
+	err = toml.Unmarshal(bytes, &config)
 
 	if err != nil {
 		return config, err
@@ -21,20 +23,23 @@ func Parse(path string) (Config, error) {
 }
 
 type Config struct {
-	WebUI WebUIConfig `json:"webui"`
-
-	Api             string             `json:"api"`
-	TransmissionRpc string             `json:"transmission_rpc"`
-	Transmission    TransmissionConfig `json:"transmission"`
+	WebUI        WebUIConfig `toml:"webui"`
+	Log          LogConfig
+	FetchApi     string
+	Transmission TransmissionConfig
 }
 
 type TransmissionConfig struct {
-	Rpc      string `json:"rpc"`
-	User     string `json:"user"`
-	Password string `json:"password"`
+	Rpc      string
+	User     string
+	Password string
 }
 
 type WebUIConfig struct {
-	Enable bool   `json:"enable"`
-	Host   string `json:"host"`
+	Enable bool
+	Host   string
+}
+
+type LogConfig struct {
+	ToJSON bool
 }

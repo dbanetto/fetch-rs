@@ -66,12 +66,12 @@ func handleHealthCheck(w http.ResponseWriter, r *http.Request, config Config) {
 	var res = make(map[string]interface{})
 
 	// check if API is assessible
-	api := fetchapi.Init(config.Api)
+	api := fetchapi.Init(config.FetchApi)
 	apiStatus := true
 	err := api.GetStatus()
 	if err != nil {
 		apiStatus = false
-		log.WithField("api", config.Api).Errorf("Error getting API status: %v", err)
+		log.WithField("api", config.FetchApi).Errorf("Error getting API status: %v", err)
 		res["api_error"] = fmt.Sprint(err)
 	}
 
@@ -79,13 +79,13 @@ func handleHealthCheck(w http.ResponseWriter, r *http.Request, config Config) {
 	transmission, err := buildTransmission(config)
 	if err != nil {
 		transmissionStatus = false
-		log.WithField("transmission", config.TransmissionRpc).Errorf("Error creating connection to Transmission: %v", err)
+		log.WithField("transmission", config.Transmission.Rpc).Errorf("Error creating connection to Transmission: %v", err)
 		res["transmission_error"] = fmt.Sprint(err)
 	} else {
 		_, err := transmission.GetTorrents()
 		if err != nil {
 			transmissionStatus = false
-			log.WithField("transmission", config.TransmissionRpc).Errorf("Error testing connection to Transmission: %v", err)
+			log.WithField("transmission", config.Transmission.Rpc).Errorf("Error testing connection to Transmission: %v", err)
 			res["transmission_error"] = fmt.Sprint(err)
 		}
 	}

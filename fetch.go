@@ -8,7 +8,7 @@ import (
 
 func Fetch(config Config) error {
 
-	client := fetchapi.Init(config.Api)
+	client := fetchapi.Init(config.FetchApi)
 
 	series, err := client.GetSeries()
 	if err != nil {
