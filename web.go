@@ -30,7 +30,7 @@ func StartWeb(config Config) {
 	}
 }
 
-func handleLog(w http.ResponseWriter, r *http.Request, config Config) {
+func handleLog(w *loggedRes, r *http.Request, config Config) {
 	var res = make(map[string]interface{})
 
 	status := 200
@@ -48,7 +48,7 @@ func handleLog(w http.ResponseWriter, r *http.Request, config Config) {
 	sendJSON(res, w, status)
 }
 
-func handleForceFetch(w http.ResponseWriter, r *http.Request, config Config) {
+func handleForceFetch(w *loggedRes, r *http.Request, config Config) {
 	var res = make(map[string]interface{})
 
 	err := Fetch(config)
@@ -62,7 +62,7 @@ func handleForceFetch(w http.ResponseWriter, r *http.Request, config Config) {
 	sendJSON(res, w, status)
 }
 
-func handleHealthCheck(w http.ResponseWriter, r *http.Request, config Config) {
+func handleHealthCheck(w *loggedRes, r *http.Request, config Config) {
 	var res = make(map[string]interface{})
 
 	// check if API is assessible
@@ -101,19 +101,19 @@ func handleHealthCheck(w http.ResponseWriter, r *http.Request, config Config) {
 	sendJSON(res, w, status)
 }
 
-func sendJSON(d interface{}, w http.ResponseWriter, status int) {
+func sendJSON(d interface{}, w *loggedRes, status int) {
 	bytes, err := json.Marshal(d)
 
 	if err == nil {
 		w.Header().Add("Content-Type", "application/json")
-		w.WriteHeader(status)
+		w.SetStatus(status)
 		w.Write(bytes)
 	} else {
 		fmt.Fprint(w, err)
 	}
 }
 
-func handleFunc(pattern string, method string, config Config, handler func(http.ResponseWriter, *http.Request, Config)) {
+func handleFunc(pattern string, method string, config Config, handler func(*loggedRes, *http.Request, Config)) {
 
 	// duplicates the handler with a trailing slash
 	if pattern == strings.TrimRight(pattern, "/") {
@@ -126,12 +126,28 @@ func handleFunc(pattern string, method string, config Config, handler func(http.
 		matchedTrim := pattern == strings.TrimRight(r.URL.Path, "/")
 		if method == r.Method && (matched || matchedTrim) {
 			start := time.Now()
-			handler(w, r, config)
+			logged := loggedRes{w, 200}
+			handler(&logged, r, config)
 
 			end := time.Now()
-			log.WithField("path", r.URL.Path).WithField("method", r.Method).WithField("time", end.Sub(start)).Info("Request complete")
+			log.
+				WithField("path", r.URL.Path).
+				WithField("method", r.Method).
+				WithField("status", logged.Status).
+				WithField("time_delta", end.Sub(start)).
+				Info()
 		} else {
 			http.NotFound(w, r)
 		}
 	})
+}
+
+type loggedRes struct {
+	http.ResponseWriter
+	Status int
+}
+
+func (logged *loggedRes) SetStatus(status int) {
+	logged.Status = status
+	logged.WriteHeader(status)
 }
