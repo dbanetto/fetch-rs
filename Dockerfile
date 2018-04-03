@@ -1,4 +1,4 @@
-FROM golang:1.10 AS build
+FROM golang:1.10-alpine AS build
 
 RUN mkdir -p /go/src/gitlab.com/zyphrus/fetcherd-go
 WORKDIR /go/src/gitlab.com/zyphrus/fetcherd-go
@@ -16,5 +16,6 @@ RUN apk --update upgrade && \
     update-ca-certificates && \
     rm -rf /varcache/apk/*
 
+HEALTHCHECK --interval=5m CMD wget http://localhost:8181/api/v1/healthcheck -q -O /dev/null
 HEALTHCHECK CMD wget http://localhost:8181/api/v1/healthcheck -q -O /dev/null
-CMD ["/usr/local/bin/fetcherd", "-config", "/etc/fetcherd.json"]
+ENTRYPOINT ["/usr/local/bin/fetcherd", "-config", "/etc/fetcherd.toml"]
