@@ -21,6 +21,7 @@ func ParseConfig(path string) (Config, error) {
 }
 
 type Config struct {
+	JSONLog  bool
 	FetchAPI ApiConfig
 	Kitsu    KitsuConfig
 	Mal      SiteConfig

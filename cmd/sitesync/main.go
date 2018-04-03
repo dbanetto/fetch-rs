@@ -17,6 +17,10 @@ func main() {
 		return
 	}
 
+	if config.JSONLog {
+		log.SetFormatter(&log.JSONFormatter{})
+	}
+
 	fetch := fetchapi.Init(config.FetchAPI.URL)
 
 	series, err := fetch.GetSeries()

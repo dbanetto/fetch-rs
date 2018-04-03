@@ -1,3 +1,5 @@
+jsonlog = false
+
 [Kitsu]
 username = "kitsu"
 password = "test"
