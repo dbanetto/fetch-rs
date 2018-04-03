@@ -1,4 +1,4 @@
-FROM golang:1.10-alpine AS build
+FROM golang:1.10 AS build
 
 RUN mkdir -p /go/src/gitlab.com/zyphrus/fetcherd-go
 WORKDIR /go/src/gitlab.com/zyphrus/fetcherd-go
