@@ -22,13 +22,19 @@ func ParseConfig(path string) (Config, error) {
 
 type Config struct {
 	FetchAPI ApiConfig
-	Kitsu    SiteConfig
+	Kitsu    KitsuConfig
 	Mal      SiteConfig
 }
 
 type SiteConfig struct {
 	Username string
 	Password string
+}
+
+type KitsuConfig struct {
+	Username string
+	Password string
+	UserID   string
 }
 
 type ApiConfig struct {

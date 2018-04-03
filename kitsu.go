@@ -116,7 +116,7 @@ func generateBody(current int, status string, id string) string {
 }
 
 // GetKitsuToken Authenticates against the Kitsu API
-func GetKitsuToken(creds SiteConfig) (KitsuSession, error) {
+func GetKitsuToken(creds KitsuConfig) (KitsuSession, error) {
 
 	session := KitsuSession{}
 
@@ -135,6 +135,9 @@ func GetKitsuToken(creds SiteConfig) (KitsuSession, error) {
 	}
 
 	err = json.Unmarshal(bytes, &session)
+	if err == nil {
+		session.UserId = creds.UserID
+	}
 
 	return session, err
 }
@@ -248,6 +251,7 @@ func kitsuPost(endpoint string, method string, body string, session *KitsuSessio
 
 // KitsuSession is an authenicated blob required to make requests
 type KitsuSession struct {
+	UserId       string `json:"-,omitempty"`
 	AccessToken  string `json:"access_token"`
 	CreatedAt    int    `json:"created_at"`
 	ExpiresIn    int    `json:"expires_in"`
