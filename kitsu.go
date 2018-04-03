@@ -44,35 +44,65 @@ func SyncKitsu(logger *log.Entry, session *KitsuSession, count *fetchapi.InfoBlo
 
 	logger = logger.
 		WithField("current", current).
-		WithField("status", status).
+		WithField("show_status", status).
 		WithField("kitsu_id", id)
 
 	// check if the entry exists
-	// GET /libraryentry/:id
-	err := kitsuGet(fmt.Sprintf("/api/edge/library-entries/%v", id), session)
+	libraryID := getLibraryEntryID(logger, id, session)
 
-	if fmt.Sprint(err) == "404 Not Found" {
-		// Create
-		body := generateBody(current, status, "")
+	if libraryID == "" {
+		logger.Info("Creating new entry")
 
-		_, err = kitsuPost("/api/edge/library-entries", "POST", body, session)
+		body := generatePOSTBody(current, status, id, session.UserId)
 
-	} else if err != nil {
-		// Unknown error
+		_, err := kitsuPost(logger, "/api/edge/library-entries", "POST", body, session)
+
 		return err
-	} else {
-		// Update
-		body := generateBody(current, status, id)
-
-		_, err = kitsuPost(fmt.Sprintf("/api/edge/library-entries/%v", id), "PUT", body, session)
-
 	}
+
+	// Update
+	logger = logger.WithField("entry_id", libraryID)
+	logger.Info("Updating entry")
+	body := generatePUTBody(current, status, libraryID)
+
+	_, err := kitsuPost(logger, fmt.Sprintf("/api/edge/library-entries/%v", libraryID), "PUT", body, session)
 
 	return err
 }
 
-func generateBody(current int, status string, id string) string {
+func getLibraryEntryID(logger *log.Entry, showID string, session *KitsuSession) string {
+	url := fmt.Sprintf(
+		"/api/edge/library-entries?filter[userId]=%v&filter[animeId]=%v&page[limit]=1",
+		session.UserId,
+		showID)
 
+	bytes, err := kitsuGet(logger, url, session)
+
+	if err != nil {
+		log.Error(err)
+		return ""
+	}
+
+	var entry struct {
+		Data []struct {
+			ID string `json:"id"`
+		} `json:"data"`
+	}
+
+	err = json.Unmarshal(bytes, &entry)
+	if err != nil {
+		log.Error(err)
+		return ""
+	}
+
+	if len(entry.Data) > 0 {
+		return entry.Data[0].ID
+	}
+
+	return ""
+}
+
+func generatePUTBody(current int, status string, libraryID string) string {
 	attr := make(map[string]interface{})
 	attr["progress"] = current
 	attr["status"] = status
@@ -84,28 +114,46 @@ func generateBody(current int, status string, id string) string {
 	top := make(map[string]interface{})
 
 	top["data"] = data
-	if id != "" {
-		data["id"] = id
-	} else {
-		userData := make(map[string]interface{})
-		userData["type"] = "user"
-		userData["id"] = 0 // not sure what ID this should be
-		user := make(map[string]interface{})
-		user["data"] = userData
+	data["id"] = libraryID
 
-		mediaData := make(map[string]interface{})
-		mediaData["type"] = "anime"
-		mediaData["id"] = "user"
-
-		media := make(map[string]interface{})
-		media["data"] = mediaData
-
-		relationships := make(map[string]interface{})
-		relationships["user"] = user
-		relationships["media"] = media
-
-		data["relationships"] = relationships
+	body, err := json.Marshal(top)
+	if err != nil {
+		log.WithField("body", top).Error(err)
 	}
+
+	return fmt.Sprintf("%s", body)
+}
+
+func generatePOSTBody(current int, status string, showID string, userID string) string {
+	attr := make(map[string]interface{})
+	attr["progress"] = current
+	attr["status"] = status
+
+	data := make(map[string]interface{})
+	data["type"] = "libraryEntries"
+	data["attributes"] = attr
+
+	top := make(map[string]interface{})
+
+	top["data"] = data
+	userData := make(map[string]interface{})
+	userData["type"] = "users"
+	userData["id"] = userID // not sure what ID this should be
+	user := make(map[string]interface{})
+	user["data"] = userData
+
+	mediaData := make(map[string]interface{})
+	mediaData["type"] = "anime"
+	mediaData["id"] = showID
+
+	media := make(map[string]interface{})
+	media["data"] = mediaData
+
+	relationships := make(map[string]interface{})
+	relationships["user"] = user
+	relationships["media"] = media
+
+	data["relationships"] = relationships
 
 	body, err := json.Marshal(top)
 	if err != nil {
@@ -129,7 +177,8 @@ func GetKitsuToken(creds KitsuConfig) (KitsuSession, error) {
 
 	body := form.Encode()
 
-	bytes, err := kitsuPost("/api/oauth/token", "POST", body, nil)
+	bytes, err := kitsuPost(log.WithField("kitsu_get_token", true), "/api/oauth/token", "POST", body, nil)
+
 	if err != nil {
 		return session, err
 	}
@@ -142,7 +191,7 @@ func GetKitsuToken(creds KitsuConfig) (KitsuSession, error) {
 	return session, err
 }
 
-func kitsuGet(endpoint string, session *KitsuSession) error {
+func kitsuGet(logger *log.Entry, endpoint string, session *KitsuSession) ([]byte, error) {
 
 	client := &http.Client{}
 
@@ -150,7 +199,7 @@ func kitsuGet(endpoint string, session *KitsuSession) error {
 
 	req, err := http.NewRequest("GET", uri, nil)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	if session != nil {
@@ -162,7 +211,7 @@ func kitsuGet(endpoint string, session *KitsuSession) error {
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	defer resp.Body.Close()
@@ -175,23 +224,23 @@ func kitsuGet(endpoint string, session *KitsuSession) error {
 	bytes, err := ioutil.ReadAll(resp.Body)
 
 	if err == nil {
-		log.
+		logger.
 			WithField("status", resp.StatusCode).
 			WithField("uri", uri).
-			Debugf("%s", bytes)
+			Info()
 
-		return statusErr
+		return bytes, statusErr
 	}
 
-	log.
+	logger.
 		WithField("status", resp.StatusCode).
 		WithField("uri", uri).
-		Errorf("%s", bytes)
+		Errorf("%s", err)
 
-	return err
+	return nil, err
 }
 
-func kitsuPost(endpoint string, method string, body string, session *KitsuSession) ([]byte, error) {
+func kitsuPost(logger *log.Entry, endpoint string, method string, body string, session *KitsuSession) ([]byte, error) {
 
 	client := &http.Client{}
 
@@ -231,20 +280,20 @@ func kitsuPost(endpoint string, method string, body string, session *KitsuSessio
 	bytes, err := ioutil.ReadAll(resp.Body)
 
 	if err == nil {
-		log.
+		logger.
 			WithField("status", resp.StatusCode).
 			WithField("uri", uri).
 			WithField("method", method).
-			Debugf("%s", bytes)
+			Info()
 
 		return bytes, statusErr
 	}
 
-	log.
+	logger.
 		WithField("status", resp.StatusCode).
 		WithField("uri", uri).
 		WithField("method", method).
-		Errorf("%s", bytes)
+		Errorf("%s", err)
 
 	return nil, err
 }
