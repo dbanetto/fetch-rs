@@ -18,4 +18,4 @@ RUN apk --update upgrade && \
 
 HEALTHCHECK --interval=30m CMD wget http://localhost:8181/healthcheck -q -O /dev/null
 
-ENTRYPOINT ["/usr/local/bin/sitesync", "-config", "/etc/fetcherd.toml"]
+ENTRYPOINT ["/usr/local/bin/sitesync", "-config", "/etc/sitesync.toml"]
