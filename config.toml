@@ -11,3 +11,6 @@ password = "test"
 
 [FetchAPI]
 url = "http://localhost:3000"
+
+[web]
+host = "localhost:7323"

@@ -293,7 +293,7 @@ func kitsuPost(logger *log.Entry, endpoint string, method string, body string, s
 		WithField("status", resp.StatusCode).
 		WithField("uri", uri).
 		WithField("method", method).
-		Errorf("%s", err)
+		Error()
 
 	return nil, err
 }

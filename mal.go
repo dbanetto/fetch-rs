@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 
 	log "github.com/sirupsen/logrus"
@@ -54,7 +53,7 @@ func SyncMAL(logger *log.Entry, creds *SiteConfig, count *fetchapi.InfoBlob, mal
 
 // CheckMALCreds ensures that the given credentials are valid
 func CheckMALCreds(creds *SiteConfig) error {
-	return malGet("/account/verify_credentials.xml", creds)
+	return malGet("/account/verify_credentials.xml", creds, nil)
 }
 
 func buildXML(status int, count int) string {
@@ -66,7 +65,10 @@ func buildXML(status int, count int) string {
 	return fmt.Sprintf(xmlTemplate, count, status, tags)
 }
 
-func malGet(endpoint string, creds *SiteConfig) error {
+func malGet(endpoint string, creds *SiteConfig, logger *log.Entry) error {
+	if logger == nil {
+		logger = log.WithField("no_logger", true)
+	}
 	client := &http.Client{}
 
 	uri := fmt.Sprint(malAPIURL, endpoint)
@@ -83,13 +85,10 @@ func malGet(endpoint string, creds *SiteConfig) error {
 	}
 	defer resp.Body.Close()
 
-	bytes, err := ioutil.ReadAll(resp.Body)
-	if err == nil {
-		log.
-			WithField("status", resp.StatusCode).
-			WithField("uri", uri).
-			Infof("%s", bytes)
-	}
+	logger.
+		WithField("status", resp.StatusCode).
+		WithField("uri", uri).
+		Info()
 
 	if resp.StatusCode > 400 {
 		return errors.New(resp.Status)
@@ -99,6 +98,10 @@ func malGet(endpoint string, creds *SiteConfig) error {
 }
 
 func malPost(endpoint string, body string, creds *SiteConfig, logger *log.Entry) error {
+	if logger == nil {
+		logger = log.WithField("no_logger", true)
+	}
+
 	client := &http.Client{}
 
 	uri := fmt.Sprint(malAPIURL, endpoint)
@@ -119,20 +122,10 @@ func malPost(endpoint string, body string, creds *SiteConfig, logger *log.Entry)
 	}
 	defer resp.Body.Close()
 
-	bytes, err := ioutil.ReadAll(resp.Body)
-	if logger != nil {
-		if err == nil {
-			logger.
-				WithField("status", resp.StatusCode).
-				WithField("uri", uri).
-				Infof("%s", bytes)
-		} else {
-			logger.
-				WithField("status", resp.StatusCode).
-				WithField("uri", uri).
-				Info("")
-		}
-	}
+	logger.
+		WithField("status", resp.StatusCode).
+		WithField("uri", uri).
+		Info()
 
 	if resp.StatusCode > 400 {
 		return errors.New(resp.Status)

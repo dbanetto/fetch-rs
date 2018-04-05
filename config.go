@@ -25,6 +25,7 @@ type Config struct {
 	FetchAPI ApiConfig
 	Kitsu    KitsuConfig
 	Mal      SiteConfig
+	Web      WebConfig
 }
 
 type SiteConfig struct {
@@ -40,4 +41,8 @@ type KitsuConfig struct {
 
 type ApiConfig struct {
 	URL string
+}
+
+type WebConfig struct {
+	Host string
 }
