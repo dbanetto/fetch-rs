@@ -6,7 +6,6 @@ import (
 	log "github.com/sirupsen/logrus"
 	fetchapi "gitlab.com/zyphrus/fetch-api-go"
 	"net/http"
-	"os/exec"
 	"strings"
 	"time"
 )
@@ -14,38 +13,20 @@ import (
 // StartWeb initilising the web API
 // Is a blocking call until the server terminates (never)
 func StartWeb(config Config) {
-	handleFunc("/api/v1/log", "GET", config, handleLog)
 
-	handleFunc("/api/v1/force/fetch", "POST", config, handleForceFetch)
+	handleFunc("/fetch", "POST", config, handleForceFetch)
 
-	handleFunc("/api/v1/healthcheck", "GET", config, handleHealthCheck)
+	handleFunc("/healthcheck", "GET", config, handleHealthCheck)
 
 	addr := config.WebUI.Host
 
-	log.Info("Server starting to listen on ", addr)
+	log.
+		Info("Server starting to listen on ", addr)
 
 	err := http.ListenAndServe(addr, nil)
 	if err != nil {
 		log.Fatal("Error during serving web interface", err)
 	}
-}
-
-func handleLog(w *loggedRes, r *http.Request, config Config) {
-	var res = make(map[string]interface{})
-
-	status := 200
-	res["success"] = true
-	res["log"] = make([]string, 0)
-	// HACK: this is a pretty dirty way to read the log
-	out, err := exec.Command("journalctl", "--no-pager", "-u", "fetcherd", "--output=cat", "-n", "100").Output()
-	if err != nil {
-		log.WithField("err", err).Error("Failed to run journalctl command")
-		status = 500
-	} else {
-		res["log"] = strings.Split(string(out), "\n")
-	}
-
-	sendJSON(res, w, status)
 }
 
 func handleForceFetch(w *loggedRes, r *http.Request, config Config) {
@@ -130,13 +111,25 @@ func handleFunc(pattern string, method string, config Config, handler func(*logg
 			handler(&logged, r, config)
 
 			end := time.Now()
-			log.
+			entry := log.
 				WithField("path", r.URL.Path).
 				WithField("method", r.Method).
 				WithField("status", logged.Status).
-				WithField("time_delta", end.Sub(start)).
-				Info()
+				WithField("time_delta", end.Sub(start))
+
+			if logged.Status == 200 {
+				entry.Info()
+			} else {
+				entry.Error()
+			}
+
 		} else {
+			log.
+				WithField("method", r.Method).
+				WithField("path", r.URL.Path).
+				WithField("status", 404).
+				Warn("Not Found")
+
 			http.NotFound(w, r)
 		}
 	})
