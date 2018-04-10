@@ -13,6 +13,8 @@ import (
 	"strings"
 )
 
+// NyaaFetch searches for the given show using
+// the nyaa api and pushes findings to transmission
 func NyaaFetch(show fetchapi.Series, config Config) error {
 
 	// type def for later
@@ -46,6 +48,12 @@ func NyaaFetch(show fetchapi.Series, config Config) error {
 
 	searchTitle := resolveSearchTitle(show, nyaaBlob)
 
+	logger := log.
+		WithField("title", show.Title).
+		WithField("id", show.ID)
+
+	logger.WithField("search_title", searchTitle).Debug()
+
 	// Supported  media type option
 	query := url.PathEscape(nyaaBlob.Blob["query"].(string))
 
@@ -58,13 +66,13 @@ func NyaaFetch(show fetchapi.Series, config Config) error {
 		url.QueryEscape(searchTitle))
 
 	// logs the resulting URL
-	log.WithField("url", searchURL).Info("Searching for ", searchTitle)
+	logger.WithField("url", searchURL).Info("Searching for ", searchTitle)
 
 	// Build the request
 	client := &http.Client{}
 	req, err := http.NewRequest("GET", searchURL, nil)
 	if err != nil {
-		log.WithField("err", err).Errorf("Error during request building")
+		logger.WithField("err", err).Error("Error during request building")
 		return err
 	}
 	req.Close = true
@@ -72,14 +80,14 @@ func NyaaFetch(show fetchapi.Series, config Config) error {
 	// Handle the response
 	resp, err := client.Do(req)
 	if err != nil {
-		log.WithField("err", err).Errorf("Error during request")
+		logger.WithField("err", err).Error("Error during request")
 		return err
 	}
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil { // FIXME: this can fail with EOF due to unknown reasons
-		log.WithField("err", err).Errorf("Error during read")
+		logger.WithField("err", err).Error("Error during read")
 		return err
 	}
 
@@ -87,7 +95,7 @@ func NyaaFetch(show fetchapi.Series, config Config) error {
 	res := new(Nyaa)
 	err = xml.Unmarshal(body, &res)
 	if err != nil {
-		log.WithField("err", err).Errorf("Error during Unmarshal")
+		logger.WithField("err", err).Error("Error during Unmarshal")
 		return err
 	}
 
@@ -105,29 +113,45 @@ func NyaaFetch(show fetchapi.Series, config Config) error {
 
 		has, err := regexp.MatchString(regexp.QuoteMeta(searchTitle), item.Title)
 		if err != nil {
-			log.Errorf("ERROR testing item against search title", err)
+			logger.
+				WithField("err", err).
+				Error("ERROR testing item against search title")
 		}
 
 		if !has {
-			log.Warnf("SKIPPED item title (%v) did not match %v", item.Title, searchTitle)
+			logger.
+				WithField("item_title", item.Title).
+				WithField("search_title", searchTitle).
+				Warn("Skipped item as it did not match")
 			continue
 		}
 
 		count, err := strconv.Atoi(countMatch)
 		if err != nil {
-			log.Errorf("ERROR parsing episode count (%v): %v", countMatch, err)
+			logger.
+				WithField("err", err).
+				WithField("count_match", countMatch).
+				Error("Parsing episode count")
 		}
 
 		// check if this is a new episode found
 		if count > current {
-			log.Infof("Found episode %v of %v", count, show.Title)
+			logger.
+				WithField("found", count).
+				WithField("current", current).
+				Info("Found new episode")
 
 			// push episode to transmission
 			_, err := t.Add(item.Link)
 			if err != nil {
-				log.Errorf("ERROR while pushing url to transmission (%v): %v", item.Link, err)
+				logger.
+					WithField("link", item.Link).
+					WithField("err", err).
+					Error("ERROR while pushing url to transmission")
 			} else {
-				log.Infof("Pushed '%v' to transmission", item.Title)
+				logger.
+					WithField("link", item.Link).
+					Info("Pushed uploaded to transmission")
 				// only update max count if it was successfully pushed
 				if count > newCurrent {
 					newCurrent = count
@@ -138,7 +162,10 @@ func NyaaFetch(show fetchapi.Series, config Config) error {
 
 	if newCurrent > current {
 		// push update to API
-		log.WithField("old_count", current).WithField("new_count", newCurrent).Infof("Update episode of %v to %v", show.Title, newCurrent)
+		logger.
+			WithField("old_count", current).
+			WithField("new_count", newCurrent).
+			Info("Updating episode count")
 		countBlob.Blob["current"] = newCurrent
 		return api.PutInfoBlob(show.ID, *countBlob)
 	}
