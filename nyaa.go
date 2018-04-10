@@ -52,8 +52,6 @@ func NyaaFetch(show fetchapi.Series, config Config) error {
 		WithField("title", show.Title).
 		WithField("id", show.ID)
 
-	logger.WithField("search_title", searchTitle).Debug()
-
 	// Supported  media type option
 	query := url.PathEscape(nyaaBlob.Blob["query"].(string))
 
@@ -66,7 +64,10 @@ func NyaaFetch(show fetchapi.Series, config Config) error {
 		url.QueryEscape(searchTitle))
 
 	// logs the resulting URL
-	logger.WithField("url", searchURL).Info("Searching for ", searchTitle)
+	logger.
+		WithField("search_title", searchTitle).
+		WithField("url", searchURL).
+		Info("Searching")
 
 	// Build the request
 	client := &http.Client{}
@@ -169,6 +170,8 @@ func NyaaFetch(show fetchapi.Series, config Config) error {
 		countBlob.Blob["current"] = newCurrent
 		return api.PutInfoBlob(show.ID, *countBlob)
 	}
+
+	logger.Info("Complete")
 
 	// everything must of been ffiinnee
 	return nil

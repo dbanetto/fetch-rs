@@ -12,7 +12,7 @@ func Fetch(config Config) error {
 
 	series, err := client.GetSeries()
 	if err != nil {
-		log.Errorf("Error while getting series list: %v", err)
+		log.WithField("err", err).Error("Error while getting series list")
 		return err
 	}
 
@@ -21,12 +21,15 @@ func Fetch(config Config) error {
 	for _, show := range series {
 		wg.Add(1)
 
-		log.WithField("title", show.Title).WithField("id", show.ID).Printf("Starting search for %v", show.Title)
+		log.
+			WithField("title", show.Title).
+			WithField("id", show.ID).
+			Info("Starting search")
 		go handleShow(show, config, &wg)
 	}
 
 	wg.Wait()
-	log.Println("Completed search")
+	log.Info("Completed search")
 	return nil
 }
 
@@ -38,12 +41,12 @@ func handleShow(show fetchapi.Series, config Config, wg *sync.WaitGroup) {
 	for i := 1; i < 4; i++ {
 		err := handle(show, config)
 		if err != nil {
-			log.Printf("Error in %v: %v", show.Title, err)
-			log.Printf("Retry search for %v #%v", show.Title, i)
+			log.
+				WithField("try", i).
+				WithField("title", show.Title).
+				Warn("Retry search")
 		} else {
 			break
 		}
 	}
-
-	log.Printf("Completed search for %v", show.Title)
 }
