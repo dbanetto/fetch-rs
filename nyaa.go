@@ -103,6 +103,16 @@ func NyaaFetch(show fetchapi.Series, config Config) error {
 		findCount := regexp.MustCompile("\\d+")
 		countMatch := strings.TrimLeft(findCount.FindString(epi), "0")
 
+		has, err := regexp.MatchString(regexp.QuoteMeta(searchTitle), item.Title)
+		if err != nil {
+			log.Errorf("ERROR testing item against search title", err)
+		}
+
+		if !has {
+			log.Warnf("SKIPPED item title (%v) did not match %v", item.Title, searchTitle)
+			continue
+		}
+
 		count, err := strconv.Atoi(countMatch)
 		if err != nil {
 			log.Errorf("ERROR parsing episode count (%v): %v", countMatch, err)
