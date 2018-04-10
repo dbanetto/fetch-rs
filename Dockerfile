@@ -1,11 +1,13 @@
 FROM golang:1.10 AS build
 
+ARG version
+
 RUN mkdir -p /go/src/gitlab.com/zyphrus/fetcherd-go
 WORKDIR /go/src/gitlab.com/zyphrus/fetcherd-go
 COPY . .
 
 RUN go get -v -d ./ && \
-    CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -v -o /usr/local/bin/fetcherd cmd/fetcherd/main.go
+    CGO_ENABLED=0 GOOS=linux go build -ldflags "-X main.version=${version:-$(date -u +%Y%m%d.%H%M%S)}" -a -installsuffix cgo -v -o /usr/local/bin/fetcherd cmd/fetcherd/main.go
 
 FROM alpine:3.7
 

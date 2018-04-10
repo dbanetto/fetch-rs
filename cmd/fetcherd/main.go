@@ -6,6 +6,8 @@ import (
 	"gitlab.com/zyphrus/fetcherd-go"
 )
 
+var version string
+
 func main() {
 
 	options := cli()
@@ -14,6 +16,7 @@ func main() {
 
 	fetcher.RegisterFetchProvider("nyaa", fetcher.NyaaFetch)
 	// fetcher.RegisterFetchProvider("magnetrss", fetcher.MagnetRss)
+
 	if err != nil {
 		log.WithField("args", options).Fatal("Error while loading config:", err)
 		return
@@ -21,6 +24,15 @@ func main() {
 
 	if config.Log.ToJSON {
 		log.SetFormatter(&log.JSONFormatter{})
+	}
+
+	// logout the version
+	if version != "" {
+		log.
+			WithField("version", version).
+			Info()
+	} else {
+		log.Warn("Unknown version")
 	}
 
 	log.WithFields(log.Fields{
