@@ -18,6 +18,8 @@ func StartWeb(config Config) {
 
 	handleFunc("/healthcheck", "GET", config, handleHealthCheck)
 
+	handleFunc("/", "GET", config, handleStatus)
+
 	addr := config.WebUI.Host
 
 	log.
@@ -27,6 +29,15 @@ func StartWeb(config Config) {
 	if err != nil {
 		log.Fatal("Error during serving web interface", err)
 	}
+}
+
+func handleStatus(w *loggedRes, r *http.Request, config Config) {
+	var res = make(map[string]interface{})
+
+	res["success"] = true
+	status := 200
+
+	sendJSON(res, w, status)
 }
 
 func handleForceFetch(w *loggedRes, r *http.Request, config Config) {
@@ -105,15 +116,17 @@ func handleFunc(pattern string, method string, config Config, handler func(*logg
 		log.Debug("Trying Request for ", r.URL.Path, " (", r.Method, ") against ", pattern)
 		matched := pattern == r.URL.Path
 		matchedTrim := pattern == strings.TrimRight(r.URL.Path, "/")
+		entry := log.
+			WithField("path", r.URL.Path).
+			WithField("method", r.Method)
+
 		if method == r.Method && (matched || matchedTrim) {
 			start := time.Now()
 			logged := loggedRes{w, 200}
 			handler(&logged, r, config)
 
 			end := time.Now()
-			entry := log.
-				WithField("path", r.URL.Path).
-				WithField("method", r.Method).
+			entry = entry.
 				WithField("status", logged.Status).
 				WithField("time_delta", end.Sub(start))
 
@@ -124,11 +137,9 @@ func handleFunc(pattern string, method string, config Config, handler func(*logg
 			}
 
 		} else {
-			log.
-				WithField("method", r.Method).
-				WithField("path", r.URL.Path).
+			entry.
 				WithField("status", 404).
-				Warn("Not Found")
+				Warn("not found")
 
 			http.NotFound(w, r)
 		}
