@@ -19,5 +19,4 @@ RUN apk --update upgrade && \
     rm -rf /varcache/apk/*
 
 HEALTHCHECK --interval=5m CMD wget http://localhost:8181/healthcheck -q -O /dev/null
-HEALTHCHECK CMD wget http://localhost:8181/api/v1/healthcheck -q -O /dev/null
 ENTRYPOINT ["/usr/local/bin/fetcherd", "-config", "/etc/fetcherd.toml"]
