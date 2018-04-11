@@ -34,18 +34,24 @@ func SyncKitsu(logger *log.Entry, session *KitsuSession, count *fetchapi.InfoBlo
 
 	current = current - offset
 
-	if current <= 0 {
+	logger = logger.
+		WithField("current", current).
+		WithField("kitsu_id", id)
+
+	if current < 0 {
+		logger.Warn("current is less than 0, setting to 0")
+		current = 0
+		status = kitsuPlanned
+	} else if current == 0 {
 		status = kitsuPlanned
 	} else if total != 0 && current >= total {
 		status = kitsuCompleted
 	}
 
-	current = current - offset
-
+	// update logger entry
 	logger = logger.
 		WithField("current", current).
-		WithField("show_status", status).
-		WithField("kitsu_id", id)
+		WithField("show_status", status)
 
 	// check if the entry exists
 	libraryID := getLibraryEntryID(logger, id, session)
