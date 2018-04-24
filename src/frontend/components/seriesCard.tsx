@@ -16,8 +16,17 @@ class SeriesCard extends Component<any, ICardProps> {
     super(props);
   }
 
-  public componentWillMount() {
-      this.props.dispatch(getInfoBlobType(this.props.series.id, ["count", "url"]));
+  public componentDidMount() {
+      const types = [];
+      if (!this.props.count) {
+          types.push("count");
+      }
+      if (!this.props.link) {
+          types.push("url");
+      }
+      if (types.length !== 0 && !this.props.loading) {
+          this.props.dispatch(getInfoBlobType(this.props.series.id, types));
+      }
   }
 
   public render() {
@@ -47,14 +56,14 @@ class SeriesCard extends Component<any, ICardProps> {
   }
 
   private renderProgressBar() {
-      if (this.state.count) {
-          const value = this.state.count.blob.current;
-          const max = this.state.count.blob.total > 0 ? this.state.count.blob.total : value * 2;
+      if (this.props.count) {
+          const value = this.props.count.blob.current;
+          const max = this.props.count.blob.total > 0 ? this.props.count.blob.total : value * 2;
 
           let currentStatus = "is-success";
-          if (this.state.count.blob.total <= 0) {
+          if (this.props.count.blob.total <= 0) {
               currentStatus = "is-warning";
-          } else if (this.state.count.blob.current === this.state.count.blob.total) {
+          } else if (this.props.count.blob.current === this.props.count.blob.total) {
               currentStatus = "is-link";
           }
 
@@ -70,9 +79,9 @@ class SeriesCard extends Component<any, ICardProps> {
 
   private renderLink() {
 
-      if (this.state.link) {
+      if (this.props.link) {
           return (
-              <a href={this.state.link.blob.url} target="_blank" rel="noopener noreferrer">
+              <a href={this.props.link.blob.url} target="_blank" rel="noopener noreferrer">
                   <span class="icon is-small">
                       <i class="mdi mdi-open-in-new" />
                   </span>
@@ -86,10 +95,10 @@ class SeriesCard extends Component<any, ICardProps> {
 
 export default connect((state, props: any) => {
     const blobs = state.infoBlob.blobs[props.series.id];
-    let link;
-    let count;
+    let link = null;
+    let count = null;
     if (blobs) {
-        link = blobs.find((b) => b.info_type === "link");
+        link = blobs.find((b) => b.info_type === "url");
         count = blobs.find((b) => b.info_type === "count");
     }
 

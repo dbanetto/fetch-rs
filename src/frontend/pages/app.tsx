@@ -33,7 +33,9 @@ class App extends Component<any, IAppProps> {
                     <div class="navbar-brand">
 
                         <div class="navbar-item" >
-                            <h1 class="title" onClick={this.handleError}>ICON</h1>
+                            <Link href="/">
+                                <h1 class="title">ICON</h1>
+                            </Link>
                         </div>
 
                         <label class="navbar-burger" data-target="navbar-menu-target">
