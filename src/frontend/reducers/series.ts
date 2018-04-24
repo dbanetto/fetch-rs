@@ -19,10 +19,10 @@ const seriesReducer = (state, action) => {
       return { ...state, loading: false, items: action.series };
 
     case "GET_SERIES":
-      return { ...state, ...getSeries(action.id, state.items) };
+      return { ...state, ...getSeries(parseInt(action.id, 10), state.items) };
 
     case "FINISHED_GET_SERIES":
-      const seriesList: ISeries[] = state.items.filter((ele) => ele.id !== action.id);
+      const seriesList: ISeries[] = state.items.filter((ele) => ele.id !== parseInt(action.id, 10));
       if (action.series) {
         seriesList.push(action.series);
       }
@@ -43,8 +43,7 @@ const getAllSeries = () => {
   return { loading: true };
 };
 
-const getSeries = (id, stateSeries) => {
-  // // should we be caching?
+const getSeries = (id: number, stateSeries) => {
   if (stateSeries.find((ele) => ele.id === id)) {
     return { loading: false };
   }

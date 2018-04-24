@@ -2,24 +2,21 @@ import * as actions from "../actions";
 import * as api from "../api";
 import store from "../store";
 
-const INITAL_SATE = {
+const INITAL_STATE = {
   blobs: {},
   isAll: {},
   loading: false,
 };
 
-const infoBlobReducer = (state, action) => {
-  if (!state) {
-    return INITAL_SATE;
-  }
-
+const infoBlobReducer = (state = INITAL_STATE, action) => {
   switch (action.type) {
-
+    // All types of a series
     case "GET_ALL_INFOBLOBS":
       return { ...state, ...getInfoBlob(state, action.seriesId) };
     case "FINISHED_GET_INFOBLOBS":
       return { ...state, ...finishedGetInfoBlobs(state, action.seriesId, action.infoBlobs) };
 
+    // Single types of a series
     case "GET_TYPE_INFOBLOBS":
       return { ...state, ...getInfoBlobType(state, action.seriesId, action.types) };
     case "FINISHED_GET_TYPE_INFOBLOBS":
@@ -31,8 +28,7 @@ const infoBlobReducer = (state, action) => {
 };
 
 const getInfoBlob = (state, seriesId: number) => {
-  console.log(state.isAll);
-  if (state.blobs[seriesId] && state.isAll && state.isAll[seriesId]) {
+  if (state.blobs[seriesId] && state.isAll[seriesId]) {
     return { loading: false };
   }
 
@@ -67,13 +63,16 @@ const finishedGetInfoBlobs = (state, seriesId: number, infoblobs: IInfoBlob[]) =
 
 const getInfoBlobType = (state, seriesId: number, types: string[]) => {
 
+  // If we know we already have all of the items, don't bother
+  if (state.blobs[seriesId] && state.isAll[seriesId]) {
+      return { loading: false };
+  }
+
   if (state.blobs[seriesId]) {
-    const cacheBlobs = state.blobs[seriesId];
+    const hasTypes = state.blobs[seriesId].map((b) => b.info_type);
 
     // remove types that are already held
-    types = types.filter((t) => {
-      return !cacheBlobs.find((b) => b.info_type === t);
-    });
+    types = types.filter((t) => !hasTypes.includes(t));
 
     if (types.length === 0) {
       return { loading: false };
