@@ -27,6 +27,10 @@ const seriesReducer = (state, action) => {
         seriesList.push(action.series);
       }
       return { ...state, loading: false, items: seriesList };
+
+    case "UPSERT_SERIES":
+      return { ...state, ...upsertSeries(action.formData) };
+
     default:
       return state;
   }
@@ -54,6 +58,19 @@ const getSeries = (id: number, stateSeries) => {
     store.dispatch(actions.showError(err.toString()));
     store.dispatch(actions.finishedGetSeries(id, null));
   });
+  return { loading: true };
+};
+
+const upsertSeries = (formData: SeriesFull) => {
+
+  api.upsertSeries(formData)
+    .then((series) => {
+      store.dispatch(actions.finishedGetSeries(series.id, series));
+      store.dispatch(actions.finishedGetInfoBlobs(series.id, []));
+    }).catch((err) => {
+      console.error(err, err.stack);
+    });
+
   return { loading: true };
 };
 

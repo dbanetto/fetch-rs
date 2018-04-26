@@ -31,6 +31,16 @@ export const finishDeleteSeries = (id: number) => ({
   type: "FINISHED_DELETE_SERIES",
 });
 
+export const upsertSeries = (formData: SeriesFull) => ({
+  formData,
+  type: "UPSERT_SERIES",
+});
+
+export const finishedUpsertSeries = (id: number) => ({
+  id,
+  type: "FINISHED_UPSERT_SERIES",
+});
+
 // Infoblob actions
 export const getInfoBlobs = (seriesId: number) => ({
   seriesId,

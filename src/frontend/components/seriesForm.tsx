@@ -1,11 +1,14 @@
 import { Component, h } from "preact";
+import { connect } from "preact-redux";
 import { Link, route } from "preact-router";
-import { upsertSeries } from "../api";
+import { upsertSeries } from "../actions";
 import "../model";
 import handler from "./handler";
 import InfoList from "./infoList";
 
 interface IFormProps {
+    dispatch: (action: any) => void;
+    loading: boolean;
     series?: SeriesFull;
     back: string;
 }
@@ -14,7 +17,7 @@ interface IFormState {
     series: SeriesFull;
 }
 
-export default class SeriesForm extends Component<IFormProps, IFormState> {
+class SeriesForm extends Component<IFormProps, IFormState> {
 
     constructor(props) {
         super();
@@ -88,12 +91,7 @@ export default class SeriesForm extends Component<IFormProps, IFormState> {
 
         const formData = this.state.series;
 
-        upsertSeries(formData)
-            .then((resp) => {
-                // redirect to view
-                route(`/series/${ resp.id }`, true);
-            })
-            .catch(alert);
+        this.props.dispatch(upsertSeries(formData));
 
         // stops the HTML form from completing the request
         return false;
@@ -139,3 +137,9 @@ export default class SeriesForm extends Component<IFormProps, IFormState> {
         }
     }
 }
+
+export default connect((state, props: any) => ({
+    back: props.back,
+    loading: state.series.loading,
+    series: props.series,
+}))(SeriesForm);

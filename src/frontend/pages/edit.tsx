@@ -1,69 +1,75 @@
 import { Component, h } from "preact";
+import { connect } from "preact-redux";
 import { Link, route } from "preact-router";
-import { getSeriesId, getSeriesInfo } from "../api";
+import { getInfoBlobs, getSeries } from "../actions";
 import SeriesForm from "../components/seriesForm";
 import "../model";
 
-interface IEditState {
-    series: ISeries;
-    info: IInfoBlob[];
-}
-
 interface IEditProps {
     path: string;
+    loading: boolean;
+    series: ISeries;
+    info: IInfoBlob[];
     matches?: {
         id: number;
     };
 }
 
-export default class Edit extends Component<IEditProps, IEditState> {
+class Edit extends Component<any, IEditProps> {
 
     constructor() {
         super();
-
-        this.state = {
-            info: null,
-            series: null,
-        };
     }
 
     public componentDidMount() {
         this.getSeries();
     }
 
+    public componentDidUpdate(prevProps) {
+        if (!this.props.loading && (!this.props.series || !this.props.info)) {
+            this.getSeries();
+        }
+    }
+
     public render() {
-        if (this.state.series === null) {
+        if (this.props.loading || !this.props.series) {
             return (
-                <div>
-                    <p>loading...</p>
-                    <Link href="/">back</Link>
-                </div>
-            );
+                <div class="container box">
+                    <p>Loading...</p>
+                    <Link class="button" href="/">Back</Link>
+                </div>);
         }
 
-        const series: any = this.state.series;
-        series.info = this.state.info;
+        const series: any = this.props.series;
+        series.info = this.props.info;
 
         return (
             <div class="container box">
-                <SeriesForm series={series} back={`/series/${ this.state.series.id }`} />
+                <SeriesForm series={series} back={`/series/${ this.props.series.id }`} />
             </div>
         );
     }
 
     private getSeries() {
-        Promise.all([
-            getSeriesId(this.props.matches.id),
-            getSeriesInfo(this.props.matches.id),
-        ]).then((result) => {
-
-            this.setState({
-                info: result[1],
-                series: result[0],
-            });
-        }).catch((err) => {
-            // FIXME: should show an error modal
-            route("/");
-        });
+        this.props.dispatch(getSeries(this.props.matches.id));
+        this.props.dispatch(getInfoBlobs(this.props.matches.id));
     }
 }
+
+export default connect((state, props: any) => {
+    let series;
+    if (state.series.items) {
+        series = state.series.items.find((s) => s.id.toString() === props.matches.id);
+    }
+
+    let info = state.infoBlob.blobs[props.matches.id];
+    if (!info) {
+        info = [];
+    }
+
+    return {
+        info,
+        loading: state.series.loading,
+        series,
+    };
+})(Edit);
