@@ -8,6 +8,8 @@ cargo:
   image: "rust:latest"
   variables:
     CARGO_HOME: "$CI_PROJECT_DIR/cargo"
+  except:
+    - master
   before_script:
     - apt-get update -yqq
     - apt-get install -yqq --no-install-recommends libpq-dev
@@ -25,6 +27,8 @@ cargo:
 npm:
   stage: test
   image: node:8
+  except:
+    - master
   script:
     - du -hs node_modules || true
     - node --version && npm --version
@@ -37,6 +41,8 @@ npm:
 rustfmt:
   stage: style
   image: rust:latest
+  except:
+    - master
   allow_failure: true
   script:
     - rustc --version && cargo --version && rustup --version
@@ -46,22 +52,13 @@ rustfmt:
 tslint:
   stage: style
   image: node:8
+  except:
+    - master
   allow_failure: true
   script:
     - node --version && npm --version
     - npm install tslint tslint-react typescript
     - ./node_modules/.bin/tslint -c tslint.json 'src/frontend/**/*.{ts,tsx}'
-
-clippy:
-  stage: style
-  image: nrdmn/clippy:latest
-  allow_failure: true
-  script:
-    - du -hs target || true
-    - cargo clippy
-  cache:
-    paths:
-      - target/
 
 # Continual errors with pages:deploy
 # pages:
@@ -84,7 +81,7 @@ clippy:
 #   only:
 #     - master
 
-api:
+docker:
   stage: deploy
   image: docker:latest
   variables:
@@ -97,49 +94,17 @@ api:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script:
     - docker build . -f src/deploy/api/Dockerfile -t $CI_REGISTRY_IMAGE/api:latest
-    - docker push $CI_REGISTRY_IMAGE/api:latest
-    - |
-      if [ "$CI_COMMIT_TAG" ] ; then
-        docker build . -t $CI_REGISTRY_IMAGE/api:$CI_COMMIT_TAG
-        docker push $CI_REGISTRY_IMAGE/api:$CI_COMMIT_TAG
-      fi
-
-web:
-  stage: deploy
-  image: docker:latest
-  variables:
-    DOCKER_DRIVER: overlay2
-  services:
-    - docker:dind
-  only:
-    - master
-  before_script:
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-  script:
+    - docker build . -f src/deploy/migrate/Dockerfile -t $CI_REGISTRY_IMAGE/migrate:latest
     - docker build . -f src/deploy/web/Dockerfile -t $CI_REGISTRY_IMAGE/web:latest
+    - docker push $CI_REGISTRY_IMAGE/api:latest
+    - docker push $CI_REGISTRY_IMAGE/migrate:latest
     - docker push $CI_REGISTRY_IMAGE/web:latest
     - |
       if [ "$CI_COMMIT_TAG" ] ; then
-        docker build . -t $CI_REGISTRY_IMAGE/web:$CI_COMMIT_TAG
-        docker push $CI_REGISTRY_IMAGE/web:$CI_COMMIT_TAG
-      fi
-
-migrate:
-  stage: deploy
-  image: docker:latest
-  variables:
-    DOCKER_DRIVER: overlay2
-  services:
-    - docker:dind
-  only:
-    - master
-  before_script:
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-  script:
-    - docker build . -f src/deploy/migrate/Dockerfile -t $CI_REGISTRY_IMAGE/migrate:latest
-    - docker push $CI_REGISTRY_IMAGE/migrate:latest
-    - |
-      if [ "$CI_COMMIT_TAG" ] ; then
-        docker build . -t $CI_REGISTRY_IMAGE/migrate:$CI_COMMIT_TAG
+        docker build . -f src/deploy/api/Dockerfile-t $CI_REGISTRY_IMAGE/api:$CI_COMMIT_TAG
+        docker build . -f src/deploy/migrate/Dockerfile-t $CI_REGISTRY_IMAGE/migrate:$CI_COMMIT_TAG
+        docker build . -f src/deploy/web/Dockerfile-t $CI_REGISTRY_IMAGE/web:$CI_COMMIT_TAG
+        docker push $CI_REGISTRY_IMAGE/api:$CI_COMMIT_TAG
         docker push $CI_REGISTRY_IMAGE/migrate:$CI_COMMIT_TAG
+        docker push $CI_REGISTRY_IMAGE/web:$CI_COMMIT_TAG
       fi
