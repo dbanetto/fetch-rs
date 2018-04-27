@@ -6,12 +6,7 @@ stages:
 cargo:
   stage: test
   image: "rust:latest"
-  # services:
-  #   - postgres:10
   variables:
-    # POSTGRES_DB: fetch_test
-    # POSTGRES_USER: fetch
-    # POSTGRES_PASSWORD: "$CI_COMMIT_SHA"
     CARGO_HOME: "$CI_PROJECT_DIR/cargo"
   before_script:
     - apt-get update -yqq
@@ -20,10 +15,6 @@ cargo:
     - du -hs target || true
     - du -hs cargo || true
     - echo "$CARGO_HOME" && rustc --version && cargo --version && rustup --version
-    # - which $CARGO_HOME/cargo/bin/diesel || cargo install diesel_cli --no-default-features --features postgres
-    # - echo "DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres/${POSTGRES_DB}" > .env
-    # - cat .env
-    # - $CARGO_HOME/cargo/bin/diesel migration run
     - cargo build --verbose
     - cargo test --verbose --jobs 1
   cache:
@@ -93,7 +84,7 @@ clippy:
 #   only:
 #     - master
 
-docker:
+api:
   stage: deploy
   image: docker:latest
   variables:
@@ -105,10 +96,50 @@ docker:
   before_script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script:
-    - docker build . -t $CI_REGISTRY_IMAGE:latest
+    - docker build . -f src/deploy/api/Dockerfile -t $CI_REGISTRY_IMAGE/api:latest
+    - docker push $CI_REGISTRY_IMAGE/api:latest
+    - |
+      if [ "$CI_COMMIT_TAG" ] ; then
+        docker build . -t $CI_REGISTRY_IMAGE/api:$CI_COMMIT_TAG
+        docker push $CI_REGISTRY_IMAGE/api:$CI_COMMIT_TAG
+      fi
+
+web:
+  stage: deploy
+  image: docker:latest
+  variables:
+    DOCKER_DRIVER: overlay2
+  services:
+    - docker:dind
+  only:
+    - master
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  script:
+    - docker build . -f src/deploy/web/Dockerfile -t $CI_REGISTRY_IMAGE/web:latest
+    - docker push $CI_REGISTRY_IMAGE/web:latest
+    - |
+      if [ "$CI_COMMIT_TAG" ] ; then
+        docker build . -t $CI_REGISTRY_IMAGE/web:$CI_COMMIT_TAG
+        docker push $CI_REGISTRY_IMAGE/web:$CI_COMMIT_TAG
+      fi
+
+migrate:
+  stage: deploy
+  image: docker:latest
+  variables:
+    DOCKER_DRIVER: overlay2
+  services:
+    - docker:dind
+  only:
+    - master
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  script:
+    - docker build . -f src/deploy/migrate/Dockerfile -t $CI_REGISTRY_IMAGE/migrate:latest
     - docker push $CI_REGISTRY_IMAGE:latest
     - |
       if [ "$CI_COMMIT_TAG" ] ; then
-        docker build . -t $CI_REGISTRY_IMAGE:$CI_COMMIT_TAG
-        docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_TAG
+        docker build . -t $CI_REGISTRY_IMAGE/migrate:$CI_COMMIT_TAG
+        docker push $CI_REGISTRY_IMAGE/migrate:$CI_COMMIT_TAG
       fi

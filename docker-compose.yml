@@ -1,0 +1,49 @@
+version: "2"
+
+services:
+
+  api:
+    build:
+      context: .
+      dockerfile: src/deploy/api/Dockerfile
+    restart: on-failure
+    volumes:
+      - ./src/deploy/api/config.toml:/etc/fetch.toml:ro
+    links:
+      - db
+    depends_on:
+      - db
+      - migrate
+    environment:
+      DATABASE_URL: postgres://postgres@db/postgres
+
+  web:
+    build:
+      context: .
+      dockerfile: src/deploy/web/Dockerfile
+    restart: on-failure
+    volumes:
+      - ./src/deploy/api/nginx.conf:/etc/nginx/service.d/api.conf:ro
+    ports:
+      - 3000:80
+    links:
+      - api
+    depends_on:
+      - api
+
+  migrate:
+    build:
+      context: .
+      dockerfile: src/deploy/migrate/Dockerfile
+    restart: on-failure
+    depends_on:
+      - db
+    links:
+      - db
+    environment:
+      DATABASE_URL: postgres://postgres@db/postgres
+      
+  db:
+    image: postgres:10-alpine
+    volumes:
+      - /var/lib/postgresql/data

@@ -46,7 +46,7 @@ module.exports = {
         })
       },
       {
-        test: /.(png|woff(2)?|eot|ttf|svg)(\?[a-z0-9=\.]+)?$/,
+        test: /.(html|png|woff(2)?|eot|ttf|svg)(\?[a-z0-9=\.]+)?$/,
         loader: 'file-loader',
         options: {
           name: '[name].[ext]',
