@@ -1,2 +1,2 @@
 apt-get install -yqq entr
-ls /opt | entr -r /opt/fetch-web --config /etc/fetch.toml
+ls /opt | entr -r /opt/fetch-api --config /etc/fetch.toml

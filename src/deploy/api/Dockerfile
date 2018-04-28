@@ -17,9 +17,9 @@ RUN cargo build --release --verbose
 COPY src/backend /code/src/backend
 
 # remove fake build and build release
-RUN rm target/release/fetch-web && \
+RUN rm target/release/fetch-api && \
     cargo build --release --verbose && \
-    strip target/release/fetch-web
+    strip target/release/fetch-api
 
 # Create final slim image
 FROM debian:stretch-slim
@@ -29,7 +29,7 @@ RUN apt-get update && \
 
 WORKDIR /opt
 
-COPY --from=backend /code/target/release/fetch-web /bin/fetch
+COPY --from=backend /code/target/release/fetch-api /bin/fetch
 COPY src/docker-entrypoint.sh /usr/bin
 
 CMD ["/bin/fetch", "--config", "/etc/fetch.toml"]
