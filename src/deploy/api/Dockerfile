@@ -30,6 +30,5 @@ RUN apt-get update && \
 WORKDIR /opt
 
 COPY --from=backend /code/target/release/fetch-api /bin/fetch
-COPY src/docker-entrypoint.sh /usr/bin
 
 CMD ["/bin/fetch", "--config", "/etc/fetch.toml"]
