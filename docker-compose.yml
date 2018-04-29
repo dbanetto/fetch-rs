@@ -6,9 +6,11 @@ services:
     build:
       context: .
       dockerfile: src/deploy/api/Dockerfile
-    restart: on-failure
+    command: /bin/sh /bin/dev
     volumes:
       - ./src/deploy/api/config.toml:/etc/fetch.toml:ro
+      - ./target/debug:/opt
+      - ./src/deploy/api/dev.sh:/bin/dev:ro
     links:
       - db
     depends_on:
@@ -21,9 +23,9 @@ services:
     build:
       context: .
       dockerfile: src/deploy/web/Dockerfile
-    restart: on-failure
     volumes:
       - ./src/deploy/api/nginx.conf:/etc/nginx/service.d/api.conf:ro
+      - ./public:/www:ro
     ports:
       - 3000:80
     links:

@@ -4,7 +4,7 @@ name = "fetch-rs"
 version = "0.1.0"
 
 [[bin]]
-name = "fetch-web"
+name = "fetch-api"
 path = "src/backend/main.rs"
 
 [dependencies]
