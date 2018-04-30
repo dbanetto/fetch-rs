@@ -1,37 +1,30 @@
-use staticfile::Static;
+use db::DbConnection;
 use mount::Mount;
 use iron::prelude::*;
 use iron::status::Status;
-use hbs::Template;
-
-use config::Config;
-use error::*;
+use util::{api_error, api_success};
+use diesel::prelude::*;
 
 pub mod api;
 
 pub fn routes() -> Mount {
     let mut mount = Mount::new();
 
-    // static files
-    mount.mount("/", index);
-    mount.mount("/public/", Static::new("public/"));
-
     // endpoints
+    mount.mount("/api/v1/healthcheck", healthcheck);
     mount.mount("/api/v1/", api::routes());
 
     mount
 }
 
-fn index(req: &mut Request) -> IronResult<Response> {
-    let config = match req.extensions.get::<Config>() {
-        Some(config) => config,
-        None => {
-            return Err(IronError::new(
-                Error::from(ErrorKind::ConfigReadFailed),
-                Status::InternalServerError,
-            ));
-        }
+fn healthcheck(req: &mut Request) -> IronResult<Response> {
+    let conn = match req.extensions.get::<DbConnection>().unwrap().get() {
+        Ok(conn) => conn,
+        Err(err) => return Err(api_error(err, Status::BadRequest)),
     };
 
-    Ok(Response::with((Template::new("index", config), Status::Ok)))
+    match (&*conn).execute("SELECT 1;") {
+        Ok(_) => Ok(api_success("healthy")),
+        Err(err) => Err(api_error(err, Status::InternalServerError)),
+    }
 }
