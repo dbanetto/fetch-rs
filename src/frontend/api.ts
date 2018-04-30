@@ -1,37 +1,37 @@
 import "./model";
 
 export function getSeries(): Promise<ISeries[]> {
-  const endpoint = "/api/v1/series";
+  const endpoint = "/api/series";
   return api_get(endpoint);
 }
 
 export function getSeriesId(id: number): Promise<ISeries> {
-  const endpoint = `/api/v1/series/${ id }`;
+  const endpoint = `/api/series/${ id }`;
   return api_get(endpoint);
 }
 
 export function getInfoType(id: number, types: string[]): Promise<IInfoBlob[]> {
   const typeQuery = types.join("+");
-  const endpoint = `/api/v1/info/${ id }/types/${ typeQuery }`;
+  const endpoint = `/api/info/${ id }/types/${ typeQuery }`;
   // prevents repeat calls to the API for non-existing data
   return api_get(endpoint);
 }
 
 export function getSeriesInfo(id: number): Promise<IInfoBlob[]> {
-  const endpoint = `/api/v1/info/${ id }`;
+  const endpoint = `/api/info/${ id }`;
   return api_get(endpoint);
 }
 
 export function deleteSeriesId(id: number): Promise<void> {
-  const endpoint = `/api/v1/series/${ id }`;
+  const endpoint = `/api/series/${ id }`;
   return api_delete(endpoint);
 }
 
 export function upsertSeries(series: ISeries): Promise<ISeries> {
   if (series.id) {
-    return api_put(`/api/v1/series/${ series.id }`, series);
+    return api_put(`/api/series/${ series.id }`, series);
   } else {
-    return api_post("/api/v1/series/new", series);
+    return api_post("/api/series/new", series);
   }
 }
 
