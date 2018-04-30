@@ -66,6 +66,11 @@ export const finishedGetInfoBlobs = (seriesId: number, infoBlobs: IInfoBlob[]) =
   type: "FINISHED_GET_INFOBLOBS",
 });
 
+export const clearInfoBlob = (seriesId: number) => ({
+  seriesId,
+  type: "CLEAR_INFOBLOBS",
+});
+
 // App actions
 export const showError = (message: string) => ({
   message,

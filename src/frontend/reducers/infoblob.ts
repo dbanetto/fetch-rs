@@ -22,6 +22,9 @@ const infoBlobReducer = (state = INITAL_STATE, action) => {
     case "FINISHED_GET_TYPE_INFOBLOBS":
       return { ...state, ...finishedGetInfoBlobType(state, action.seriesId, action.types, action.blobs) };
 
+    case "CLEAR_INFOBLOBS":
+      return { ...state, ...clearInfoBlob(state, action.seriesId) };
+
     default:
       return state;
   }
@@ -107,6 +110,21 @@ const finishedGetInfoBlobType = (state, seriesId: number, types: string[], newBl
     blobs: { ...state.blobs, ...newBlob },
     loading: false,
   };
+};
+
+const clearInfoBlob = (state, seriesId: number) => {
+  const blobs = { ...state.blobs };
+  const isAll = { ...state.isAll };
+
+  if (blobs[seriesId]) {
+    delete blobs[seriesId];
+  }
+
+  if (isAll[seriesId]) {
+    delete isAll[seriesId];
+  }
+
+  return { blobs, isAll };
 };
 
 export default infoBlobReducer;

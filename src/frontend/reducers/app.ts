@@ -4,10 +4,7 @@ const INITAL_SATE = {
   showError: false,
 };
 
-export const appReducer = (state, action) => {
-  if (!state) {
-    return INITAL_SATE;
-  }
+export const appReducer = (state = INITAL_SATE, action) => {
 
   switch (action.type) {
     case "SHOW_ERROR":

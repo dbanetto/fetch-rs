@@ -1,3 +1,4 @@
+import { route } from "preact-router";
 import * as actions from "../actions";
 import * as api from "../api";
 import store from "../store";
@@ -66,9 +67,10 @@ const upsertSeries = (formData: SeriesFull) => {
   api.upsertSeries(formData)
     .then((series) => {
       store.dispatch(actions.finishedGetSeries(series.id, series));
-      store.dispatch(actions.finishedGetInfoBlobs(series.id, []));
+      store.dispatch(actions.clearInfoBlob(series.id));
+      route(`/series/${series.id}`);
     }).catch((err) => {
-      console.error(err, err.stack);
+      store.dispatch(actions.showError(err.toString()));
     });
 
   return { loading: true };
