@@ -24,7 +24,7 @@ module.exports = {
     ]
   },
   output: {
-    path: path.resolve(__dirname, 'public'),
+    path: path.resolve(__dirname, 'public', 'static'),
     filename: '[name].js',
     chunkFilename: '[chunkhash].js'
   },
@@ -52,7 +52,7 @@ module.exports = {
         loader: 'file-loader',
         options: {
           name: '[name].[ext]',
-          publicPath: '/public',
+          publicPath: '/static'
         }
       }
     ]
