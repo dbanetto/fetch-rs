@@ -22,7 +22,6 @@ extern crate serde;
 extern crate serde_derive;
 #[macro_use]
 extern crate serde_json;
-extern crate staticfile;
 extern crate structopt;
 #[macro_use]
 extern crate structopt_derive;

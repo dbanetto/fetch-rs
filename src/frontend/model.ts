@@ -18,4 +18,4 @@ interface IHandlerProps {
     name: string;
 }
 
-type SeriesFull = ISeries & {info: IInfoBlob[]; };
+type SeriesFull = ISeries & { info: IInfoBlob[]; };

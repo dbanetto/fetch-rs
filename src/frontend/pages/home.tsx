@@ -1,29 +1,25 @@
 import { Component, h } from "preact";
+import { connect } from "preact-redux";
 import { Link } from "preact-router";
-import { getSeries } from "../api";
+import { getAllSeries } from "../actions";
 import SeriesCard from "../components/seriesCard";
 import "../model";
+import store from "../store";
 
-interface IHomeState {
+interface IHomeProps {
+    loading: boolean;
+    path: string;
     series: ISeries[];
 }
 
-interface IHomeProps {
-    path: string;
-}
+class Home extends Component<any, IHomeProps> {
 
-export default class Home extends Component<IHomeProps, IHomeState> {
-
-    constructor() {
-        super();
-
-        this.state = {
-            series: [],
-        };
+    constructor(props) {
+        super(props);
     }
 
-    public componentDidMount() {
-        this.loadSeries();
+    public componentWillMount() {
+        store.dispatch(getAllSeries());
     }
 
     public render() {
@@ -34,25 +30,24 @@ export default class Home extends Component<IHomeProps, IHomeState> {
         );
     }
 
-    private loadSeries() {
-        getSeries()
-            .then((series) => {
-                this.setState({
-                    series,
-                });
-            })
-            .catch(alert);
-    }
-
     private renderSeries() {
-        if (this.state && this.state.series) {
+        if (this.props.loading) {
             return (
-                <div class="card-list tile is-parent">
-                    {this.state.series.map((i) => <SeriesCard key={i.id} series={i} />)}
+                <div class="box">
+                    <span>loading...</span>
                 </div>
             );
         } else {
-            return (<span>loading...</span>);
+            return (
+                <div class="card-list tile is-parent">
+                    {this.props.series.map((i) => <SeriesCard key={i.id} series={i} />)}
+                </div>
+            );
         }
     }
 }
+
+export default connect((state) => ({
+    loading: state.series.loading,
+    series: state.series.items,
+}))(Home);

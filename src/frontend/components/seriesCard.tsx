@@ -1,39 +1,32 @@
 import { Component, h } from "preact";
+import { connect } from "preact-redux";
 import { Link } from "preact-router";
-import { getInfoType } from "../api";
+import { getInfoBlobType } from "../actions";
 import "../model";
 
 interface ICardProps {
     series: ISeries;
-}
-
-interface ICardState {
     link: IInfoBlob;
     count: IInfoBlob;
 }
 
-export default class SeriesCard extends Component<ICardProps, ICardState> {
+class SeriesCard extends Component<any, ICardProps> {
 
-  constructor() {
-    super();
-
-    this.state = {
-      count: null,
-      link: null,
-    };
+  constructor(props) {
+    super(props);
   }
 
   public componentDidMount() {
-
-    getInfoType(this.props.series.id, ["url", "count"])
-      .then((blobs) => {
-        const link = blobs.find((b) => b.info_type === "url");
-        const count = blobs.find((b) => b.info_type === "count");
-        this.setState({
-            count,
-            link,
-        });
-      }).catch(() => null);
+      const types = [];
+      if (!this.props.count) {
+          types.push("count");
+      }
+      if (!this.props.link) {
+          types.push("url");
+      }
+      if (types.length !== 0 && !this.props.loading) {
+          this.props.dispatch(getInfoBlobType(this.props.series.id, types));
+      }
   }
 
   public render() {
@@ -63,14 +56,14 @@ export default class SeriesCard extends Component<ICardProps, ICardState> {
   }
 
   private renderProgressBar() {
-      if (this.state.count) {
-          const value = this.state.count.blob.current;
-          const max = this.state.count.blob.total > 0 ? this.state.count.blob.total : value * 2;
+      if (this.props.count) {
+          const value = this.props.count.blob.current;
+          const max = this.props.count.blob.total > 0 ? this.props.count.blob.total : value * 2;
 
           let currentStatus = "is-success";
-          if (this.state.count.blob.total <= 0) {
+          if (this.props.count.blob.total <= 0) {
               currentStatus = "is-warning";
-          } else if (this.state.count.blob.current === this.state.count.blob.total) {
+          } else if (this.props.count.blob.current === this.props.count.blob.total) {
               currentStatus = "is-link";
           }
 
@@ -86,9 +79,9 @@ export default class SeriesCard extends Component<ICardProps, ICardState> {
 
   private renderLink() {
 
-      if (this.state.link) {
+      if (this.props.link) {
           return (
-              <a href={this.state.link.blob.url} target="_blank" rel="noopener noreferrer">
+              <a href={this.props.link.blob.url} target="_blank" rel="noopener noreferrer">
                   <span class="icon is-small">
                       <i class="mdi mdi-open-in-new" />
                   </span>
@@ -99,3 +92,19 @@ export default class SeriesCard extends Component<ICardProps, ICardState> {
       }
   }
 }
+
+export default connect((state, props: any) => {
+    const blobs = state.infoBlob.blobs[props.series.id];
+    let link = null;
+    let count = null;
+    if (blobs) {
+        link = blobs.find((b) => b.info_type === "url");
+        count = blobs.find((b) => b.info_type === "count");
+    }
+
+    return {
+        count,
+        link,
+        loading: state.infoBlob.loading,
+    };
+})(SeriesCard);
