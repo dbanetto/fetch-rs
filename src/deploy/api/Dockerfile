@@ -31,5 +31,5 @@ WORKDIR /opt
 
 COPY --from=backend /code/target/release/fetch-api /bin/fetch
 
-HEALTHCHECK --interval=5m CMD wget http://localhost:3000/healthcheck -q -O /dev/null
+HEALTHCHECK --interval=5m CMD wget http://localhost:3000/api/healthcheck -q -O /dev/null
 CMD ["/bin/fetch", "--config", "/etc/fetch.toml"]
