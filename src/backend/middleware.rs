@@ -5,7 +5,6 @@ use std::time::Instant;
 use hbs::HandlebarsEngine;
 use hbs::handlebars::Handlebars;
 use serde_json::Value;
-use durationfmt;
 
 use config::Config;
 use db::DbConnection;
@@ -23,14 +22,18 @@ impl AfterMiddleware for ErrorLog {
             Some(status) => format!("{}", status.to_u16()),
             None => "OK".to_owned(),
         };
+
+        let duraction_ms = (duration.as_secs() as f64 * 1_000.0)
+            + (duration.subsec_nanos() as f64 * 1e-6);
+
         println!(
-            "{} {} {} ({})",
+            "{} {} {} ({:.5}ms)",
             status,
             req.method,
-            req.url,
+            req.url.as_ref().path(),
             // This duration does not include time spent writing to net
             // only the time to route & create a response
-            durationfmt::to_string(duration)
+            duraction_ms
         );
         Ok(res)
     }
@@ -45,15 +48,19 @@ impl AfterMiddleware for ErrorLog {
             Some(status) => format!("{}", status.to_u16()),
             None => "ERROR".to_owned(),
         };
+
+        let duraction_ms = (duration.as_secs() as f64 * 1_000.0)
+            + (duration.subsec_nanos() as f64 * 1e-6);
+
         println!(
-            "{} {} {}: {} ({})",
+            "{} {} {}: {} ({:.5}ms)",
             status,
             req.method,
-            req.url,
+            req.url.as_ref().path(),
             err,
             // This duration does not include time spent writing to net
             // only the time to route & create a response
-            durationfmt::to_string(duration)
+            duraction_ms
         );
         Err(err)
     }

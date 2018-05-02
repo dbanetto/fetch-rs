@@ -9,7 +9,6 @@ path = "src/backend/main.rs"
 
 [dependencies]
 dotenv = "^0.8.0"
-durationfmt = "^0.1.1"
 error-chain = "^0.8.1"
 filetime = "^0.1.14"
 handlebars-iron = "0.26.2"

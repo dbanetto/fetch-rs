@@ -6,7 +6,6 @@ extern crate diesel;
 #[macro_use]
 extern crate diesel_derives;
 extern crate dotenv;
-extern crate durationfmt;
 #[macro_use]
 extern crate error_chain;
 extern crate filetime;
