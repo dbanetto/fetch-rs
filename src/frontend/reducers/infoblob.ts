@@ -25,6 +25,9 @@ const infoBlobReducer = (state = INITAL_STATE, action) => {
     case "CLEAR_INFOBLOBS":
       return { ...state, ...clearInfoBlob(state, action.seriesId) };
 
+    case "DELETE_SERIES":
+      return { ...state, ...clearInfoBlob(state, action.id) };
+
     default:
       return state;
   }

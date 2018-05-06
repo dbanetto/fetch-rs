@@ -15,7 +15,7 @@ const seriesReducer = (state, action) => {
 
   switch (action.type) {
     case "GET_ALL_SERIES":
-      return { ...state, ...getAllSeries() };
+      return { ...state, ...getAllSeries(state) };
     case "FINISHED_GET_ALL_SERIES":
       return { ...state, loading: false, items: action.series };
 
@@ -29,6 +29,12 @@ const seriesReducer = (state, action) => {
       }
       return { ...state, loading: false, items: seriesList };
 
+    case "DELETE_SERIES":
+      return { ...state, ...deleteSeries(state, parseInt(action.id, 10)) };
+
+    case "FINISHED_DELETE_SERIES":
+      return { ...state, ...finishedDeleteSeries(state, parseInt(action.id, 10)) };
+
     case "UPSERT_SERIES":
       return { ...state, ...upsertSeries(action.formData) };
 
@@ -37,7 +43,7 @@ const seriesReducer = (state, action) => {
   }
 };
 
-const getAllSeries = () => {
+const getAllSeries = (state) => {
   api.getSeries()
     .then((series) => {
       store.dispatch(actions.finishedGetAllSeries(series));
@@ -45,7 +51,9 @@ const getAllSeries = () => {
       store.dispatch(actions.showError(err.toString()));
       store.dispatch(actions.finishedGetAllSeries([]));
     });
-  return { loading: true };
+
+  // do not show loading if we got something to show
+  return { loading: Boolean(state.items.length) };
 };
 
 const getSeries = (id: number, stateSeries) => {
@@ -74,6 +82,25 @@ const upsertSeries = (formData: SeriesFull) => {
     });
 
   return { loading: true };
+};
+
+const deleteSeries = (state, id: number) => {
+
+  api.deleteSeriesId(id).then(() => {
+    store.dispatch(actions.clearInfoBlob(id));
+    store.dispatch(actions.finishedDeleteSeries(id));
+  }).catch((err) => {
+    store.dispatch(actions.showError(err.toString()));
+    store.dispatch(actions.finishedDeleteSeries(null));
+  });
+
+  return { loading: true };
+};
+
+const finishedDeleteSeries = (state, id: number) => {
+  const removedList: ISeries[] = state.items.filter((ele) => ele.id !== id);
+
+  return { loading: false, items: removedList };
 };
 
 export default seriesReducer;

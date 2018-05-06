@@ -26,7 +26,7 @@ export const deleteSeries = (id: number) => ({
   type: "DELETE_SERIES",
 });
 
-export const finishDeleteSeries = (id: number) => ({
+export const finishedDeleteSeries = (id: number) => ({
   id,
   type: "FINISHED_DELETE_SERIES",
 });
@@ -34,11 +34,6 @@ export const finishDeleteSeries = (id: number) => ({
 export const upsertSeries = (formData: SeriesFull) => ({
   formData,
   type: "UPSERT_SERIES",
-});
-
-export const finishedUpsertSeries = (id: number) => ({
-  id,
-  type: "FINISHED_UPSERT_SERIES",
 });
 
 // Infoblob actions
