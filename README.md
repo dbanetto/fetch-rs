@@ -1,6 +1,7 @@
 # fetch-rs
 
-Fetch web interface similar to [fetch-django](https://github.com/zyphrus/fetch-django) using [rocket](https://rocket.rs/)+[diesel](https://diesel.rs)
+Fetch web interface similar to [fetch-django](https://github.com/zyphrus/fetch-django)
+using [diesel](https://diesel.rs)
 
 ## What you need
 
@@ -17,6 +18,13 @@ cargo install diesel-cli
 diesel migration run
 cargo run
 ```
+
+## Deploying
+
+See the `docker-compose.yml` to see an example of how to deploy this app.
+
+> Note: the provided `docker-compose.yml` is designed for development where 
+> changes are live reloaded.
 
 ## License
 
