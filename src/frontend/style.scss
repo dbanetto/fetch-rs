@@ -18,13 +18,26 @@ html {
 
 .card {
     background: $white-ter;
-    min-width: 300px;
-    width: 300px;
-    max-width: 300px;
-    min-height: 480px;
     box-shadow: 0 2px 3px rgba(10, 10, 10, 0.1), 0 0 0 1px rgba(10, 10, 10, 0.1);
     color: #4a4a4a;
     display: block;
+    min-height: 480px;
+}
+
+@media all and (min-width: 766px) {
+    .card {
+        flex-grow: 0;
+        min-width: 300px;
+        width: 300px;
+        max-width: 300px;
+    }
+}
+
+@media all and (max-width: 765px) {
+    .card {
+        flex-grow: 1;
+        width: auto;
+    }
 }
 
 .card-body {
@@ -68,7 +81,7 @@ html {
 }
 
 .has-gap {
-    margin: 0rem 0rem 1rem 1rem;
+    margin: 0.5rem 0.5rem 0.5rem 0.5rem;
 }
 
 .margin-right {

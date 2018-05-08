@@ -39,8 +39,8 @@ class Home extends Component<any, IHomeProps> {
             );
         } else {
             return (
-                <div class="card-list tile is-parent">
-                    {this.props.series.map((i) => <SeriesCard key={i.id} series={i} />)}
+                <div class="columns card-list tile is-parent">
+                    {this.props.series.map((i) => <div key={i.id} class="column"><SeriesCard series={i} /></div>)}
                 </div>
             );
         }
