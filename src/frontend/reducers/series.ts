@@ -53,7 +53,7 @@ const getAllSeries = (state) => {
     });
 
   // do not show loading if we got something to show
-  return { loading: Boolean(state.items.length) };
+  return { loading: !Boolean(state.items.length) };
 };
 
 const getSeries = (id: number, stateSeries) => {
