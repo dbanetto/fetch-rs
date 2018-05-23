@@ -1,11 +1,11 @@
 [package]
 authors = ["David Barnett <david@barnett.net.nz>"]
-name = "fetch-rs"
+name = "fetch-api"
 version = "0.1.0"
 
 [[bin]]
 name = "fetch-api"
-path = "src/backend/main.rs"
+path = "src/main.rs"
 
 [dependencies]
 dotenv = "^0.8.0"

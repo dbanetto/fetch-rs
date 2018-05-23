@@ -14,8 +14,8 @@ module.exports = {
   cache: true,
   devtool: production ? '' : 'source-map',
   entry: {
-    main: './src/frontend/main.tsx',
-    style: './src/frontend/style.scss',
+    main: './src/main.tsx',
+    style: './src/style.scss',
     vendor: [
       'preact',
       'preact-redux',
