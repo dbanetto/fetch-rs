@@ -86,8 +86,7 @@ module.exports = {
   watchOptions: {
     ignored: [
       /node_modules/,
-      "src/backend/*",
-      /target/,
+      /public/,
       /.git/
     ],
   }
