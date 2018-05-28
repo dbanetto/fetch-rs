@@ -4,7 +4,7 @@ services:
 
   api:
     build:
-      context: ../services/api
+      context: ../../services/api
       dockerfile: Dockerfile
     command: /bin/sh /bin/watch-dev
     volumes:
@@ -21,7 +21,7 @@ services:
 
   web:
     build:
-      context: ../services/web
+      context: ../../services/web
       dockerfile: Dockerfile
     volumes:
       - ./web/service.d:/etc/nginx/service.d:ro
@@ -35,7 +35,7 @@ services:
 
   migrate:
     build:
-      context: ../services/api
+      context: ../../services/api
       dockerfile: Dockerfile-migrate
     restart: on-failure
     depends_on:

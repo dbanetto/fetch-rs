@@ -1,0 +1,88 @@
+#!/usr/bin/env python3
+"""fetch-backup
+
+Usage:
+    fetch-backup backup <FETCH_URL> [-o FILE]
+    fetch-backup restore <FETCH_URL> <FILE>
+
+Options:
+  -h --help     Show this screen.
+  --version     Show version.
+  -o FILE    Backup file generated
+"""
+
+import requests
+import json
+from docopt import docopt
+
+
+def main(args):
+    if args['backup']:
+        backup(args['<FETCH_URL>'], args['-o'])
+    else:
+        restore(args['<FETCH_URL>'], args['<FILE>'])
+
+
+def backup(fetch_url, filename):
+    res = requests.get("{0}/api".format(fetch_url))
+
+    # check if the API endpoint works
+    if not res.ok:
+        print("failed to GET {0}, response was {1}"
+              .format(fetch_url, res.status_code))
+        return
+
+    # now pull the data!
+    res = requests.get("{0}/api/series".format(fetch_url)).json()
+    backup = []
+    series = res['data']
+
+    # pull info_blobs & clean ids
+    for obj in series:
+        # drop id from series
+        id = obj.pop('id')
+
+        # get all blobs of series
+        blobs = requests.get("{0}/api/info/{1}"
+                             .format(fetch_url, id)).json()
+
+        # drop ids
+        for blob in blobs['data']:
+            blob.pop('id')
+            blob.pop('series_id')
+
+        # attach it to series in POST /api/series/new form
+        obj['info'] = blobs['data']
+
+        backup.append(obj)
+
+    backup_json = json.dumps(backup)
+
+    # write to STDOUT or file
+    if not filename:
+        print(backup_json)
+    else:
+        with open(filename, 'w') as backup_file:
+            backup_file.write(backup_json)
+
+def restore(fetch_url, filename):
+    # read backup file
+    with open(filename, 'r') as backup_file:
+
+        backup = json.loads(backup_file.read())
+
+        for series in backup:
+            # create new entry based off backup file
+            res = requests.post("{0}/api/series/new"
+                                .format(fetch_url),
+                                json=series)
+
+            if res.ok:
+                print("Restored {}".format(series['title']))
+            else:
+                print(res)
+
+
+if __name__ == '__main__':
+    args = docopt(__doc__, version='fetch-backup')
+    main(args)
