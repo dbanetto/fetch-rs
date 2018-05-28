@@ -5,11 +5,11 @@ services:
   api:
     build:
       context: ../services/api
-      dockerfile: ../../deploy/api/Dockerfile
-    command: /bin/sh /bin/dev
+      dockerfile: Dockerfile
+    command: /bin/sh /bin/watch-dev
     volumes:
       - ./api/config.toml:/etc/fetch.toml:ro
-      - ./api/dev.sh:/bin/dev:ro
+      - ./api/watch-dev.sh:/bin/watch-dev:ro
       - ../services/api/target/debug:/opt
     links:
       - db
@@ -22,7 +22,7 @@ services:
   web:
     build:
       context: ../services/web
-      dockerfile: ../../deploy/web/Dockerfile
+      dockerfile: Dockerfile
     volumes:
       - ./web/service.d:/etc/nginx/service.d:ro
       - ../services/web/public:/www:ro
@@ -36,7 +36,7 @@ services:
   migrate:
     build:
       context: ../services/api
-      dockerfile: ../../deploy/migrate/Dockerfile
+      dockerfile: Dockerfile-migrate
     restart: on-failure
     depends_on:
       - db
