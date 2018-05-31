@@ -1,6 +1,7 @@
 package sitesync
 
 import (
+	"errors"
 	log "github.com/sirupsen/logrus"
 	fetchapi "gitlab.com/zyphrus/fetch-api-go"
 	"sync"
@@ -24,20 +25,22 @@ func Run(config Config) error {
 			WithField("err", err).
 			WithField("mal_user", config.Mal.Username).
 			Errorf("Could not verify credentials for MAL")
-		return err
 	}
 
-	kitsuSession, err := GetKitsuToken(config.Kitsu)
-	kitsuToken := &kitsuSession
+	kitsuToken, err := GetKitsuToken(config.Kitsu)
 	if err != nil {
 		log.
 			WithField("err", err).
 			WithField("kitsu_user", config.Kitsu.Username).
 			Errorf("Could get Kitsu token: %v", err)
-		return err
 	}
 
 	var wg sync.WaitGroup
+
+	if kitsuToken == nil && malCreds == nil {
+		log.Errorf("No valid token for syncing, aborting sync")
+		return errors.New("No valid tokens to sync providers")
+	}
 
 	for _, show := range series {
 		wg.Add(1)

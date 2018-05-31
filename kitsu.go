@@ -170,7 +170,7 @@ func generatePOSTBody(current int, status string, showID string, userID string) 
 }
 
 // GetKitsuToken Authenticates against the Kitsu API
-func GetKitsuToken(creds KitsuConfig) (KitsuSession, error) {
+func GetKitsuToken(creds KitsuConfig) (*KitsuSession, error) {
 
 	session := KitsuSession{}
 
@@ -186,7 +186,7 @@ func GetKitsuToken(creds KitsuConfig) (KitsuSession, error) {
 	bytes, err := kitsuPost(log.WithField("kitsu_get_token", true), "/api/oauth/token", "POST", body, nil)
 
 	if err != nil {
-		return session, err
+		return nil, err
 	}
 
 	err = json.Unmarshal(bytes, &session)
@@ -194,7 +194,7 @@ func GetKitsuToken(creds KitsuConfig) (KitsuSession, error) {
 		session.UserId = creds.UserID
 	}
 
-	return session, err
+	return &session, err
 }
 
 func kitsuGet(logger *log.Entry, endpoint string, session *KitsuSession) ([]byte, error) {
