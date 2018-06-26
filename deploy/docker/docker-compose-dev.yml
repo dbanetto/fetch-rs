@@ -7,10 +7,11 @@ services:
       context: ../../services/api
       dockerfile: Dockerfile
     command: /bin/sh /bin/watch-dev
+    restart: on-failure
     volumes:
       - ./api/config.toml:/etc/fetch.toml:ro
       - ./api/watch-dev.sh:/bin/watch-dev:ro
-      - ../services/api/target/debug:/opt
+      - ../../services/api/target/debug:/opt:ro
     links:
       - db
     depends_on:
@@ -23,9 +24,10 @@ services:
     build:
       context: ../../services/web
       dockerfile: Dockerfile
+    restart: on-failure
     volumes:
       - ./web/service.d:/etc/nginx/service.d:ro
-      - ../services/web/public:/www:ro
+      - ../../services/web/public:/www:ro
     ports:
       - 3000:80
     links:
