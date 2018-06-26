@@ -50,7 +50,7 @@ rustfmt:
     - cd services/api
     - rustc --version && cargo --version && rustup --version
     - rustup component add rustfmt-preview
-    - rustfmt --write-mode diff src/backend/**.rs
+    - rustfmt --write-mode diff src/**.rs
 
 tslint:
   stage: style
@@ -62,7 +62,7 @@ tslint:
     - cd services/web
     - node --version && npm --version
     - npm install tslint tslint-react typescript
-    - ./node_modules/.bin/tslint -c tslint.json 'src/frontend/**/*.{ts,tsx}'
+    - ./node_modules/.bin/tslint -c tslint.json 'src/**/*.{ts,tsx}'
 
 # Continual errors with pages:deploy
 # pages:
