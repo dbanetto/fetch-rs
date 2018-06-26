@@ -1,6 +1,6 @@
-FROM node:8 AS frontend
+FROM node:10 AS frontend
 
-RUN mkdir -p /code/src/frontend
+RUN mkdir -p /code/src
 
 WORKDIR /code
 
@@ -12,14 +12,14 @@ RUN npm install
 COPY webpack.config.js /code/webpack.config.js
 COPY tsconfig.json /code/tsconfig.json
 
-COPY src/frontend /code/src/frontend
+COPY src /code/src
 
 RUN npm run build
 
 FROM nginx:alpine
 
 COPY --from=frontend /code/public /www
-COPY src/deploy/web/web.conf /etc/nginx/conf.d/default.conf
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 RUN mkdir -p /etc/nginx/service.d && \
         chown nginx:nginx -R /www

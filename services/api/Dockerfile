@@ -1,8 +1,8 @@
 FROM rust:latest AS backend
 
 # static setup
-RUN mkdir -p /code/src/backend && \
-    echo 'fn main() {}' > /code/src/backend/main.rs
+RUN mkdir -p /code/src && \
+    echo 'fn main() {}' > /code/src/main.rs
 
 WORKDIR /code
 
@@ -14,7 +14,7 @@ COPY Cargo.lock /code/Cargo.lock
 RUN cargo build --release --verbose
 
 # copy over project code
-COPY src/backend /code/src/backend
+COPY src /code/src
 
 # remove fake build and build release
 RUN rm target/release/fetch-api && \
@@ -29,7 +29,9 @@ RUN apt-get update && \
 
 WORKDIR /opt
 
-COPY --from=backend /code/target/release/fetch-api /bin/fetch
+COPY --from=backend /code/target/release/fetch-api /bin/fetch-api
 
-HEALTHCHECK --interval=5m CMD wget http://localhost:3000/api/healthcheck -q -O /dev/null
-CMD ["/bin/fetch", "--config", "/etc/fetch.toml"]
+HEALTHCHECK --start-period=1m --interval=1m --timeout=30s --retries=3 \
+    CMD wget http://localhost:3000/api/healthcheck -q -O /dev/null
+
+CMD ["/bin/fetch-api", "--config", "/etc/fetch.toml"]

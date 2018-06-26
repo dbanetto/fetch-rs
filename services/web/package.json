@@ -1,9 +1,7 @@
 {
   "scripts": {
     "build": "ENV='production' webpack",
-    "watch": "webpack --watch --progress",
-    "watch:back": "cargo watch -x build --ignore 'src/frontend/*' --ignore 'public/*'",
-    "cargo": "cargo watch -x run --ignore 'src/frontend/*'"
+    "watch": "webpack --watch --progress"
   },
   "dependencies": {
     "bulma": "^0.7.1",

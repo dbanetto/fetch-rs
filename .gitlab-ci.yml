@@ -14,6 +14,7 @@ cargo:
     - apt-get update -yqq
     - apt-get install -yqq --no-install-recommends libpq-dev
   script:
+    - cd services/api
     - du -hs target || true
     - du -hs cargo || true
     - echo "$CARGO_HOME" && rustc --version && cargo --version && rustup --version
@@ -21,7 +22,7 @@ cargo:
     - cargo test --verbose --jobs 1
   cache:
     paths:
-      - target/
+      - services/api/target/
       - cargo/
 
 npm:
@@ -30,13 +31,14 @@ npm:
   except:
     - master
   script:
+    - cd services/web
     - du -hs node_modules || true
     - node --version && npm --version
     - npm install
     - npm run build
   cache:
     paths:
-      - node_modules/
+      - services/web/node_modules/
 
 rustfmt:
   stage: style
@@ -45,6 +47,7 @@ rustfmt:
     - master
   allow_failure: true
   script:
+    - cd services/api
     - rustc --version && cargo --version && rustup --version
     - rustup component add rustfmt-preview
     - rustfmt --write-mode diff src/backend/**.rs
@@ -56,6 +59,7 @@ tslint:
     - master
   allow_failure: true
   script:
+    - cd services/web
     - node --version && npm --version
     - npm install tslint tslint-react typescript
     - ./node_modules/.bin/tslint -c tslint.json 'src/frontend/**/*.{ts,tsx}'
@@ -93,18 +97,19 @@ docker:
   before_script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script:
-    - docker build . -f src/deploy/api/Dockerfile -t $CI_REGISTRY_IMAGE/api:latest
-    - docker build . -f src/deploy/migrate/Dockerfile -t $CI_REGISTRY_IMAGE/migrate:latest
-    - docker build . -f src/deploy/web/Dockerfile -t $CI_REGISTRY_IMAGE/web:latest
+    - ( cd services/api && docker build . -f ./Dockerfile -t $CI_REGISTRY_IMAGE/api:latest )
+    - ( cd services/api && docker build . -f ./Dockerfile-migrate -t $CI_REGISTRY_IMAGE/migrate:latest )
+    - ( cd services/web && docker build . -f ./Dockerfile -t $CI_REGISTRY_IMAGE/web:latest )
     - docker push $CI_REGISTRY_IMAGE/api:latest
     - docker push $CI_REGISTRY_IMAGE/migrate:latest
     - docker push $CI_REGISTRY_IMAGE/web:latest
     - |
       if [ "$CI_COMMIT_TAG" ] ; then
-        docker build . -f src/deploy/api/Dockerfile-t $CI_REGISTRY_IMAGE/api:$CI_COMMIT_TAG
-        docker build . -f src/deploy/migrate/Dockerfile-t $CI_REGISTRY_IMAGE/migrate:$CI_COMMIT_TAG
-        docker build . -f src/deploy/web/Dockerfile-t $CI_REGISTRY_IMAGE/web:$CI_COMMIT_TAG
+        ( cd services/api && docker build . -f ./Dockerfile -t $CI_REGISTRY_IMAGE/api:$CI_COMMIT_TAG )
+        ( cd services/api && docker build . -f ./Dockerfile-migrate -t $CI_REGISTRY_IMAGE/migrate:$CI_COMMIT_TAG )
+        ( cd services/web && docker build . -f ./Dockerfile -t $CI_REGISTRY_IMAGE/web:$CI_COMMIT_TAG )
         docker push $CI_REGISTRY_IMAGE/api:$CI_COMMIT_TAG
         docker push $CI_REGISTRY_IMAGE/migrate:$CI_COMMIT_TAG
         docker push $CI_REGISTRY_IMAGE/web:$CI_COMMIT_TAG
       fi
+

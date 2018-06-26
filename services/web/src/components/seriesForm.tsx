@@ -69,7 +69,7 @@ class SeriesForm extends Component<IFormProps, IFormState> {
                 </div>
                 <div>
                     <label class="label" for="poster_url">Poster URL</label>
-                    {}
+                    {poster}
                 </div>
                 <div>
                     <h3 class="subtitle">Info</h3>

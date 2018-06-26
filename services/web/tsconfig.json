@@ -11,7 +11,7 @@
     "lib": ["es2016", "dom"]
   },
   "include": [
-    "./src/frontend/**/*.tsx",
-    "./src/frontend/**/*.ts"
+    "./src/**/*.tsx",
+    "./src/**/*.ts"
   ]
 }
