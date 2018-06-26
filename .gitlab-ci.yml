@@ -1,0 +1,115 @@
+stages:
+  - test
+  - style
+  - deploy
+
+cargo:
+  stage: test
+  image: "rust:latest"
+  variables:
+    CARGO_HOME: "$CI_PROJECT_DIR/cargo"
+  except:
+    - master
+  before_script:
+    - apt-get update -yqq
+    - apt-get install -yqq --no-install-recommends libpq-dev
+  script:
+    - cd services/api
+    - du -hs target || true
+    - du -hs cargo || true
+    - echo "$CARGO_HOME" && rustc --version && cargo --version && rustup --version
+    - cargo build --verbose
+    - cargo test --verbose --jobs 1
+  cache:
+    paths:
+      - services/api/target/
+      - cargo/
+
+npm:
+  stage: test
+  image: node:8
+  except:
+    - master
+  script:
+    - cd services/web
+    - du -hs node_modules || true
+    - node --version && npm --version
+    - npm install
+    - npm run build
+  cache:
+    paths:
+      - services/web/node_modules/
+
+rustfmt:
+  stage: style
+  image: rust:latest
+  except:
+    - master
+  allow_failure: true
+  script:
+    - cd services/api
+    - rustc --version && cargo --version && rustup --version
+    - rustup component add rustfmt-preview
+    - rustfmt --write-mode diff src/backend/**.rs
+
+tslint:
+  stage: style
+  image: node:8
+  except:
+    - master
+  allow_failure: true
+  script:
+    - cd services/web
+    - node --version && npm --version
+    - npm install tslint tslint-react typescript
+    - ./node_modules/.bin/tslint -c tslint.json 'src/frontend/**/*.{ts,tsx}'
+
+# Continual errors with pages:deploy
+# pages:
+#   stage: deploy
+#   image: rust:latest
+#   allow_failure: true
+#   script:
+#     - du -hs cargo || true
+#     - rustc --version && cargo --version && rustup --version
+#     - CARGO_HOME=$CI_PROJECT_DIR/cargo cargo doc
+#     - rm -rf public
+#     - mv target/doc public
+#     - echo "<meta http-equiv=refresh content=1;url=fetch_web/index.html>" > public/index.html
+#   cache:
+#     paths:
+#       - cargo/
+#   artifacts:
+#     paths:
+#     - public
+#   only:
+#     - master
+
+docker:
+  stage: deploy
+  image: docker:latest
+  variables:
+    DOCKER_DRIVER: overlay2
+  services:
+    - docker:dind
+  only:
+    - master
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  script:
+    - ( cd services/api && docker build . -f ./Dockerfile -t $CI_REGISTRY_IMAGE/api:latest )
+    - ( cd services/api && docker build . -f ./Dockerfile-migrate -t $CI_REGISTRY_IMAGE/migrate:latest )
+    - ( cd services/web && docker build . -f ./Dockerfile -t $CI_REGISTRY_IMAGE/web:latest )
+    - docker push $CI_REGISTRY_IMAGE/api:latest
+    - docker push $CI_REGISTRY_IMAGE/migrate:latest
+    - docker push $CI_REGISTRY_IMAGE/web:latest
+    - |
+      if [ "$CI_COMMIT_TAG" ] ; then
+        ( cd services/api && docker build . -f ./Dockerfile -t $CI_REGISTRY_IMAGE/api:$CI_COMMIT_TAG )
+        ( cd services/api && docker build . -f ./Dockerfile-migrate -t $CI_REGISTRY_IMAGE/migrate:$CI_COMMIT_TAG )
+        ( cd services/web && docker build . -f ./Dockerfile -t $CI_REGISTRY_IMAGE/web:$CI_COMMIT_TAG )
+        docker push $CI_REGISTRY_IMAGE/api:$CI_COMMIT_TAG
+        docker push $CI_REGISTRY_IMAGE/migrate:$CI_COMMIT_TAG
+        docker push $CI_REGISTRY_IMAGE/web:$CI_COMMIT_TAG
+      fi
+
