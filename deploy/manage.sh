@@ -2,6 +2,7 @@
 
 cd `dirname $0`
 OPTION=$1
+DEFAULT_SEVER='http://localhost:3000'
 
 function print_help {
     echo "dev.sh build - build containers"
@@ -21,11 +22,11 @@ case $OPTION in
         docker-compose -p fetch -f docker/docker-compose-dev.yml stop
         ;;
     backup)
-        SERVER=${2:http://localhost:3000}
+        SERVER=${2:-"$DEFAULT_SEVER"}
         ./backup/fetch-backup backup "$SERVER"
         ;;
     restore)
-        SERVER=${2:http://localhost:3000}
+        SERVER=${2:-"$DEFAULT_SEVER"}
         INPUT=${3:/dev/stdin}
         ./backup/fetch-backup restore "$SERVER" "$INPUT"
         ;;
