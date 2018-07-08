@@ -1,10 +1,10 @@
-import { Component, h } from "preact";
-import { connect } from "preact-redux";
-import { Link } from "preact-router";
+import * as React from "react";
+import { render } from "react-dom";
+import { connect } from "react-redux";
 import { getAllSeries } from "../actions";
 import SeriesCard from "../components/seriesCard";
 import "../model";
-import store from "../store";
+import store, { IReduxState } from "../store";
 
 interface IHomeProps {
     loading: boolean;
@@ -12,7 +12,7 @@ interface IHomeProps {
     series: ISeries[];
 }
 
-class Home extends Component<any, IHomeProps> {
+class Home extends React.PureComponent<IHomeProps> {
 
     constructor(props) {
         super(props);
@@ -33,21 +33,21 @@ class Home extends Component<any, IHomeProps> {
     private renderSeries() {
         if (this.props.loading) {
             return (
-                <div class="box">
+                <div className="box">
                     <span>loading...</span>
                 </div>
             );
         } else {
             return (
-                <div class="columns card-list tile is-parent">
-                    {this.props.series.map((i) => <div key={i.id} class="column"><SeriesCard series={i} /></div>)}
+                <div className="columns card-list tile is-parent">
+                    {this.props.series.map((i) => <div key={i.id} className="column"><SeriesCard series={i} /></div>)}
                 </div>
             );
         }
     }
 }
 
-export default connect((state) => ({
+export default connect((state: IReduxState) => ({
     loading: state.series.loading,
     series: state.series.items,
 }))(Home);

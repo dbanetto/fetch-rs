@@ -1,22 +1,25 @@
-import { Component, h } from "preact";
-import { connect } from "preact-redux";
-import { Link, route } from "preact-router";
+import * as React from "react";
+import { render } from "react-dom";
+import { connect } from "react-redux";
+import { Link, withRouter } from "react-router-dom";
 import { deleteSeries, getInfoBlobs, getSeries, showError } from "../actions";
 import handler from "../components/handler";
 import "../model";
-import store from "../store";
+import store, { IReduxState } from "../store";
 
 interface IViewProps {
-    matches?: {
-        id: number;
+    history?: any;
+    match?: {
+        params: {
+            id: number;
+        };
     };
     loading: boolean;
-    path: string;
     series: ISeries;
     info: IInfoBlob[];
 }
 
-class View extends Component<any, IViewProps> {
+class View extends React.PureComponent<IViewProps> {
 
     constructor(props) {
         super(props);
@@ -25,45 +28,45 @@ class View extends Component<any, IViewProps> {
     }
 
     public componentWillMount() {
-        store.dispatch(getSeries(this.props.matches.id));
-        store.dispatch(getInfoBlobs(this.props.matches.id));
+        store.dispatch(getSeries(this.props.match.params.id));
+        store.dispatch(getInfoBlobs(this.props.match.params.id));
     }
 
     public render() {
         if (this.props.loading || !this.props.series || !this.props.info) {
             return (
-                <div class="container box">
+                <div className="container box">
                     <p>Loading...</p>
-                    <Link class="button" href="/">Back</Link>
+                    <Link className="button" to="/">Back</Link>
                 </div>);
         }
 
         const series = this.props.series;
 
         return (
-            <div class="container box">
+            <div className="container box">
                 <div>
                     <div>
-                        <h1 class="title">{series.title}</h1>
+                        <h1 className="title">{series.title}</h1>
                     </div>
-                    <div class="columns">
-                        <div class="column">
+                    <div className="columns">
+                        <div className="column">
                             {this.renderInfoList()}
                         </div>
-                        <div class="column">
-                            <img class="image" src={series.poster_url}/>
+                        <div className="column">
+                            <img className="image" src={series.poster_url}/>
                         </div>
                     </div>
                 </div>
-                <div class="is-flex">
-                    <div class="has-gap">
-                        <Link class="button" href="/">Back</Link>
+                <div className="is-flex">
+                    <div className="has-gap">
+                        <Link className="button" to="/">Back</Link>
                     </div>
-                    <div class="has-gap">
-                        <Link class="button is-warning" href={`/series/${ series.id }/edit`}>Edit</Link>
+                    <div className="has-gap">
+                        <Link className="button is-warning" to={`/series/${ series.id }/edit`}>Edit</Link>
                     </div>
-                    <div class="has-gap margin-right">
-                        <a class="button is-danger" href="javascript:void(0)" onClick={this.handleDelete}>
+                    <div className="has-gap margin-right">
+                        <a className="button is-danger" href="javascript:void(0)" onClick={this.handleDelete}>
                             Delete
                         </a>
                     </div>
@@ -79,8 +82,8 @@ class View extends Component<any, IViewProps> {
             return;
         }
 
-        store.dispatch(deleteSeries(this.props.matches.id));
-        route("/");
+        store.dispatch(deleteSeries(this.props.match.params.id));
+        this.props.history.push("/");
     }
 
     private renderInfoList() {
@@ -89,13 +92,13 @@ class View extends Component<any, IViewProps> {
         }
 
         const infoItems = this.props.info.map((u, i) =>
-            <div key={i.toString()} class="info-list-item" >
+            <div key={i.toString()} className="info-list-item" >
                 {handler.build(u.blob, u.info_type, {})}
             </div>);
 
         return (
             <div>
-                <div class="info-list">
+                <div className="info-list">
                     {infoItems}
                 </div>
             </div>
@@ -103,16 +106,15 @@ class View extends Component<any, IViewProps> {
   }
 }
 
-export default connect((state, props: any) => {
-
+export default withRouter(connect((state: IReduxState, props: any): IViewProps => {
     let series;
     if (state.series && state.series.items && Array.isArray(state.series.items)) {
-        series = state.series.items.find((s) => s.id.toString() === props.matches.id);
+        series = state.series.items.find((s) => s.id.toString() === props.match.params.id);
     }
 
     let info = [];
     if (state.infoBlob && state.infoBlob.blobs) {
-        info = state.infoBlob.blobs[props.matches.id];
+        info = state.infoBlob.blobs[props.match.params.id];
     }
 
     return {
@@ -120,4 +122,4 @@ export default connect((state, props: any) => {
         loading: state.series.loading,
         series,
     };
-})(View);
+})(View));

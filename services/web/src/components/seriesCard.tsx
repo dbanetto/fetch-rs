@@ -1,16 +1,21 @@
-import { Component, h } from "preact";
-import { connect } from "preact-redux";
-import { Link } from "preact-router";
+import * as React from "react";
+import { render } from "react-dom";
+import { connect } from "react-redux";
+import { Link } from "react-router-dom";
+
 import { getInfoBlobType } from "../actions";
 import "../model";
+import { IReduxState } from "../store";
 
 interface ICardProps {
+    dispatch: (action: any) => void;
     series: ISeries;
     link: IInfoBlob;
     count: IInfoBlob;
+    loading: boolean;
 }
 
-class SeriesCard extends Component<any, ICardProps> {
+class SeriesCard extends React.PureComponent<ICardProps> {
 
   constructor(props) {
     super(props);
@@ -32,18 +37,18 @@ class SeriesCard extends Component<any, ICardProps> {
   public render() {
       const series = this.props.series;
       return (
-          <div class="card has-gap">
-              <div class="card-head" >
-                  <Link href={`/series/${ series.id }`} >
-                      <div class="poster">
-                          <img class="image" src={series.poster_url} />
+          <div className="card has-gap">
+              <div className="card-head" >
+                  <Link to={`/series/${ series.id }`} >
+                      <div className="poster">
+                          <img className="image" src={series.poster_url} />
                       </div>
                   </Link>
               </div>
-              <div class="card-body">
-                  <div class="is-flex" >
-                      <Link href={`/series/${ series.id }`} class="card-subtitle is-truncated" title={series.title}>
-                          <h2 class="subtitle is-truncated">{series.title}</h2>
+              <div className="card-body">
+                  <div className="is-flex" >
+                      <Link to={`/series/${ series.id }`} className="card-subtitle is-truncated" title={series.title}>
+                          <h2 className="subtitle is-truncated">{series.title}</h2>
                       </Link>
                       {this.renderLink()}
                   </div>
@@ -69,7 +74,7 @@ class SeriesCard extends Component<any, ICardProps> {
 
           return (
               <div>
-                  <progress class={`progress ${currentStatus}`}  value={value} max={max} />
+                  <progress className={`progress ${currentStatus}`}  value={value} max={max} />
               </div>
           );
       } else {
@@ -82,8 +87,8 @@ class SeriesCard extends Component<any, ICardProps> {
       if (this.props.link) {
           return (
               <a href={this.props.link.blob.url} target="_blank" rel="noopener noreferrer">
-                  <span class="icon is-small">
-                      <i class="mdi mdi-open-in-new" />
+                  <span className="icon is-small">
+                      <i className="mdi mdi-open-in-new" />
                   </span>
               </a>
           );
@@ -93,7 +98,7 @@ class SeriesCard extends Component<any, ICardProps> {
   }
 }
 
-export default connect((state, props: any) => {
+export default connect((state: IReduxState, props: any) => {
     const blobs = state.infoBlob.blobs[props.series.id];
     let link = null;
     let count = null;

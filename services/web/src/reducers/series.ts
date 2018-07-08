@@ -1,18 +1,19 @@
-import { route } from "preact-router";
+import { push } from "connected-react-router";
 import * as actions from "../actions";
 import * as api from "../api";
 import store from "../store";
 
-const INITAL_SATE = {
+export interface ISeriesState {
+  items: ISeries[];
+  loading: boolean;
+}
+
+const INITAL_STATE: ISeriesState = {
   items: [],
   loading: false,
 };
 
-const seriesReducer = (state, action) => {
-  if (!state) {
-    return INITAL_SATE;
-  }
-
+const seriesReducer = (state: ISeriesState = INITAL_STATE, action): ISeriesState => {
   switch (action.type) {
     case "GET_ALL_SERIES":
       return { ...state, ...getAllSeries(state) };
@@ -76,7 +77,7 @@ const upsertSeries = (formData: SeriesFull) => {
     .then((series) => {
       store.dispatch(actions.finishedGetSeries(series.id, series));
       store.dispatch(actions.clearInfoBlob(series.id));
-      route(`/series/${series.id}`);
+      store.dispatch(push(`/series/${series.id}`));
     }).catch((err) => {
       store.dispatch(actions.showError(err.toString()));
     });

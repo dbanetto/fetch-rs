@@ -1,4 +1,7 @@
-import { Component, h } from "preact";
+import * as React from "react";
+import { render } from "react-dom";
+import { connect } from "react-redux";
+
 import "../model";
 import handler from "./handler";
 import InfoElement from "./infoElement";
@@ -8,7 +11,7 @@ interface IInfoListProps {
     handleUpdate: (key: string, value: IInfoBlob[]) => void;
 }
 
-export default class InfoList extends Component<IInfoListProps, void> {
+export default class InfoList extends React.PureComponent<IInfoListProps> {
 
     constructor(props) {
         super(props);
@@ -19,17 +22,17 @@ export default class InfoList extends Component<IInfoListProps, void> {
     public render() {
         return  (
             <div>
-                <div class="info-list">
+                <div className="info-list">
                     {this.props.value.map((ele, index) => this.buildElement(ele, index))}
                 </div>
 
-                <div class="select">
+                <div className="select">
                     <select  id="type-selector">
                         {this.getTypes().map((t, i) => <option key={i.toString()} value={t.type}>{t.name}</option>)}
                     </select>
                 </div>
                 <span>&nbsp;</span>
-                <button class="button" type="button" onClick={this.handleAdd}>Add</button>
+                <button className="button" type="button" onClick={this.handleAdd}>Add</button>
             </div>
         );
     }
@@ -66,12 +69,11 @@ export default class InfoList extends Component<IInfoListProps, void> {
     }
 
     private buildElement(ele, index) {
-        return (<div class="info-list-item">
+        return (<div key={index} className="info-list-item">
             <InfoElement
                 handleDelete={this.handleDelete.bind(this, index)}
                 handleUpdate={this.handleUpdate.bind(this, index)}
                 value={ele}
-                key={index}
             />
         </div>
         );

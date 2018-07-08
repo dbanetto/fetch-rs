@@ -17,9 +17,12 @@ module.exports = {
     main: './src/main.tsx',
     style: './src/style.scss',
     vendor: [
-      'preact',
-      'preact-redux',
-      'preact-router',
+      'connected-react-router',
+      'react',
+      'react-dom',
+      'react-redux',
+      'react-router',
+      'react-router-dom',
       'redux',
     ]
   },

@@ -1,7 +1,8 @@
-import { Component, h } from "preact";
+import * as React from "react";
+import { render } from "react-dom";
 import "../../model";
 
-export default class ImageHandler extends Component<IHandlerProps, void> {
+export default class ImageHandler extends React.PureComponent<IHandlerProps> {
 
     public static TypeName(): string {
         return "Image";
@@ -27,20 +28,20 @@ export default class ImageHandler extends Component<IHandlerProps, void> {
 
     private renderEdit() {
         return (
-            <div class="columns">
-                <div class="column">
+            <div className="columns">
+                <div className="column">
                     <input
                         type="url"
-                        class="input"
+                        className="input"
                         name={this.props.name || ""}
                         value={this.props.blob.src}
                         onChange={this.handleUpdate}
                     />
                 </div>
-                <div class="column">
-                    <h3 class="subtitle">Preview</h3>
-                    <div class="poster preview">
-                        <img class="image" src={this.props.blob.src}/>
+                <div className="column">
+                    <h3 className="subtitle">Preview</h3>
+                    <div className="poster preview">
+                        <img className="image" src={this.props.blob.src}/>
                     </div>
                 </div>
             </div>);

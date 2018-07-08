@@ -1,7 +1,8 @@
-import { Component, h } from "preact";
+import * as React from "react";
+import { render } from "react-dom";
 import "../../model";
 
-export default class UriDefault extends Component<IHandlerProps, void> {
+export default class UriDefault extends React.PureComponent<IHandlerProps> {
 
     public static TypeName(): string {
         return "Link";
@@ -24,7 +25,7 @@ export default class UriDefault extends Component<IHandlerProps, void> {
             rel="noopener noreferrer"
         >
             {this.props.blob.url}
-            <i class="mdi mdi-open-in-new" />
+            <i className="mdi mdi-open-in-new" />
         </a>);
     }
 
@@ -34,7 +35,7 @@ export default class UriDefault extends Component<IHandlerProps, void> {
 
     private renderEdit() {
         return (<input
-            class="input"
+            className="input"
             type="url"
             name={this.props.name || "url"}
             value={this.props.blob.url}

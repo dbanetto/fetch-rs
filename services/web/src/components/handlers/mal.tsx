@@ -1,7 +1,8 @@
-import { Component, h } from "preact";
+import * as React from "react";
+import { render } from "react-dom";
 import "../../model";
 
-export default class MalHandler extends Component<IHandlerProps, void> {
+export default class MalHandler extends React.PureComponent<IHandlerProps> {
 
     public static TypeName(): string {
         return "MAL";
@@ -27,25 +28,25 @@ export default class MalHandler extends Component<IHandlerProps, void> {
 
     private renderView() {
         return (
-            <div class="columns">
-                <div class="column">
-                    <label class="label">MAL ID</label>
+            <div className="columns">
+                <div className="column">
+                    <label className="label">MAL ID</label>
                     <a
                         href={`https://myanimelist.net/anime/${ this.props.blob.id }`}
                         target="_blank"
                         rel="noopener noreferrer"
                     >
                         {this.props.blob.id}
-                        <span class="icon is-small">
-                            <i class="mdi mdi-open-in-new" />
+                        <span className="icon is-small">
+                            <i className="mdi mdi-open-in-new" />
                         </span>
                     </a>
                 </div>
-                <div class="column">
-                    <label class="label">Episode Offset</label>
+                <div className="column">
+                    <label className="label">Episode Offset</label>
                     <input
                         disabled={true}
-                        class="input"
+                        className="input"
                         type="number"
                         value={this.props.blob.offset}
                     />
@@ -55,23 +56,21 @@ export default class MalHandler extends Component<IHandlerProps, void> {
 
     private renderEdit() {
         return (
-        <div class="columns">
-            <div class="column">
-                <label class="label" for="id">MAL id</label>
+        <div className="columns">
+            <div className="column">
+                <label className="label" htmlFor="id">MAL id</label>
                 <input
-                    label="id"
-                    class="input"
+                    className="input"
                     type="number"
                     value={this.props.blob.id}
                     min="0"
                     onChange={this.handleUpdate}
                 />
             </div>
-            <div class="column">
-                <label class="label" for="offset">Episode count offset</label>
+            <div className="column">
+                <label className="label" htmlFor="offset">Episode count offset</label>
                 <input
-                    label="offset"
-                    class="input"
+                    className="input"
                     type="number"
                     value={this.props.blob.offset}
                     min="0"

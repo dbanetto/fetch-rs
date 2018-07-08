@@ -1,4 +1,6 @@
-import { Component, h } from "preact";
+import * as React from "react";
+import { render } from "react-dom";
+
 import "../model";
 import handler from "./handler";
 
@@ -8,7 +10,7 @@ interface IInfoProps {
     handleDelete: () => void;
 }
 
-export default class InfoElement extends Component<IInfoProps, void> {
+export default class InfoElement extends React.PureComponent<IInfoProps> {
 
     constructor(props) {
         super(props);
@@ -29,11 +31,11 @@ export default class InfoElement extends Component<IInfoProps, void> {
 
             {this.renderId()}
 
-            <div class="columns">
-                <div class="column">{builtHandler} </div>
+            <div className="columns">
+                <div className="column">{builtHandler} </div>
 
-                <div class="column is-one-fifth">
-                    <button class="button is-danger" type="button" onClick={this.props.handleDelete}>
+                <div className="column is-one-fifth">
+                    <button className="button is-danger" type="button" onClick={this.props.handleDelete}>
                         x
                     </button>
                 </div>
