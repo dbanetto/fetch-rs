@@ -2,13 +2,19 @@ import * as actions from "../actions";
 import * as api from "../api";
 import store from "../store";
 
-const INITAL_STATE = {
+export interface IInfoBlobState {
+  blobs: object;
+  isAll: object;
+  loading: boolean;
+}
+
+const INITAL_STATE: IInfoBlobState = {
   blobs: {},
   isAll: {},
   loading: false,
 };
 
-const infoBlobReducer = (state = INITAL_STATE, action) => {
+const infoBlobReducer = (state: IInfoBlobState = INITAL_STATE, action): IInfoBlobState => {
   switch (action.type) {
     // All types of a series
     case "GET_ALL_INFOBLOBS":

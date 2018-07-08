@@ -1,24 +1,30 @@
-import { Component, h } from "preact";
-import { connect } from "preact-redux";
-import { Link, route } from "preact-router";
+import * as React from "react";
+import { render } from "react-dom";
+import { connect } from "react-redux";
+import { Link, Route } from "react-router-dom";
+
 import { getInfoBlobs, getSeries } from "../actions";
 import SeriesForm from "../components/seriesForm";
 import "../model";
+import { IReduxState } from "../store";
 
 interface IEditProps {
+    dispatch: (action: any) => void;
     path: string;
     loading: boolean;
     series: ISeries;
     info: IInfoBlob[];
-    matches?: {
-        id: number;
+    match?: {
+        params: {
+            id: number;
+        };
     };
 }
 
-class Edit extends Component<any, IEditProps> {
+class Edit extends React.PureComponent<IEditProps> {
 
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
     }
 
     public componentDidMount() {
@@ -34,9 +40,9 @@ class Edit extends Component<any, IEditProps> {
     public render() {
         if (this.props.loading || !this.props.series) {
             return (
-                <div class="container box">
+                <div className="container box">
                     <p>Loading...</p>
-                    <Link class="button" href="/">Back</Link>
+                    <Link className="button" to="/">Back</Link>
                 </div>);
         }
 
@@ -44,25 +50,26 @@ class Edit extends Component<any, IEditProps> {
         series.info = this.props.info;
 
         return (
-            <div class="container box">
+            <div className="container box">
                 <SeriesForm series={series} back={`/series/${ this.props.series.id }`} />
             </div>
         );
     }
 
     private getSeries() {
-        this.props.dispatch(getSeries(this.props.matches.id));
-        this.props.dispatch(getInfoBlobs(this.props.matches.id));
+        this.props.dispatch(getSeries(this.props.match.params.id));
+        this.props.dispatch(getInfoBlobs(this.props.match.params.id));
     }
 }
 
-export default connect((state, props: any) => {
+export default connect((state: IReduxState, props: any) => {
     let series;
     if (state.series.items) {
-        series = state.series.items.find((s) => s.id.toString() === props.matches.id);
+        series = state.series.items.find((s) => s.id.toString() === props.match.params.id);
     }
 
-    let info = state.infoBlob.blobs[props.matches.id];
+    let info = state.infoBlob.blobs[props.match.params.id];
+
     if (!info) {
         info = [];
     }

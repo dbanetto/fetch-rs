@@ -1,4 +1,5 @@
-import { Component, h } from "preact";
+import * as React from "react";
+import { render } from "react-dom";
 import "../../model";
 
 interface IJsonHandlerState {
@@ -6,7 +7,7 @@ interface IJsonHandlerState {
     text: string;
 }
 
-export default class JsonHandler extends Component<IHandlerProps, IJsonHandlerState> {
+export default class JsonHandler extends React.Component<IHandlerProps, IJsonHandlerState> {
 
     public static TypeName(): string {
         return "JSON";
@@ -33,7 +34,7 @@ export default class JsonHandler extends Component<IHandlerProps, IJsonHandlerSt
 
     private renderView() {
         return (<textarea
-            class="textarea"
+            className="textarea"
             disabled={true}
             name={this.props.name}
             value={JSON.stringify(this.props.blob)}
@@ -58,7 +59,7 @@ export default class JsonHandler extends Component<IHandlerProps, IJsonHandlerSt
 
     private renderEdit() {
         return (<textarea
-            class={this.textareaClass()}
+            className={this.textareaClass()}
             name={this.props.name}
             value={this.state.text}
             onChange={this.handleUpdate}

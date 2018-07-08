@@ -1,19 +1,24 @@
-import { Component, h } from "preact";
-import { connect } from "preact-redux";
-import { Link, Router  } from "preact-router";
+import { ConnectedRouter as Router } from "connected-react-router";
+import * as React from "react";
+import { render } from "react-dom";
+import { connect } from "react-redux";
+import { Link, Route, Switch } from "react-router-dom";
 import { hideError, showError } from "../actions";
-import store from "../store";
-import Edit from "./edit";
-import Home from "./home";
-import New from "./new";
-import View from "./view";
+
+import NavBar from "../components/navbar";
+import store, { history, IReduxState } from "../store";
+import EditPage from "./edit";
+import HomePage from "./home";
+import NewPage from "./new";
+import ViewPage from "./view";
 
 interface IAppProps {
-    showError: boolean;
     errorMessage: string;
+    history: any;
+    showError: boolean;
 }
 
-class App extends Component<any, IAppProps> {
+class App extends React.PureComponent<IAppProps> {
 
     constructor(props) {
         super(props);
@@ -28,58 +33,32 @@ class App extends Component<any, IAppProps> {
         }
 
         return (
-            <div>
-                <nav class="navbar" role="navigation" aria-label="main navigation">
-                    <div class="navbar-brand">
-
-                        <div class="navbar-item" >
-                            <Link href="/">
-                                <h1 class="title">ICON</h1>
-                            </Link>
+            <Router history={history}>
+                <div>
+                    <NavBar />
+                    <div className="container is-fluid app-main">
+                        <Switch>
+                            <Route exact={true} path="/" component={HomePage} />
+                            <Route exact={true} path="/series/new" component={NewPage} />
+                            <Route exact={true} path="/series/:id" component={ViewPage} />
+                            <Route exact={true} path="/series/:id/edit" component={EditPage} />
+                        </Switch>
+                    </div>
+                    <div className={modalClass} >
+                        <div className="modal-background" onClick={this.handleClose} />
+                        <div className="modal-card">
+                            <header className="modal-card-head">
+                                <p className="modal-card-title">Error!</p>
+                                <button className="delete" aria-label="close" onClick={this.handleClose} />
+                            </header>
+                            <section className="modal-card-body">
+                                {this.props.errorMessage}
+                            </section>
                         </div>
-
-                        <label class="navbar-burger" data-target="navbar-menu-target">
-                            <span />
-                            <span />
-                            <span />
-                        </label>
+                        <button className="modal-close is-large" aria-label="close" onClick={this.handleClose} />
                     </div>
-                    <div id="navbar-menu-target" class="navbar-menu">
-                        <div class="navbar-start">
-                            <Link class="navbar-item" href="/">
-                                <h1>Home</h1>
-                            </Link>
-
-                            <Link class="navbar-item" href="/series/new">
-                                <h1>New</h1>
-                            </Link>
-                        </div>
-                    </div>
-                </nav>
-
-                <div class="container is-fluid app-main">
-                    <Router>
-                        <Home path="/" />
-                        <New path="/series/new" />
-                        <View path="/series/:id" />
-                        <Edit path="/series/:id/edit" />
-                    </Router>
                 </div>
-
-                <div class={modalClass} >
-                    <div class="modal-background" onClick={this.handleClose} />
-                    <div class="modal-card">
-                        <header class="modal-card-head">
-                            <p class="modal-card-title">Error!</p>
-                            <button class="delete" aria-label="close" onClick={this.handleClose} />
-                        </header>
-                        <section class="modal-card-body">
-                            {this.props.errorMessage}
-                        </section>
-                    </div>
-                    <button class="modal-close is-large" aria-label="close" onClick={this.handleClose} />
-                </div>
-            </div>
+            </Router>
         );
     }
 
@@ -92,7 +71,7 @@ class App extends Component<any, IAppProps> {
     }
 }
 
-export default connect((state) => ({
+export default connect((state: IReduxState) => ({
     errorMessage: state.app.errorMessage,
     showError: state.app.showError,
 }))(App);

@@ -1,8 +1,11 @@
-import { Component, h } from "preact";
-import { connect } from "preact-redux";
-import { Link, route } from "preact-router";
+import * as React from "react";
+import { render } from "react-dom";
+import { connect } from "react-redux";
+import { Link } from "react-router-dom";
+
 import { upsertSeries } from "../actions";
 import "../model";
+import { IReduxState } from "../store";
 import handler from "./handler";
 import InfoList from "./infoList";
 
@@ -17,10 +20,10 @@ interface IFormState {
     series: SeriesFull;
 }
 
-class SeriesForm extends Component<IFormProps, IFormState> {
+class SeriesForm extends React.Component<IFormProps, IFormState> {
 
     constructor(props) {
-        super();
+        super(props);
 
         let series = {
             id: null,
@@ -56,9 +59,9 @@ class SeriesForm extends Component<IFormProps, IFormState> {
             <form onSubmit={this.handleSubmit}>
                 {this.renderId()}
                 <div>
-                    <label class="label" for="title">Title</label>
+                    <label className="label" htmlFor="title">Title</label>
                     <input
-                        class="input"
+                        className="input"
                         name="title"
                         id="title"
                         type="text"
@@ -68,17 +71,17 @@ class SeriesForm extends Component<IFormProps, IFormState> {
                     />
                 </div>
                 <div>
-                    <label class="label" for="poster_url">Poster URL</label>
+                    <label className="label" htmlFor="poster_url">Poster URL</label>
                     {poster}
                 </div>
                 <div>
-                    <h3 class="subtitle">Info</h3>
+                    <h3 className="subtitle">Info</h3>
                     <InfoList value={series.info || []} handleUpdate={this.handleInfoUpdate} />
                 </div>
                 <br />
                 <div>
-                    <Link class="button" href={this.props.back}>Back</Link>
-                    <button class={submitClass} type="submit">
+                    <Link className="button" to={this.props.back}>Back</Link>
+                    <button className={submitClass} type="submit">
                         {submitText}
                     </button>
                 </div>
@@ -127,7 +130,7 @@ class SeriesForm extends Component<IFormProps, IFormState> {
         this.handleUpdate("poster_url", blob.src);
     }
 
-    private renderId(): preact.VNode {
+    private renderId() {
         if (this.state.series.id) {
             return (<div>
                 <input name="id" id="id" type="hidden" value={this.state.series.id.toString()} />
@@ -138,7 +141,7 @@ class SeriesForm extends Component<IFormProps, IFormState> {
     }
 }
 
-export default connect((state, props: any) => ({
+export default connect((state: IReduxState, props: {back?: string, series?: object}) => ({
     back: props.back,
     loading: state.series.loading,
     series: props.series,

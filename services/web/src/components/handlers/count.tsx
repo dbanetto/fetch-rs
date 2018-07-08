@@ -1,7 +1,8 @@
-import { Component,  h } from "preact";
+import * as React from "react";
+import { render } from "react-dom";
 import "../../model";
 
-export default class CountHandler extends Component<IHandlerProps, void> {
+export default class CountHandler extends React.PureComponent<IHandlerProps> {
 
     public static TypeName(): string {
         return "Count";
@@ -26,23 +27,21 @@ export default class CountHandler extends Component<IHandlerProps, void> {
 
     private renderView() {
         return (
-            <div class="columns">
-                <div class="column">
-                    <label class="label" for="current">Current count</label>
+            <div className="columns">
+                <div className="column">
+                    <label className="label" htmlFor="current">Current count</label>
                     <input
-                        label="current"
                         disabled={true}
-                        class="input"
+                        className="input"
                         type="number"
                         value={this.props.blob.current}
                     />
                 </div>
-                <div class="column">
-                    <label class="label" for="total">Total count</label>
+                <div className="column">
+                    <label className="label" htmlFor="total">Total count</label>
                     <input
-                        label="total"
                         disabled={true}
-                        class="input"
+                        className="input"
                         type="number"
                         value={this.props.blob.total}
                     />
@@ -52,12 +51,11 @@ export default class CountHandler extends Component<IHandlerProps, void> {
 
     private renderEdit() {
         return (
-            <div class="columns">
-                <div class="column">
-                    <label class="label" for="current">Current count</label>
+            <div className="columns">
+                <div className="column">
+                    <label className="label" htmlFor="current">Current count</label>
                     <input
-                        label="current"
-                        class="input"
+                        className="input"
                         type="number"
                         value={this.props.blob.current}
                         min="0"
@@ -65,11 +63,10 @@ export default class CountHandler extends Component<IHandlerProps, void> {
                         onChange={this.handleUpdate}
                     />
                 </div>
-                <div class="column">
-                    <label class="label" for="total">Total count</label>
+                <div className="column">
+                    <label className="label" htmlFor="total">Total count</label>
                     <input
-                        label="total"
-                        class="input"
+                        className="input"
                         type="number"
                         value={this.props.blob.total}
                         min={this.props.blob.total > 0 ? this.props.blob.current : false}

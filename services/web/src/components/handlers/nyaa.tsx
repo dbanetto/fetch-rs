@@ -1,7 +1,8 @@
-import { Component, h } from "preact";
+import * as React from "react";
+import { render } from "react-dom";
 import "../../model";
 
-export default class NyaaHandler extends Component<IHandlerProps, void> {
+export default class NyaaHandler extends React.PureComponent<IHandlerProps> {
 
     public static TypeName(): string {
         return "Nyaa";
@@ -27,34 +28,34 @@ export default class NyaaHandler extends Component<IHandlerProps, void> {
 
     private renderView() {
         return (
-            <div class="columns">
-                <div class="column">
-                    <label class="label" >Nyaa ID</label>
+            <div className="columns">
+                <div className="column">
+                    <label className="label" >Nyaa ID</label>
                     <a
                         href={`https://nyaa.si/user/${ this.props.blob.user_id }`}
                         target="_blank"
                         rel="noopener noreferrer"
                     >
                         {this.props.blob.user_id}
-                        <span class="icon is-small">
-                            <i class="mdi mdi-open-in-new" />
+                        <span className="icon is-small">
+                            <i className="mdi mdi-open-in-new" />
                         </span>
                     </a>
                 </div>
-                <div class="column">
-                    <label class="label">Query</label>
+                <div className="column">
+                    <label className="label">Query</label>
                     <input
                         disabled={true}
-                        class="input"
+                        className="input"
                         type="text"
                         value={this.props.blob.query}
                     />
                 </div>
-                <div class="column">
-                    <label class="label">Search Title</label>
+                <div className="column">
+                    <label className="label">Search Title</label>
                     <input
                         disabled={true}
-                        class="input"
+                        className="input"
                         type="text"
                         value={this.props.blob.search_title}
                     />
@@ -64,32 +65,29 @@ export default class NyaaHandler extends Component<IHandlerProps, void> {
 
     private renderEdit() {
         return (
-        <div class="columns">
-            <div class="column">
-                <label class="label" for="user_id">Nyaa ID</label>
+        <div className="columns">
+            <div className="column">
+                <label className="label" htmlFor="user_id">Nyaa ID</label>
                 <input
-                    label="user_id"
-                    class="input"
+                    className="input"
                     type="text"
                     value={this.props.blob.user_id}
                     onChange={this.handleUpdate}
                 />
             </div>
-            <div class="column">
-                <label class="label" for="query">Query</label>
+            <div className="column">
+                <label className="label" htmlFor="query">Query</label>
                 <input
-                    label="query"
-                    class="input"
+                    className="input"
                     type="text"
                     value={this.props.blob.query}
                     onChange={this.handleUpdate}
                 />
             </div>
-            <div class="column">
-                <label class="label" for="search_title">Search Title</label>
+            <div className="column">
+                <label className="label" htmlFor="search_title">Search Title</label>
                 <input
-                    label="search_title"
-                    class="input"
+                    className="input"
                     type="text"
                     value={this.props.blob.search_title}
                     onChange={this.handleUpdate}
