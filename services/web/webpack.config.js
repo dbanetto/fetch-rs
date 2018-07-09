@@ -65,6 +65,11 @@ module.exports = {
     new webpack.optimize.CommonsChunkPlugin({
       name: "vendor", filename: "vendor.js", minChunks: Infinity}),
 
+    new webpack.DefinePlugin({
+      'process.env.NODE_ENV': JSON.stringify(process.env.ENV || 'development'),
+      'process.env.ENV'     : JSON.stringify(process.env.ENV || 'development')
+    }),
+
     extractSass,
 
   ].concat(production ?

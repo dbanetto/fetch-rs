@@ -31,7 +31,7 @@ class SeriesForm extends React.Component<IFormProps, IFormState> {
             poster_url: "",
             title: "",
         };
-        if (props &&  props.series) {
+        if (props && props.series) {
             series = props.series;
         }
 

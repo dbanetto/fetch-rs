@@ -59,7 +59,7 @@ export default class CountHandler extends React.PureComponent<IHandlerProps> {
                         type="number"
                         value={this.props.blob.current}
                         min="0"
-                        max={this.props.blob.total > 0 ?  this.props.blob.total : false}
+                        max={this.props.blob.total > 0 ? this.props.blob.total : undefined}
                         onChange={this.handleUpdate}
                     />
                 </div>
@@ -69,7 +69,7 @@ export default class CountHandler extends React.PureComponent<IHandlerProps> {
                         className="input"
                         type="number"
                         value={this.props.blob.total}
-                        min={this.props.blob.total > 0 ? this.props.blob.current : false}
+                        min={this.props.blob.total > 0 ? this.props.blob.current : undefined}
                         onChange={this.handleUpdate}
                     />
                 </div>
