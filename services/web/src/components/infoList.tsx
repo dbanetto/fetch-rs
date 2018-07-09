@@ -60,9 +60,7 @@ export default class InfoList extends React.PureComponent<IInfoListProps> {
     private handleUpdate(index: number, value: IInfoBlob) {
         const blobs = this.props.value;
 
-        blobs[index] = value;
-
-        this.props.handleUpdate("info", blobs);
+        this.props.handleUpdate("info", blobs.map((v, i) => i === index ? value : v));
     }
 
     private buildElement(ele, index) {

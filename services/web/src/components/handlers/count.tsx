@@ -20,9 +20,11 @@ export default class CountHandler extends React.PureComponent<IHandlerProps> {
 
     private handleUpdate(event) {
         const state = this.props.blob;
-        state[event.target.attributes.label.value] = parseInt(event.target.value, 10);
 
-        this.props.handleUpdate(state);
+        const update = {};
+        update[event.target.attributes.id.value] = parseInt(event.target.value, 10);
+
+        this.props.handleUpdate({...state, ...update});
     }
 
     private renderView() {
@@ -55,6 +57,7 @@ export default class CountHandler extends React.PureComponent<IHandlerProps> {
                 <div className="column">
                     <label className="label" htmlFor="current">Current count</label>
                     <input
+                        id="current"
                         className="input"
                         type="number"
                         value={this.props.blob.current}
@@ -66,6 +69,7 @@ export default class CountHandler extends React.PureComponent<IHandlerProps> {
                 <div className="column">
                     <label className="label" htmlFor="total">Total count</label>
                     <input
+                        id="total"
                         className="input"
                         type="number"
                         value={this.props.blob.total}
