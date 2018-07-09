@@ -27,7 +27,7 @@ export default class InfoList extends React.PureComponent<IInfoListProps> {
                 </div>
 
                 <div className="select">
-                    <select  id="type-selector">
+                    <select id="type-selector">
                         {this.getTypes().map((t, i) => <option key={i.toString()} value={t.type}>{t.name}</option>)}
                     </select>
                 </div>
@@ -47,17 +47,14 @@ export default class InfoList extends React.PureComponent<IInfoListProps> {
             series_id: null,
         };
 
-        elements.push(built);
-
-        this.props.handleUpdate("info", elements);
+        this.props.handleUpdate("info", elements.concat(built));
     }
 
     private handleDelete(key) {
         const elements = this.props.value;
 
-        elements.splice(key, 1);
-
-        this.props.handleUpdate("info", elements);
+        this.props.handleUpdate("info",
+            elements.slice(0, key).concat(elements.slice(key + 1)));
     }
 
     private handleUpdate(index: number, value: IInfoBlob) {
