@@ -21,9 +21,10 @@ export default class MalHandler extends React.PureComponent<IHandlerProps> {
     private handleUpdate(event) {
         const state = this.props.blob;
 
-        state[event.target.attributes.label.value] = parseInt(event.target.value, 10);
+        const update = {};
+        update[event.target.attributes.id.value] = parseInt(event.target.value, 10);
 
-        this.props.handleUpdate(state);
+        this.props.handleUpdate({...state, ...update});
     }
 
     private renderView() {
@@ -60,6 +61,7 @@ export default class MalHandler extends React.PureComponent<IHandlerProps> {
             <div className="column">
                 <label className="label" htmlFor="id">MAL id</label>
                 <input
+                    id="id"
                     className="input"
                     type="number"
                     value={this.props.blob.id}
@@ -70,6 +72,7 @@ export default class MalHandler extends React.PureComponent<IHandlerProps> {
             <div className="column">
                 <label className="label" htmlFor="offset">Episode count offset</label>
                 <input
+                    id="offset"
                     className="input"
                     type="number"
                     value={this.props.blob.offset}
