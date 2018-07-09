@@ -70,13 +70,13 @@ export default connect((state: IReduxState, props: any) => {
 
     let info = state.infoBlob.blobs[props.match.params.id];
 
-    if (!info) {
+    if (!Array.isArray(info)) {
         info = [];
     }
 
     return {
         info,
-        loading: state.series.loading,
+        loading: state.series.loading || state.infoBlob.loading,
         series,
     };
 })(Edit);
