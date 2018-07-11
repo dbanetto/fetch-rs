@@ -1,4 +1,4 @@
-fetchapi = "http://localhost:3000"
+fetchapi = "http://api:3000"
 
 [webui]
 enable = true

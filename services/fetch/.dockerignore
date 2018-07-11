@@ -1,4 +1,6 @@
 Dockerfile
 *.md
 .git/
-config.json
+config.toml
+bin/
+.gopath/
