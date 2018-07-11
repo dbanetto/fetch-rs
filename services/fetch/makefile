@@ -2,6 +2,10 @@ PACKAGE=fetch
 GOPATH=$(CURDIR)/.gopath
 BASE=$(GOPATH)/src/$(PACKAGE)
 
+.PHONY: build
+build: get
+	cd $(BASE) && go build -o bin/$(PACKAGE) cmd/fetcherd/main.go
+
 $(BASE):
 	mkdir -p $(dir $@)
 	ln -sf $(CURDIR) $@
@@ -9,10 +13,6 @@ $(BASE):
 .PHONY: get
 get: $(BASE)
 	cd $(BASE) && go get -v -d ./
-
-.PHONY: all
-all: get
-	cd $(BASE) && go build -o bin/$(PACKAGE) cmd/fetcherd/main.go
 
 .PHONY: docker
 docker: get
