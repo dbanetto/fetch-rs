@@ -1,9 +1,9 @@
 package main
 
 import (
+	"fetch"
 	"flag"
 	log "github.com/sirupsen/logrus"
-	"gitlab.com/zyphrus/fetcherd-go"
 )
 
 var version string
