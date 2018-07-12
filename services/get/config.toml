@@ -1,0 +1,14 @@
+fetchapi = "http://api:3000"
+
+[webui]
+enable = true
+host = "127.0.0.1:8080"
+
+
+[Transmission]
+rpc = "http://localhost:9091/transmission/rpc"
+user = "transmission"
+password = "p@ssw0rd"
+
+[log]
+tojson = true

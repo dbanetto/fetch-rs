@@ -20,6 +20,18 @@ services:
     environment:
       DATABASE_URL: postgres://postgres@db/postgres
 
+  get:
+    build:
+      context: ../../services/get
+      dockerfile: Dockerfile
+    restart: on-failure
+    volumes:
+      - ../../services/get/config.toml:/etc/fetcherd.toml:ro
+    links:
+      - api
+    depends_on:
+      - api
+
   web:
     build:
       context: ../../services/web
