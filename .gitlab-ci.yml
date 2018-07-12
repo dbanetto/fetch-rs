@@ -47,13 +47,13 @@ go:
   except:
     - master
   script:
-    - cd services/fetch
+    - cd services/get
     - du -hs .gopath || true
     - go version
     - make build
   cache:
     paths:
-      - services/fetch/.gopath/
+      - services/get/.gopath/
 
 rustfmt:
   stage: style
@@ -94,20 +94,20 @@ docker:
     - ( cd services/api   && docker build . -f ./Dockerfile -t $CI_REGISTRY_IMAGE/api:latest )
     - ( cd services/api   && docker build . -f ./Dockerfile-migrate -t $CI_REGISTRY_IMAGE/migrate:latest )
     - ( cd services/web   && docker build . -f ./Dockerfile -t $CI_REGISTRY_IMAGE/web:latest )
-    - ( cd services/fetch && docker build . -t $CI_REGISTRY_IMAGE/fetch:latest --build-arg "version=${CI_COMMIT_SHA}-`date -u +%Y%m%d.%H%M%S`" )
+    - ( cd services/get && docker build . -t $CI_REGISTRY_IMAGE/get:latest --build-arg "version=${CI_COMMIT_SHA}-`date -u +%Y%m%d.%H%M%S`" )
     - docker push $CI_REGISTRY_IMAGE/api:latest
     - docker push $CI_REGISTRY_IMAGE/migrate:latest
     - docker push $CI_REGISTRY_IMAGE/web:latest
-    - docker push $CI_REGISTRY_IMAGE/fetch:latest
+    - docker push $CI_REGISTRY_IMAGE/get:latest
     - |
       if [ "$CI_COMMIT_TAG" ] ; then
         ( cd services/api   && docker build . -f ./Dockerfile -t $CI_REGISTRY_IMAGE/api:$CI_COMMIT_TAG )
         ( cd services/api   && docker build . -f ./Dockerfile-migrate -t $CI_REGISTRY_IMAGE/migrate:$CI_COMMIT_TAG )
         ( cd services/web   && docker build . -f ./Dockerfile -t $CI_REGISTRY_IMAGE/web:$CI_COMMIT_TAG )
-        ( cd services/fetch && docker build . -t $CI_REGISTRY_IMAGE/fetch:$CI_COMMIT_TAG --build-arg "version=${CI_COMMIT_SHA}-`date -u +%Y%m%d.%H%M%S`" )
+        ( cd services/get && docker build . -t $CI_REGISTRY_IMAGE/get:$CI_COMMIT_TAG --build-arg "version=${CI_COMMIT_SHA}-`date -u +%Y%m%d.%H%M%S`" )
         docker push $CI_REGISTRY_IMAGE/api:$CI_COMMIT_TAG
         docker push $CI_REGISTRY_IMAGE/migrate:$CI_COMMIT_TAG
         docker push $CI_REGISTRY_IMAGE/web:$CI_COMMIT_TAG
-        docker push $CI_REGISTRY_IMAGE/fetch:$CI_COMMIT_TAG
+        docker push $CI_REGISTRY_IMAGE/get:$CI_COMMIT_TAG
       fi
 
