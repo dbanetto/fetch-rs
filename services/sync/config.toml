@@ -1,0 +1,16 @@
+jsonlog = false
+
+[Kitsu]
+username = "kitsu"
+password = "test"
+userid   = "100"
+
+[MAL]
+username = "mal"
+password = "test"
+
+[FetchAPI]
+url = "http://localhost:3000"
+
+[web]
+host = "localhost:7323"
