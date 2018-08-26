@@ -11,8 +11,8 @@ pub fn routes() -> Mount {
     let mut mount = Mount::new();
 
     // endpoints
-    mount.mount("/api/healthcheck", healthcheck);
-    mount.mount("/api/", api::routes());
+    mount.mount("/healthcheck", healthcheck);
+    mount.mount("/", api::routes());
 
     mount
 }
