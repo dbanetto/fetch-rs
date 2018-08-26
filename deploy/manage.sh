@@ -24,8 +24,8 @@ case $OPTION in
         ./backup/fetch-backup backup "$SERVER"
         ;;
     restore)
-        SERVER=${2:-"$DEFAULT_SEVER"}
-        INPUT=${3:/dev/stdin}
+        INPUT=${2:-/dev/stdin}
+        SERVER=${3:-"$DEFAULT_SEVER"}
         ./backup/fetch-backup restore "$SERVER" "$INPUT"
         ;;
     *)

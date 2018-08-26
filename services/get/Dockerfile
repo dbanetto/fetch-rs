@@ -17,5 +17,7 @@ RUN apk --update upgrade && \
     update-ca-certificates && \
     rm -rf /varcache/apk/*
 
-HEALTHCHECK --interval=5m CMD wget http://localhost:8181/healthcheck -q -O /dev/null
+HEALTHCHECK --interval=10m --timeout=30s --retries=3 --start-period=10s \
+    CMD wget http://localhost:3000/healthcheck -q -O /dev/null
+
 ENTRYPOINT ["/usr/local/bin/fetch", "-config", "/etc/fetcherd.toml"]

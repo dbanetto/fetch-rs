@@ -1,4 +1,4 @@
-FROM rust:latest AS backend
+FROM rust:1.28 AS backend
 
 # static setup
 RUN mkdir -p /code/src && \
@@ -31,7 +31,7 @@ WORKDIR /opt
 
 COPY --from=backend /code/target/release/fetch-api /bin/fetch-api
 
-HEALTHCHECK --start-period=1m --interval=1m --timeout=30s --retries=3 \
+HEALTHCHECK --interval=10m --timeout=3s --retries=3 --start-period=5s \
     CMD wget http://localhost:3000/api/healthcheck -q -O /dev/null
 
 CMD ["/bin/fetch-api", "--config", "/etc/fetch.toml"]

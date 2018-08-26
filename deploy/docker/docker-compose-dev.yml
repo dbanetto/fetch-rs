@@ -32,6 +32,18 @@ services:
     depends_on:
       - api
 
+  sync:
+    build:
+      context: ../../services/sync
+      dockerfile: Dockerfile
+    restart: on-failure
+    volumes:
+      - ../../services/sync/config.toml:/etc/sitesync.toml:ro
+    links:
+      - api
+    depends_on:
+      - api
+
   web:
     build:
       context: ../../services/web

@@ -23,3 +23,6 @@ COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 RUN mkdir -p /etc/nginx/service.d && \
         chown nginx:nginx -R /www
+
+HEALTHCHECK --interval=10m --timeout=3s --retries=3 --start-period=5s \
+    CMD wget http://localhost/ -q -O /dev/null
