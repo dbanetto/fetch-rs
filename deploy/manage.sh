@@ -11,13 +11,16 @@ function print_help {
 
 case $OPTION in
     build)
-        docker-compose -p fetch -f docker/docker-compose-dev.yml build
+        docker-compose -p fetch -f docker/docker-compose-dev.yml $@
         ;;
-    up|start|run)
-        (docker-compose -p fetch -f docker/docker-compose-dev.yml up)
+    up)
+        docker-compose -p fetch -f docker/docker-compose-dev.yml $@
         ;;
     stop)
-        docker-compose -p fetch -f docker/docker-compose-dev.yml stop
+        docker-compose -p fetch -f docker/docker-compose-dev.yml $@
+        ;;
+    start|run)
+        docker-compose -p fetch -f docker/docker-compose-dev.yml up
         ;;
     backup)
         SERVER=${2:-"$DEFAULT_SEVER"}
@@ -27,6 +30,9 @@ case $OPTION in
         INPUT=${2:-/dev/stdin}
         SERVER=${3:-"$DEFAULT_SEVER"}
         ./backup/fetch-backup restore "$SERVER" "$INPUT"
+        ;;
+    help)
+        print_help
         ;;
     *)
         print_help

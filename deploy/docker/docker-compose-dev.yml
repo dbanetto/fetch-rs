@@ -31,6 +31,9 @@ services:
       - api
     depends_on:
       - api
+    extra_hosts:
+      # FIXME: https://github.com/docker/for-linux/issues/264
+      host.docker.internal: 172.17.0.1
 
   sync:
     build:
