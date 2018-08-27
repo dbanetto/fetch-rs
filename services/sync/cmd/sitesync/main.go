@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 	log "github.com/sirupsen/logrus"
-	sitesync "gitlab.com/zyphrus/sitesync"
+	sitesync "sitesync"
 )
 
 func main() {
