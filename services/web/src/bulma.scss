@@ -5,8 +5,17 @@
 $family-serif: "Noto Sans", "Open Sans", sans-serif;
 
 // set primary colour
-$primary: #4fd5b9;
+$primary: #34e09e;
 $primary-invert: findColorInvert($primary);
+
+$orange:    #EF915D;
+$yellow:    #F4E177;
+$green:     #11B31E;
+$turquoise: #1DC0AB;
+$cyan:      #2496C6;
+$blue:      #2B55CC;
+$purple:    #7A39D8;
+$red:       #EB5656;
 
 $family-primary: $family-serif;
 

@@ -3,15 +3,10 @@ version: "2"
 services:
 
   api:
-    build:
-      context: ../../services/api
-      dockerfile: Dockerfile
-    command: /bin/sh /bin/watch-dev
+    image: registry.gitlab.com/zyphrus/fetch-rs/api
     restart: on-failure
     volumes:
       - ./api/config.toml:/etc/fetch.toml:ro
-      - ./api/watch-dev.sh:/bin/watch-dev:ro
-      - ../../services/api/target/debug:/opt:ro
     links:
       - db
     depends_on:
@@ -21,12 +16,8 @@ services:
       DATABASE_URL: postgres://postgres@db/postgres
 
   get:
-    build:
-      context: ../../services/get
-      dockerfile: Dockerfile
+    image: registry.gitlab.com/zyphrus/fetch-rs/get:latest
     restart: on-failure
-    volumes:
-      - ../../services/get/config.toml:/etc/fetcherd.toml:ro
     links:
       - api
     depends_on:
@@ -36,36 +27,27 @@ services:
       host.docker.internal: 172.17.0.1
 
   sync:
-    build:
-      context: ../../services/sync
-      dockerfile: Dockerfile
+    image: registry.gitlab.com/zyphrus/fetch-rs/sync
     restart: on-failure
-    volumes:
-      - ../../services/sync/config.toml:/etc/sitesync.toml:ro
     links:
       - api
     depends_on:
       - api
 
   web:
-    build:
-      context: ../../services/web
-      dockerfile: Dockerfile
+    image: registry.gitlab.com/zyphrus/fetch-rs/web
     restart: on-failure
     volumes:
       - ./web/service.d:/etc/nginx/service.d:ro
-      - ../../services/web/public:/www:ro
     ports:
-      - 3000:80
+      - 5050:80
     links:
       - api
     depends_on:
       - api
 
   migrate:
-    build:
-      context: ../../services/api
-      dockerfile: Dockerfile-migrate
+    image: registry.gitlab.com/zyphrus/fetch-rs/migrate
     restart: on-failure
     depends_on:
       - db
@@ -76,7 +58,5 @@ services:
       
   db:
     image: postgres:10-alpine
-    ports:
-      - 5432:5432
     volumes:
       - /var/lib/postgresql/data
