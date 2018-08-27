@@ -79,7 +79,7 @@ rustfmt:
     - cd services/api
     - rustc --version && cargo --version && rustup --version
     - rustup component add rustfmt-preview
-    - rustfmt --write-mode diff service/api/src/**.rs
+    - rustfmt --check service/api/src/**.rs
 
 tslint:
   stage: style
