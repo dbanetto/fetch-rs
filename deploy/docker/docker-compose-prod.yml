@@ -1,0 +1,62 @@
+version: "2"
+
+services:
+
+  api:
+    image: registry.gitlab.com/zyphrus/fetch-rs/api
+    restart: on-failure
+    volumes:
+      - ./api/config.toml:/etc/fetch.toml:ro
+    links:
+      - db
+    depends_on:
+      - db
+      - migrate
+    environment:
+      DATABASE_URL: postgres://postgres@db/postgres
+
+  get:
+    image: registry.gitlab.com/zyphrus/fetch-rs/get:latest
+    restart: on-failure
+    links:
+      - api
+    depends_on:
+      - api
+    extra_hosts:
+      # FIXME: https://github.com/docker/for-linux/issues/264
+      host.docker.internal: 172.17.0.1
+
+  sync:
+    image: registry.gitlab.com/zyphrus/fetch-rs/sync
+    restart: on-failure
+    links:
+      - api
+    depends_on:
+      - api
+
+  web:
+    image: registry.gitlab.com/zyphrus/fetch-rs/web
+    restart: on-failure
+    volumes:
+      - ./web/service.d:/etc/nginx/service.d:ro
+    ports:
+      - 5050:80
+    links:
+      - api
+    depends_on:
+      - api
+
+  migrate:
+    image: registry.gitlab.com/zyphrus/fetch-rs/migrate
+    restart: on-failure
+    depends_on:
+      - db
+    links:
+      - db
+    environment:
+      DATABASE_URL: postgres://postgres@db/postgres
+      
+  db:
+    image: postgres:10-alpine
+    volumes:
+      - /var/lib/postgresql/data
