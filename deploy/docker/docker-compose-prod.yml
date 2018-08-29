@@ -37,8 +37,6 @@ services:
   web:
     image: registry.gitlab.com/zyphrus/fetch-rs/web
     restart: on-failure
-    volumes:
-      - ./web/service.d:/etc/nginx/service.d:ro
     ports:
       - 5050:80
     links:
