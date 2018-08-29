@@ -16,7 +16,7 @@ COPY src /code/src
 
 RUN npm run build
 
-FROM nginx:alpine
+FROM nginx:stable-alpine
 
 COPY --from=frontend /code/public /www
 COPY nginx.conf /etc/nginx/conf.d/default.conf

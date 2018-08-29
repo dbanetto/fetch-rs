@@ -6,11 +6,11 @@ services:
     build:
       context: ../../services/api
       dockerfile: Dockerfile
-    command: /bin/sh /bin/watch-dev
+    command: /bin/sh /bin/watch-dev '/bin/fetch-api' '/opt/fetch-api' '/etc/fetch.toml'
     restart: on-failure
     volumes:
-      - ./api/config.toml:/etc/fetch.toml:ro
-      - ./api/watch-dev.sh:/bin/watch-dev:ro
+      - ./watch-dev.sh:/bin/watch-dev:ro
+      - ../../services/api/config.toml:/etc/fetch.toml:ro
       - ../../services/api/target/debug:/opt:ro
     links:
       - db
@@ -24,9 +24,12 @@ services:
     build:
       context: ../../services/get
       dockerfile: Dockerfile
+    command: /bin/sh /bin/watch-dev '/usr/local/bin/fetch' '/opt/fetch' '/etc/fetcherd.toml'
     restart: on-failure
     volumes:
+      - ./watch-dev.sh:/bin/watch-dev:ro
       - ../../services/get/config.toml:/etc/fetcherd.toml:ro
+      - ../../services/get/bin:/opt:ro
     links:
       - api
     depends_on:
@@ -39,9 +42,12 @@ services:
     build:
       context: ../../services/sync
       dockerfile: Dockerfile
+    command: /bin/sh /bin/watch-dev '/usr/local/bin/sitesync' '/opt/sitesync' '/etc/sitesync.toml'
     restart: on-failure
     volumes:
+      - ./watch-dev.sh:/bin/watch-dev:ro
       - ../../services/sync/config.toml:/etc/sitesync.toml:ro
+      - ../../services/sync/bin:/opt:ro
     links:
       - api
     depends_on:
@@ -53,7 +59,6 @@ services:
       dockerfile: Dockerfile
     restart: on-failure
     volumes:
-      - ./web/service.d:/etc/nginx/service.d:ro
       - ../../services/web/public:/www:ro
     ports:
       - 3000:80

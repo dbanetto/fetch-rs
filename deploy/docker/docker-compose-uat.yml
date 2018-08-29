@@ -49,8 +49,6 @@ services:
       context: ../../services/web
       dockerfile: Dockerfile
     restart: on-failure
-    volumes:
-      - ./web/service.d:/etc/nginx/service.d:ro
     ports:
       - 3000:80
     links:
