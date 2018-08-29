@@ -1,25 +1,16 @@
 FROM rust:1.28 AS backend
 
-# static setup
-RUN mkdir -p /code/src && \
-    echo 'fn main() {}' > /code/src/main.rs
+RUN mkdir -p /code/src
 
 WORKDIR /code
 
 # copy across dependencies
 COPY Cargo.toml /code/Cargo.toml
 COPY Cargo.lock /code/Cargo.lock
-
-# build a cache of dependencies 
-RUN cargo build --release --verbose
-
-# copy over project code
 COPY src /code/src
 
 # remove fake build and build release
-RUN rm target/release/fetch-api && \
-    cargo build --release --verbose && \
-    strip target/release/fetch-api
+RUN cargo build --release --verbose
 
 # Create final slim image
 FROM debian:stretch-slim

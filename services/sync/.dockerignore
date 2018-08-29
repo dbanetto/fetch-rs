@@ -2,3 +2,5 @@ Dockerfile
 *.md
 .git/
 config.toml
+.gopath/
+bin/
