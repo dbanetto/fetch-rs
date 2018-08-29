@@ -1,0 +1,78 @@
+version: "2"
+
+services:
+
+  api:
+    build:
+      context: ../../services/api
+      dockerfile: Dockerfile
+    restart: on-failure
+    volumes:
+      - ./api/config.toml:/etc/fetch.toml:ro
+    links:
+      - db
+    depends_on:
+      - db
+      - migrate
+    environment:
+      DATABASE_URL: postgres://postgres@db/postgres
+
+  get:
+    build:
+      context: ../../services/get
+      dockerfile: Dockerfile
+    restart: on-failure
+    volumes:
+      - ../../services/get/config.toml:/etc/fetcherd.toml:ro
+    links:
+      - api
+    depends_on:
+      - api
+    extra_hosts:
+      # FIXME: https://github.com/docker/for-linux/issues/264
+      host.docker.internal: 172.17.0.1
+
+  sync:
+    build:
+      context: ../../services/sync
+      dockerfile: Dockerfile
+    restart: on-failure
+    volumes:
+      - ../../services/sync/config.toml:/etc/sitesync.toml:ro
+    links:
+      - api
+    depends_on:
+      - api
+
+  web:
+    build:
+      context: ../../services/web
+      dockerfile: Dockerfile
+    restart: on-failure
+    volumes:
+      - ./web/service.d:/etc/nginx/service.d:ro
+    ports:
+      - 3000:80
+    links:
+      - api
+    depends_on:
+      - api
+
+  migrate:
+    build:
+      context: ../../services/api
+      dockerfile: Dockerfile-migrate
+    restart: on-failure
+    depends_on:
+      - db
+    links:
+      - db
+    environment:
+      DATABASE_URL: postgres://postgres@db/postgres
+      
+  db:
+    image: postgres:10-alpine
+    ports:
+      - 5432:5432
+    volumes:
+      - /var/lib/postgresql/data
