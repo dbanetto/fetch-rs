@@ -24,7 +24,7 @@ def main(args):
 
 
 def backup(fetch_url, filename):
-    res = requests.get("{0}/api".format(fetch_url))
+    res = requests.get("{0}/api/".format(fetch_url))
 
     # check if the API endpoint works
     if not res.ok:
