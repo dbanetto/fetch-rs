@@ -14,8 +14,8 @@ services:
     depends_on:
       - db
       - migrate
-    environment:
-      DATABASE_URL: postgres://postgres@db/postgres
+    env_file:
+      - .env_uat_core
 
   get:
     build:
@@ -65,8 +65,8 @@ services:
       - db
     links:
       - db
-    environment:
-      DATABASE_URL: postgres://postgres@db/postgres
+    env_file:
+      - .env_uat_core
       
   db:
     image: postgres:10-alpine
@@ -74,3 +74,5 @@ services:
       - 5432:5432
     volumes:
       - /var/lib/postgresql/data
+    env_file:
+      - .env_uat_db
