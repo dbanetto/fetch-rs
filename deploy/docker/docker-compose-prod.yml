@@ -6,7 +6,7 @@ services:
     image: registry.gitlab.com/zyphrus/fetch-rs/api
     restart: on-failure
     volumes:
-      - ./api/config.toml:/etc/fetch.toml:ro
+      - ../../services/api/config.toml:/etc/fetch.toml:ro
     links:
       - db
     depends_on:

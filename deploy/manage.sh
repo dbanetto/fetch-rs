@@ -42,7 +42,7 @@ case $OPTION in
         ;;
     uat)
         case $2 in
-            up)
+            up|start)
                 sh docker/init-secerts.sh uat
                 docker-compose -p fetch_uat -f docker/docker-compose-uat.yml up
                 ;;
@@ -54,6 +54,10 @@ case $OPTION in
                 sh docker/init-secerts.sh uat
                 docker-compose -p fetch_uat -f docker/docker-compose-uat.yml stop
                 ;;
+            cleanup)
+                docker-compose -p fetch_uat -f docker/docker-compose-uat.yml rm -v
+                rm -f docker/.env_uat_* || true
+                ;;
             *)
                 print_help
                 ;;
@@ -61,7 +65,7 @@ case $OPTION in
         ;;
     prod)
         case $2 in
-            up)
+            up|start)
                 sh docker/init-secerts.sh prod
                 docker-compose -p fetch_prod -f docker/docker-compose-prod.yml up
                 ;;
@@ -72,6 +76,10 @@ case $OPTION in
             stop)
                 sh docker/init-secerts.sh prod
                 docker-compose -p fetch_prod -f docker/docker-compose-prod.yml stop
+                ;;
+            cleanup)
+                docker-compose -p fetch_prod -f docker/docker-compose-prod.yml rm -v
+                rm -f docker/.env_prod_* || true
                 ;;
             *)
                 print_help
