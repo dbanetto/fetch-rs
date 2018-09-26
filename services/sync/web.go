@@ -72,7 +72,7 @@ func handleHealthCheck(w *loggedRes, r *http.Request, config Config) {
 	res["kitsu"] = kitsuStatus
 
 	status := 500
-	if apiStatus && malStatus && kitsuStatus {
+	if apiStatus && (malStatus || kitsuStatus) {
 		status = 200
 	}
 
