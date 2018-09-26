@@ -6,14 +6,14 @@ services:
     image: registry.gitlab.com/zyphrus/fetch-rs/api
     restart: on-failure
     volumes:
-      - ./api/config.toml:/etc/fetch.toml:ro
+      - ../../services/api/config.toml:/etc/fetch.toml:ro
     links:
       - db
     depends_on:
       - db
       - migrate
-    environment:
-      DATABASE_URL: postgres://postgres@db/postgres
+    env_file:
+      - .env_prod_core
 
   get:
     image: registry.gitlab.com/zyphrus/fetch-rs/get:latest
@@ -51,10 +51,12 @@ services:
       - db
     links:
       - db
-    environment:
-      DATABASE_URL: postgres://postgres@db/postgres
+    env_file:
+      - .env_prod_core
       
   db:
     image: postgres:10-alpine
     volumes:
       - /var/lib/postgresql/data
+    env_file:
+      - .env_prod_db
