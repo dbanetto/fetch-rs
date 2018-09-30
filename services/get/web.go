@@ -43,8 +43,9 @@ func handleStatus(w *loggedRes, r *http.Request, config Config) {
 func handleForceFetch(w *loggedRes, r *http.Request, config Config) {
 	var res = make(map[string]interface{})
 
-	err := Fetch(config)
+	results, err := Fetch(config)
 	status := 200
+	res["results"] = results
 	res["success"] = err == nil
 	if err != nil {
 		res["error"] = fmt.Sprint(err)

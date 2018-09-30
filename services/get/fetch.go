@@ -3,43 +3,49 @@ package fetcher
 import (
 	log "github.com/sirupsen/logrus"
 	fetchapi "gitlab.com/zyphrus/fetch-api-go"
-	"sync"
 )
 
-func Fetch(config Config) error {
+func Fetch(config Config) ([]FetchResult, error) {
 
 	client := fetchapi.Init(config.FetchApi)
 
 	series, err := client.GetSeries()
 	if err != nil {
 		log.WithField("err", err).Error("Error while getting series list")
-		return err
+		return nil, err
 	}
 
-	var wg sync.WaitGroup
+    channels := make([]chan FetchResult, len(series))
+    results := make([]FetchResult, len(series))
 
-	for _, show := range series {
-		wg.Add(1)
+	for n, show := range series {
+        chann := make(chan FetchResult)
+        channels[n] = chann
 
 		log.
 			WithField("title", show.Title).
 			WithField("id", show.ID).
 			Info("Starting search")
-		go handleShow(show, config, &wg)
+		go handleShow(show, config, chann)
 	}
 
-	wg.Wait()
+    log.Info("Waiting for responses from channels")
+    for n, chann := range channels {
+        result := <-chann
+        results[n] = result
+    }
+
 	log.Info("Completed search")
-	return nil
+	return results, nil
 }
 
-func handleShow(show fetchapi.Series, config Config, wg *sync.WaitGroup) {
-	defer wg.Done()
-
+func handleShow(show fetchapi.Series, config Config, chann chan FetchResult) {
 	handle := GetProvider("nyaa") // FIXME: hard coded
 
+	var result FetchResult
 	for i := 1; i < 4; i++ {
-		err := handle(show, config)
+		res, err := handle(show, config)
+		result = res
 		if err != nil {
 			log.
 				WithField("try", i).
@@ -49,4 +55,6 @@ func handleShow(show fetchapi.Series, config Config, wg *sync.WaitGroup) {
 			break
 		}
 	}
+
+	chann <- result
 }

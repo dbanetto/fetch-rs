@@ -15,7 +15,7 @@ import (
 
 // NyaaFetch searches for the given show using
 // the nyaa api and pushes findings to transmission
-func NyaaFetch(show fetchapi.Series, config Config) error {
+func NyaaFetch(show fetchapi.Series, config Config) (FetchResult, error) {
 
 	// type def for later
 	type Nyaa struct {
@@ -25,25 +25,36 @@ func NyaaFetch(show fetchapi.Series, config Config) error {
 		} `xml:"channel>item"`
 	}
 
+    result := FetchResult{
+        ID: show.ID,
+        Count: 0,
+        Found: false,
+        Success: false,
+    }
+
 	api := fetchapi.Init(config.FetchApi)
 	blobs, err := api.GetInfoBlob(show.ID, []string{"count", "nyaa"})
 	if err != nil {
-		return err
-	}
-
-	nyaaBlob, err := blobs.GetType("nyaa")
-	if err != nil {
-		return err
+		return result, err
 	}
 
 	countBlob, err := blobs.GetType("count")
 	if err != nil {
-		return err
+		return result, err
+	}
+
+	current := int(countBlob.Blob["current"].(float64))
+	newCurrent := current
+	result.Count = current
+
+	nyaaBlob, err := blobs.GetType("nyaa")
+	if err != nil {
+		return result, err
 	}
 
 	t, err := buildTransmission(config)
 	if err != nil {
-		return err
+		return result, err
 	}
 
 	searchTitle := resolveSearchTitle(show, nyaaBlob)
@@ -74,7 +85,7 @@ func NyaaFetch(show fetchapi.Series, config Config) error {
 	req, err := http.NewRequest("GET", searchURL, nil)
 	if err != nil {
 		logger.WithField("err", err).Error("Error during request building")
-		return err
+		return result, err
 	}
 	req.Close = true
 
@@ -82,14 +93,14 @@ func NyaaFetch(show fetchapi.Series, config Config) error {
 	resp, err := client.Do(req)
 	if err != nil {
 		logger.WithField("err", err).Error("Error during request")
-		return err
+		return result, err
 	}
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil { // FIXME: this can fail with EOF due to unknown reasons
 		logger.WithField("err", err).Error("Error during read")
-		return err
+		return result, err
 	}
 
 	// Parse XML into  struct
@@ -97,11 +108,8 @@ func NyaaFetch(show fetchapi.Series, config Config) error {
 	err = xml.Unmarshal(body, &res)
 	if err != nil {
 		logger.WithField("err", err).Error("Error during Unmarshal")
-		return err
+		return result, err
 	}
-
-	current := int(countBlob.Blob["current"].(float64))
-	newCurrent := current
 
 	// Use found items in XML
 	for _, item := range res.Items {
@@ -148,11 +156,11 @@ func NyaaFetch(show fetchapi.Series, config Config) error {
 				logger.
 					WithField("link", item.Link).
 					WithField("err", err).
-					Error("ERROR while pushing url to transmission")
+					Error("Failed to push url to transmission")
 			} else {
 				logger.
 					WithField("link", item.Link).
-					Info("Pushed uploaded to transmission")
+					Info("Successfully pushed url to transmission")
 				// only update max count if it was successfully pushed
 				if count > newCurrent {
 					newCurrent = count
@@ -161,18 +169,22 @@ func NyaaFetch(show fetchapi.Series, config Config) error {
 		}
 	}
 
+    result.Success = true
+    result.Count = newCurrent
+
 	if newCurrent > current {
+		result.Found = true
 		// push update to API
 		logger.
 			WithField("old_count", current).
 			WithField("new_count", newCurrent).
 			Info("Updating episode count")
 		countBlob.Blob["current"] = newCurrent
-		return api.PutInfoBlob(show.ID, *countBlob)
+		return result, api.PutInfoBlob(show.ID, *countBlob)
 	}
 
 	logger.Info("Complete")
 
 	// everything must of been ffiinnee
-	return nil
+	return result, nil
 }

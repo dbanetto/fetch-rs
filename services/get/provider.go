@@ -4,7 +4,14 @@ import (
 	fetchapi "gitlab.com/zyphrus/fetch-api-go"
 )
 
-type FetchProvider func(show fetchapi.Series, config Config) error
+type FetchResult struct {
+    ID int;
+    Success bool;
+    Found bool;
+    Count int;
+}
+
+type FetchProvider func(show fetchapi.Series, config Config) (FetchResult, error)
 
 var baseProviders map[string]FetchProvider
 
