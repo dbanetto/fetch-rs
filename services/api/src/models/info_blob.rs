@@ -1,5 +1,5 @@
-use schema::*;
 use models::Series;
+use schema::*;
 use serde_json::Value;
 
 #[derive(Identifiable, Queryable, Associations, Serialize, Deserialize, Debug, Default)]

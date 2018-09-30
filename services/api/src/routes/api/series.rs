@@ -1,11 +1,11 @@
+use super::info_blob::{new_blob, update_blob};
 use db::DbConnection;
 use models::*;
 use schema::{info_blob, series};
-use super::info_blob::{new_blob, update_blob};
 use util::{api_error, api_response, api_success};
 
-use diesel::prelude::*;
 use diesel::dsl::*;
+use diesel::prelude::*;
 use diesel::{delete, insert_into, update};
 use iron::prelude::*;
 use iron::status::Status;
@@ -147,8 +147,7 @@ fn update_series(req: &mut Request) -> IronResult<Response> {
         .set((
             series::title.eq(series_put.title),
             series::poster_url.eq(series_put.poster_url),
-        ))
-        .returning(series::all_columns)
+        )).returning(series::all_columns)
         .get_result(&*conn)
     {
         Ok(s) => s,

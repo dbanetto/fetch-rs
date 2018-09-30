@@ -30,6 +30,7 @@ extern crate toml;
 #[cfg(test)]
 extern crate iron_test;
 
+pub mod config;
 pub mod db;
 pub mod error;
 pub mod middleware;
@@ -37,10 +38,9 @@ pub mod models;
 pub mod routes;
 pub mod schema;
 pub mod util;
-pub mod config;
 
-use iron::prelude::*;
 use dotenv::dotenv;
+use iron::prelude::*;
 
 fn main() {
     dotenv().ok();
@@ -52,7 +52,7 @@ fn main() {
             std::process::exit(1);
         }
     };
-    println!("{:?}", config);
+
     let addr = { format!("{}:{}", config.bind, config.port) };
 
     let mut chain = Chain::new(routes::routes());

@@ -1,4 +1,4 @@
-FROM rust:1.28 AS backend
+FROM rust:1.29 AS backend
 
 RUN mkdir -p /code/src
 

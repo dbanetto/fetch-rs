@@ -1,5 +1,5 @@
-pub mod series;
 pub mod info_blob;
+pub mod series;
 
 use iron::prelude::*;
 use mount::Mount;
@@ -25,8 +25,8 @@ pub fn routes() -> Mount {
 #[cfg(test)]
 mod test {
     use super::index;
-    use iron_test::{request, response};
     use iron::headers::Headers;
+    use iron_test::{request, response};
     use serde_json::{self, Value};
 
     #[test]

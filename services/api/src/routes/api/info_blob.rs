@@ -1,17 +1,17 @@
 use db::DbConnection;
-use models::{InfoBlob, InfoBlobForm, Series};
-use schema::{info_blob, series};
-use util::{api_error, api_response, api_success};
-use std::str::FromStr;
-use iron::status::Status;
-use iron::prelude::*;
-use diesel::prelude::*;
-use std::io::Read;
-use serde_json;
-use router::Router;
 use diesel::pg::PgConnection;
+use diesel::prelude::*;
 use diesel::{delete, insert_into, update};
 use error::*;
+use iron::prelude::*;
+use iron::status::Status;
+use models::{InfoBlob, InfoBlobForm, Series};
+use router::Router;
+use schema::{info_blob, series};
+use serde_json;
+use std::io::Read;
+use std::str::FromStr;
+use util::{api_error, api_response, api_success};
 
 fn all(req: &mut Request) -> IronResult<Response> {
     let series_id: i32 = match req.extensions.get::<Router>().unwrap().find("series_id") {
@@ -246,10 +246,9 @@ pub fn update_blob(
     ).set((
         info_blob::blob.eq(blob_update.blob),
         info_blob::info_type.eq(blob_update.info_type),
-    ))
-        .returning(info_blob::all_columns)
-        .get_result(&*conn)
-        .map_err(|e| e.into())
+    )).returning(info_blob::all_columns)
+    .get_result(&*conn)
+    .map_err(|e| e.into())
 }
 
 pub fn routes() -> Router {

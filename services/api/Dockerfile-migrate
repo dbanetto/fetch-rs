@@ -1,4 +1,4 @@
-FROM rust:1.28 AS build
+FROM rust:1.29 AS build
 
 RUN cargo install diesel_cli --no-default-features --features postgres --version '1.2.0'
 

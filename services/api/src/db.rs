@@ -1,8 +1,8 @@
 use std::env;
 
-use iron::typemap;
 use diesel::pg::PgConnection;
 use diesel::r2d2::ConnectionManager;
+use iron::typemap;
 use r2d2::Pool;
 
 pub struct DbConnection {

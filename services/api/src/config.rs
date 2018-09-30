@@ -1,26 +1,39 @@
-use std::io::prelude::*;
-use std::fs::File;
-use std::env;
-use structopt::StructOpt;
-use toml;
 use error::*;
 use serde_json::Value;
+use std::env;
+use std::fs::File;
+use std::io::prelude::*;
+use structopt::StructOpt;
+use toml;
 
 #[derive(Default, Debug, StructOpt, Serialize, Deserialize)]
 /// Configuration options
 ///
 /// These are both the CLI and TOML options
 pub struct Config {
-    #[structopt(short = "p", long = "port", help = "Port to run on", default_value = "3000")]
+    #[structopt(
+        short = "p",
+        long = "port",
+        help = "Port to run on",
+        default_value = "3000"
+    )]
     pub port: u16,
 
-    #[structopt(short = "b", long = "bind", help = "Bind to IP address",
-                default_value = "127.0.0.1")]
+    #[structopt(
+        short = "b",
+        long = "bind",
+        help = "Bind to IP address",
+        default_value = "127.0.0.1"
+    )]
     pub bind: String,
 
     #[serde(skip)]
-    #[structopt(short = "c", long = "config", help = "Path to configuration file",
-                default_value = "./config.toml")]
+    #[structopt(
+        short = "c",
+        long = "config",
+        help = "Path to configuration file",
+        default_value = "./config.toml"
+    )]
     pub config_path: String,
 
     #[structopt(short = "d", long = "database", help = "Database URL to use")]
