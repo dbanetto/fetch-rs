@@ -1,6 +1,6 @@
-use schema::*;
 use error::*;
 use models::InfoBlobForm;
+use schema::*;
 
 #[derive(Queryable, Associations, Identifiable, Serialize, Deserialize, Debug, Default)]
 #[table_name = "series"]

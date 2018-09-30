@@ -1,8 +1,8 @@
-use serde::Serialize;
-use serde_json;
+use hyper::mime::{Attr, Mime, SubLevel, TopLevel, Value as MimeValue};
 use iron::prelude::*;
 use iron::status::Status;
-use hyper::mime::{Attr, Mime, SubLevel, TopLevel, Value as MimeValue};
+use serde::Serialize;
+use serde_json;
 use std::error::Error;
 
 #[derive(Serialize)]

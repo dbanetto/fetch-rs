@@ -1,10 +1,10 @@
-use iron::prelude::*;
-use iron::middleware::{AfterMiddleware, BeforeMiddleware};
-use iron::typemap;
-use std::time::Instant;
-use hbs::HandlebarsEngine;
 use hbs::handlebars::Handlebars;
+use hbs::HandlebarsEngine;
+use iron::middleware::{AfterMiddleware, BeforeMiddleware};
+use iron::prelude::*;
+use iron::typemap;
 use serde_json::Value;
+use std::time::Instant;
 
 use config::Config;
 use db::DbConnection;
