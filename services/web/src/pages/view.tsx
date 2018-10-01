@@ -2,7 +2,10 @@ import * as React from "react";
 import { render } from "react-dom";
 import { connect } from "react-redux";
 import { Link, withRouter } from "react-router-dom";
-import { deleteSeries, getInfoBlobs, getSeries, showError } from "../actions";
+
+import { showError } from "../actions/app";
+import { getInfoBlobs } from "../actions/infoblob";
+import { deleteSeries, getSeries } from "../actions/series";
 import handler from "../components/handler";
 import "../model";
 import store, { IReduxState } from "../store";

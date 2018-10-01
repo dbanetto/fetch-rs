@@ -3,7 +3,7 @@ import * as React from "react";
 import { render } from "react-dom";
 import { connect } from "react-redux";
 import { Link, Route, Switch } from "react-router-dom";
-import { hideError, showError } from "../actions";
+import { hideError, showError } from "../actions/app";
 
 import NavBar from "../components/navbar";
 import store, { history, IReduxState } from "../store";

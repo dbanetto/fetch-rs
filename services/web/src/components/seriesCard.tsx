@@ -3,7 +3,7 @@ import { render } from "react-dom";
 import { connect } from "react-redux";
 import { Link } from "react-router-dom";
 
-import { getInfoBlobType } from "../actions";
+import { getInfoBlobType } from "../actions/infoblob";
 import "../model";
 import { IReduxState } from "../store";
 

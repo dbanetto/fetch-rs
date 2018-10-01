@@ -1,4 +1,5 @@
-import * as actions from "../actions";
+import { showError } from "../actions/app";
+import * as actions from "../actions/infoblob";
 import * as api from "../api";
 import store from "../store";
 
@@ -48,7 +49,7 @@ const getInfoBlob = (state, seriesId: number) => {
     store.dispatch(actions.finishedGetInfoBlobs(seriesId, blobs));
   }).catch((err) => {
     store.dispatch(actions.finishedGetInfoBlobs(seriesId, []));
-    store.dispatch(actions.showError(err.toString()));
+    store.dispatch(showError(err.toString()));
   });
 
   return { loading: true };
@@ -95,7 +96,7 @@ const getInfoBlobType = (state, seriesId: number, types: string[]) => {
     store.dispatch(actions.finishGetInfoBlobType(seriesId, types, blobs));
   }).catch((err) => {
     store.dispatch(actions.finishGetInfoBlobType(seriesId, [], []));
-    store.dispatch(actions.showError(err.toString()));
+    store.dispatch(showError(err.toString()));
   });
 
   return { loading: true };
