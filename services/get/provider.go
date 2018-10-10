@@ -5,10 +5,10 @@ import (
 )
 
 type FetchResult struct {
-    ID int;
-    Success bool;
-    Found bool;
-    Count int;
+    ID int `json:"id"`;
+    Success bool `json:"success"`;
+    Found bool `json:"found"`;
+    Count int `json:"count"`;
 }
 
 type FetchProvider func(show fetchapi.Series, config Config) (FetchResult, error)
