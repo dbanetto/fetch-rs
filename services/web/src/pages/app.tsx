@@ -8,6 +8,7 @@ import { hideError, showError } from "../actions/app";
 import NavBar from "../components/navbar";
 import store, { history, IReduxState } from "../store";
 import EditPage from "./edit";
+import FetchPage from "./fetch";
 import HomePage from "./home";
 import NewPage from "./new";
 import ViewPage from "./view";
@@ -39,6 +40,7 @@ class App extends React.PureComponent<IAppProps> {
                     <div className="container is-fluid app-main">
                         <Switch>
                             <Route exact={true} path="/" component={HomePage} />
+                            <Route exact={true} path="/fetch" component={FetchPage} />
                             <Route exact={true} path="/series/new" component={NewPage} />
                             <Route exact={true} path="/series/:id" component={ViewPage} />
                             <Route exact={true} path="/series/:id/edit" component={EditPage} />

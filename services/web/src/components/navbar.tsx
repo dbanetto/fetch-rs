@@ -23,8 +23,9 @@ class NavBar extends React.PureComponent<RouteComponentProps<any, any>> {
                     </div>
                     <div id="navbar-menu-target" className="navbar-menu">
                         <div className="navbar-start">
-                            <Link className="navbar-item" to="/">
-                                <h1>Home</h1>
+
+                            <Link className="navbar-item" to="/fetch">
+                                <h1>Fetch</h1>
                             </Link>
 
                             <Link className="navbar-item" to="/series/new">

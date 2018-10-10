@@ -102,3 +102,25 @@ html {
     margin-top: 1rem;
     margin-bottom: 1rem;
 }
+
+$circle-size: 10px;
+
+.status-circle {
+    width: $circle-size;
+    height: $circle-size;
+    -webkit-border-radius: $circle-size / 2;
+    -moz-border-radius: $circle-size / 2;
+    border-radius: $circle-size / 2;
+}
+
+.status-ok {
+    background: green;
+}
+
+.status-err {
+    background: red;
+}
+
+.status-unknown {
+    background: grey;
+}

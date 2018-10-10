@@ -35,6 +35,14 @@ export function upsertSeries(series: ISeries): Promise<ISeries> {
   }
 }
 
+export function getFetchStatus(): Promise<any> {
+  return fetch("/api/get/healthcheck")
+  .then((r) => r.json())
+  .then((resp) => {
+    return resp;
+  });
+}
+
 function api_get<T>(endpoint: string): Promise<T> {
 
   return fetch(endpoint)
