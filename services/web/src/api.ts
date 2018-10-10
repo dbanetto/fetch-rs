@@ -43,6 +43,12 @@ export function getFetchStatus(): Promise<any> {
   });
 }
 
+export function callFetch(): Promise<any> {
+  return fetch("/api/get/fetch", {
+    method: "POST",
+  }).then((r) => r.json());
+}
+
 function api_get<T>(endpoint: string): Promise<T> {
 
   return fetch(endpoint)
