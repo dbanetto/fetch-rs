@@ -43,8 +43,9 @@ func handleStatus(w *loggedRes, r *http.Request, config Config) {
 func handleForceFetch(w *loggedRes, r *http.Request, config Config) {
 	var res = make(map[string]interface{})
 
-	err := Fetch(config)
+	results, err := Fetch(config)
 	status := 200
+	res["results"] = results
 	res["success"] = err == nil
 	if err != nil {
 		res["error"] = fmt.Sprint(err)
@@ -59,34 +60,38 @@ func handleHealthCheck(w *loggedRes, r *http.Request, config Config) {
 
 	// check if API is assessible
 	api := fetchapi.Init(config.FetchApi)
-	apiStatus := true
+	var apiStatus = make(map[string]interface{})
+	apiStatus["status"] = true
 	err := api.GetStatus()
 	if err != nil {
-		apiStatus = false
+        apiStatus["status"] = false
 		log.WithField("api", config.FetchApi).Errorf("Error getting API status: %v", err)
-		res["api_error"] = fmt.Sprint(err)
+		apiStatus["message"] = fmt.Sprint(err)
 	}
 
-	transmissionStatus := true
+	var transmissionStatus = make(map[string]interface{})
+	transmissionStatus["status"] = true
 	transmission, err := buildTransmission(config)
 	if err != nil {
-		transmissionStatus = false
+		transmissionStatus["status"] = false
 		log.WithField("transmission", config.Transmission.Rpc).Errorf("Error creating connection to Transmission: %v", err)
-		res["transmission_error"] = fmt.Sprint(err)
+		transmissionStatus["message"] = fmt.Sprint(err)
 	} else {
 		_, err := transmission.GetTorrents()
 		if err != nil {
-			transmissionStatus = false
+            transmissionStatus["status"] = false
 			log.WithField("transmission", config.Transmission.Rpc).Errorf("Error testing connection to Transmission: %v", err)
-			res["transmission_error"] = fmt.Sprint(err)
+			transmissionStatus["message"] = fmt.Sprint(err)
 		}
 	}
 
 	res["api"] = apiStatus
 	res["transmission"] = transmissionStatus
 
+    healthcheckStatus := apiStatus["status"].(bool) && transmissionStatus["status"].(bool)
+	res["status"] = healthcheckStatus
 	status := 500
-	if apiStatus && transmissionStatus {
+	if healthcheckStatus {
 		status = 200
 	}
 

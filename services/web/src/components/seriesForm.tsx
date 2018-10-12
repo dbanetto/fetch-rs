@@ -3,7 +3,7 @@ import { render } from "react-dom";
 import { connect } from "react-redux";
 import { Link } from "react-router-dom";
 
-import { upsertSeries } from "../actions";
+import { upsertSeries } from "../actions/series";
 import "../model";
 import { IReduxState } from "../store";
 import handler from "./handler";

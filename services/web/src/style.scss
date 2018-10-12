@@ -102,3 +102,11 @@ html {
     margin-top: 1rem;
     margin-bottom: 1rem;
 }
+
+.is-flex-horizontal {
+    flex-direction: row;
+}
+
+.is-flex-spacebetween {
+    justify-content: space-between;
+}

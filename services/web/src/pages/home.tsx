@@ -1,7 +1,7 @@
 import * as React from "react";
 import { render } from "react-dom";
 import { connect } from "react-redux";
-import { getAllSeries } from "../actions";
+import { getAllSeries } from "../actions/series";
 import SeriesCard from "../components/seriesCard";
 import "../model";
 import store, { IReduxState } from "../store";

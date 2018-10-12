@@ -23,6 +23,6 @@ WORKDIR /opt
 COPY --from=backend /code/target/release/fetch-api /bin/fetch-api
 
 HEALTHCHECK --interval=10m --timeout=3s --retries=3 --start-period=5s \
-    CMD wget http://localhost:3000/api/healthcheck -q -O /dev/null
+    CMD wget http://localhost:3000/healthcheck -q -O /dev/null
 
 CMD ["/bin/fetch-api", "--config", "/etc/fetch.toml"]

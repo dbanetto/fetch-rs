@@ -1,5 +1,7 @@
 import { push } from "connected-react-router";
-import * as actions from "../actions";
+import { showError } from "../actions/app";
+import { clearInfoBlob } from "../actions/infoblob";
+import * as actions from "../actions/series";
 import * as api from "../api";
 import store from "../store";
 
@@ -49,7 +51,7 @@ const getAllSeries = (state) => {
     .then((series) => {
       store.dispatch(actions.finishedGetAllSeries(series));
     }).catch((err) => {
-      store.dispatch(actions.showError(err.toString()));
+      store.dispatch(showError(err.toString()));
       store.dispatch(actions.finishedGetAllSeries([]));
     });
 
@@ -65,7 +67,7 @@ const getSeries = (id: number, stateSeries) => {
   api.getSeriesId(id).then((series) => {
     store.dispatch(actions.finishedGetSeries(id, series));
   }).catch((err) => {
-    store.dispatch(actions.showError(err.toString()));
+    store.dispatch(showError(err.toString()));
     store.dispatch(actions.finishedGetSeries(id, null));
   });
   return { loading: true };
@@ -76,10 +78,10 @@ const upsertSeries = (formData: SeriesFull) => {
   api.upsertSeries(formData)
     .then((series) => {
       store.dispatch(actions.finishedGetSeries(series.id, series));
-      store.dispatch(actions.clearInfoBlob(series.id));
+      store.dispatch(clearInfoBlob(series.id));
       store.dispatch(push(`/series/${series.id}`));
     }).catch((err) => {
-      store.dispatch(actions.showError(err.toString()));
+      store.dispatch(showError(err.toString()));
     });
 
   return { loading: true };
@@ -88,10 +90,10 @@ const upsertSeries = (formData: SeriesFull) => {
 const deleteSeries = (state, id: number) => {
 
   api.deleteSeriesId(id).then(() => {
-    store.dispatch(actions.clearInfoBlob(id));
+    store.dispatch(clearInfoBlob(id));
     store.dispatch(actions.finishedDeleteSeries(id));
   }).catch((err) => {
-    store.dispatch(actions.showError(err.toString()));
+    store.dispatch(showError(err.toString()));
     store.dispatch(actions.finishedDeleteSeries(null));
   });
 

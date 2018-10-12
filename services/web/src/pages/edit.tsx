@@ -3,7 +3,8 @@ import { render } from "react-dom";
 import { connect } from "react-redux";
 import { Link, Route } from "react-router-dom";
 
-import { getInfoBlobs, getSeries } from "../actions";
+import { getInfoBlobs } from "../actions/infoblob";
+import { getSeries } from "../actions/series";
 import SeriesForm from "../components/seriesForm";
 import "../model";
 import { IReduxState } from "../store";
