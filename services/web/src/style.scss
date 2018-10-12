@@ -103,24 +103,10 @@ html {
     margin-bottom: 1rem;
 }
 
-$circle-size: 10px;
-
-.status-circle {
-    width: $circle-size;
-    height: $circle-size;
-    -webkit-border-radius: $circle-size / 2;
-    -moz-border-radius: $circle-size / 2;
-    border-radius: $circle-size / 2;
+.is-flex-horizontal {
+    flex-direction: row;
 }
 
-.status-ok {
-    background: green;
-}
-
-.status-err {
-    background: red;
-}
-
-.status-unknown {
-    background: grey;
+.is-flex-spacebetween {
+    justify-content: space-between;
 }
