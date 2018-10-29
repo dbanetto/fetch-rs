@@ -1,0 +1,167 @@
+#!/usr/bin/env python3
+
+import argparse
+import sys
+import json
+import urllib.request
+
+BASE_URL = 'https://kitsu.io/api/edge/library-entries?filter[userId]={0}&filter[kind]=anime&filter[status]=planned'
+FETCH_URL = 'http://localhost:3000/api'
+
+def main():
+    args = get_arguments()
+    kitsu_url = BASE_URL.format(args.user_id)
+    existing = get_existing_kitsu_ids(args.fetch_api)
+    planned = get_planned_series(kitsu_url)
+    planned_anime = map(get_anime, planned)
+    filtered_anime = filter(lambda s: str(s['id']) not in existing, planned_anime)
+    series = map(build_series, filtered_anime)
+
+    for show in series:
+        create_show(show, args.fetch_api)
+        print('Imported', show['title'])
+
+def get_arguments():
+    parser = argparse.ArgumentParser(description='Import series from Kitsu.io')
+    parser.add_argument('user_id',
+                        type=int,
+                        help='User ID to import from')
+    parser.add_argument('--api',
+                        dest='fetch_api',
+                        default=FETCH_URL,
+                        help='User ID to import from')
+
+    return parser.parse_args()
+
+def get_existing_kitsu_ids(api):
+    req = urllib.request.Request(api + '/series')
+    req.add_header('User-Agent', 'kistu-importer/0.1')
+    resp = urllib.request.urlopen(req)
+
+    results = json.load(resp)
+
+    ids = []
+    for result in results['data']:
+        ids.append(get_kitsu_id(result['id'], api))
+
+    ids = list(filter(lambda id: id is not None, ids))
+
+    return ids
+
+def get_kitsu_id(id, api):
+    req = urllib.request.Request("{}/info/{}/types/kitsu".format(api, id))
+    req.add_header('User-Agent', 'kistu-importer/0.1')
+    resp = urllib.request.urlopen(req)
+
+    results = json.load(resp)
+
+    if results['success']:
+        if len(results['data']) > 0:
+            return str(results['data'][0]['blob']['id'])
+
+    return None
+
+def get_planned_series(start_url):
+    url = start_url
+    seen = []
+
+    while url is not None:
+        req = urllib.request.Request(url)
+        req.add_header('User-Agent', 'kistu-importer/0.1')
+        resp = urllib.request.urlopen(req)
+
+        results = json.load(resp)
+
+        for result in results['data']:
+            if result['id'] not in seen:
+                seen.append(result['id'])
+                yield result
+
+        links = results['links']
+
+        if 'next' in links:
+            url = links['next']
+        else:
+            break
+
+def get_anime(entry):
+    relationships = entry['relationships']
+    anime = relationships['anime']
+
+    req = urllib.request.Request(anime['links']['related'])
+    req.add_header('User-Agent', 'kistu-importer/0.1')
+    resp = urllib.request.urlopen(req)
+
+    result = json.load(resp)
+
+    return result['data']
+
+def build_series(show):
+    kistu_id = show['id']
+    attr = show['attributes']
+    title = attr['canonicalTitle']
+    poster_url = attr['posterImage']['original']
+    total_count = attr['episodeCount']
+
+    mal_id = get_mal_id(show['relationships']['mappings'])
+
+    return {
+        'title': title,
+        'poster_url': poster_url,
+        'info': [
+            {
+                'info_type': 'count',
+                'blob': {
+                    'current': 0,
+                    'total': total_count,
+                }
+            },
+            {
+                'info_type': 'mal',
+                'blob': {
+                    'id': mal_id,
+                    'offset': 0,
+                }
+            },
+            {
+                'info_type': 'kitsu',
+                'blob': {
+                    'id': kistu_id,
+                    'offset': 0,
+                }
+            },
+            # Default nyaa provider
+            {
+                'info_type': 'nyaa',
+                'blob': {
+                    'user_id': 'HorribleSubs',
+                    'search_title': '',
+                    'query': '720',
+                }
+            }
+        ]
+    }
+
+def get_mal_id(mappings):
+    req = urllib.request.Request(mappings['links']['related'])
+    req.add_header('User-Agent', 'kistu-importer/0.1')
+    resp = urllib.request.urlopen(req)
+
+    results = json.load(resp)
+
+    for result in results['data']:
+        attr = result['attributes']
+        if attr['externalSite'] == 'myanimelist/anime':
+            return attr['externalId']
+
+    return None
+
+def create_show(show, api):
+    req = urllib.request.Request(api + '/series/new', method='POST')
+    req.add_header('User-Agent', 'kistu-importer/0.1')
+    req.add_header('Content-Type', 'text/json')
+    req.data = json.dumps(show).encode('utf-8')
+    resp = urllib.request.urlopen(req)
+
+if __name__ == '__main__':
+    main()
