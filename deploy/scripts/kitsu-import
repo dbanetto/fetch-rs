@@ -5,30 +5,57 @@ import sys
 import json
 import urllib.request
 
-BASE_URL = 'https://kitsu.io/api/edge/library-entries?filter[userId]={0}&filter[kind]=anime&filter[status]=planned'
+BASE_PLANNING_URL = 'https://kitsu.io/api/edge/library-entries?filter[userId]={0}&filter[kind]=anime&filter[status]=planned'
+BASE_SLUG_URL = 'https://kitsu.io/api/edge/anime/?filter[slug]={0}'
 FETCH_URL = 'http://localhost:3000/api'
 
 def main():
     args = get_arguments()
-    kitsu_url = BASE_URL.format(args.user_id)
-    existing = get_existing_kitsu_ids(args.fetch_api)
+    if args.user_id is not None:
+        import_planning(args.user_id, args.fetch_api)
+    else:
+        import_slug(args.slug, args.fetch_api)
+
+def import_planning(user_id, fetch_api):
+    kitsu_url = BASE_PLANNING_URL.format(user_id)
+
+    existing = get_existing_kitsu_ids(fetch_api)
     planned = get_planned_series(kitsu_url)
     planned_anime = map(get_anime, planned)
     filtered_anime = filter(lambda s: str(s['id']) not in existing, planned_anime)
     series = map(build_series, filtered_anime)
 
     for show in series:
-        create_show(show, args.fetch_api)
+        create_show(show, fetch_api)
         print('Imported', show['title'])
+
+def import_slug(slug, fetch_api):
+    existing = get_existing_kitsu_ids(fetch_api)
+    anime = get_from_slug(slug)
+
+    if str(anime['id']) in existing:
+        print('{} already exists'.format(anime['attributes']['canonicalTitle']))
+        return
+
+    create_show(build_series(anime), fetch_api)
+    print('Imported', anime['attributes']['canonicalTitle'])
 
 def get_arguments():
     parser = argparse.ArgumentParser(description='Import series from Kitsu.io')
-    parser.add_argument('user_id',
-                        type=int,
-                        help='User ID to import from')
+
     parser.add_argument('--api',
                         dest='fetch_api',
                         default=FETCH_URL,
+                        help='User ID to import from')
+
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument('--slug',
+                        type=str,
+                        help='Kitsu series slug')
+
+    group.add_argument('--user-id',
+                        dest='user_id',
+                        type=int,
                         help='User ID to import from')
 
     return parser.parse_args()
@@ -95,6 +122,21 @@ def get_anime(entry):
     result = json.load(resp)
 
     return result['data']
+
+def get_from_slug(slug):
+    kitsu_url = BASE_SLUG_URL.format(slug)
+
+    req = urllib.request.Request(kitsu_url)
+    req.add_header('User-Agent', 'kistu-importer/0.1')
+    resp = urllib.request.urlopen(req)
+
+    result = json.load(resp)
+
+    if len(result['data']) > 0:
+        return result['data'][0]
+
+    print("Did not find {}".format(slug))
+    return None
 
 def build_series(show):
     kistu_id = show['id']
