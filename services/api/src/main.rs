@@ -53,7 +53,7 @@ fn main() {
         }
     };
 
-    let addr = { format!("{}:{}", config.bind, config.port) };
+    let addr = format!("{}:{}", config.bind, config.port);
 
     let mut chain = Chain::new(routes::routes());
 

@@ -1,8 +1,8 @@
-use super::info_blob::{new_blob, update_blob};
-use db::DbConnection;
-use models::*;
-use schema::{info_blob, series};
-use util::{api_error, api_response, api_success};
+use crate::db::DbConnection;
+use crate::models::*;
+use crate::routes::api::info_blob::{new_blob, update_blob};
+use crate::schema::{info_blob, series};
+use crate::util::{api_error, api_response, api_success};
 
 use diesel::dsl::*;
 use diesel::prelude::*;
@@ -147,7 +147,8 @@ fn update_series(req: &mut Request) -> IronResult<Response> {
         .set((
             series::title.eq(series_put.title),
             series::poster_url.eq(series_put.poster_url),
-        )).returning(series::all_columns)
+        ))
+        .returning(series::all_columns)
         .get_result(&*conn)
     {
         Ok(s) => s,
@@ -181,7 +182,8 @@ fn update_series(req: &mut Request) -> IronResult<Response> {
             info_blob::dsl::info_blob
                 .filter(not(info_blob::id.eq(any(seen_blobs))))
                 .filter(info_blob::series_id.eq(series_id)),
-        ).execute(&*conn)
+        )
+        .execute(&*conn)
         {
             Ok(_) => (),
             Err(err) => return Err(api_error(err, Status::InternalServerError)),
@@ -216,10 +218,10 @@ fn delete_series(req: &mut Request) -> IronResult<Response> {
 
 pub fn routes() -> Router {
     router!(
-        series_index: get "/" => all,
-        series_select: get "/:id" => select,
-        series_update: put "/:id" => update_series,
-        series_new: post "/new" => new,
-        series_delete: delete "/:id" => delete_series,
-        )
+    series_index: get "/" => all,
+    series_select: get "/:id" => select,
+    series_update: put "/:id" => update_series,
+    series_new: post "/new" => new,
+    series_delete: delete "/:id" => delete_series,
+    )
 }

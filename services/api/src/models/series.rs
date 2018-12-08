@@ -1,6 +1,6 @@
-use error::*;
-use models::InfoBlobForm;
-use schema::*;
+use crate::error::*;
+use crate::models::InfoBlobForm;
+use crate::schema::*;
 
 #[derive(Queryable, Associations, Identifiable, Serialize, Deserialize, Debug, Default)]
 #[table_name = "series"]

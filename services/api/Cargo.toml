@@ -2,6 +2,7 @@
 authors = ["David Barnett <david@barnett.net.nz>"]
 name = "fetch-api"
 version = "0.1.0"
+edition = "2018"
 
 [[bin]]
 name = "fetch-api"

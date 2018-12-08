@@ -6,8 +6,8 @@ use iron::typemap;
 use serde_json::Value;
 use std::time::Instant;
 
-use config::Config;
-use db::DbConnection;
+use crate::config::Config;
+use crate::db::DbConnection;
 
 pub struct ErrorLog;
 

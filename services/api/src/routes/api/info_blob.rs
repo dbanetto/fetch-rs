@@ -1,17 +1,17 @@
-use db::DbConnection;
+use crate::db::DbConnection;
+use crate::error::*;
+use crate::models::{InfoBlob, InfoBlobForm, Series};
+use crate::schema::{info_blob, series};
+use crate::util::{api_error, api_response, api_success};
 use diesel::pg::PgConnection;
 use diesel::prelude::*;
 use diesel::{delete, insert_into, update};
-use error::*;
 use iron::prelude::*;
 use iron::status::Status;
-use models::{InfoBlob, InfoBlobForm, Series};
 use router::Router;
-use schema::{info_blob, series};
 use serde_json;
 use std::io::Read;
 use std::str::FromStr;
-use util::{api_error, api_response, api_success};
 
 fn all(req: &mut Request) -> IronResult<Response> {
     let series_id: i32 = match req.extensions.get::<Router>().unwrap().find("series_id") {
@@ -139,7 +139,8 @@ fn delete_api(req: &mut Request) -> IronResult<Response> {
         info_blob::dsl::info_blob
             .filter(info_blob::id.eq(blob_id))
             .filter(info_blob::series_id.eq(series_id)),
-    ).get_result(&*conn)
+    )
+    .get_result(&*conn)
     {
         Ok(blob) => blob,
         Err(err) => return Err(api_error(err, Status::NotFound)),
@@ -210,7 +211,11 @@ fn select_types(req: &mut Request) -> IronResult<Response> {
     Ok(api_success(blobs))
 }
 
-pub fn new_blob(conn: &PgConnection, series_id: i32, blob_form: InfoBlobForm) -> Result<InfoBlob> {
+pub(crate) fn new_blob(
+    conn: &PgConnection,
+    series_id: i32,
+    blob_form: InfoBlobForm,
+) -> Result<InfoBlob> {
     let series: Series = match series::dsl::series
         .filter(series::id.eq(series_id))
         .select(series::all_columns)
@@ -229,7 +234,7 @@ pub fn new_blob(conn: &PgConnection, series_id: i32, blob_form: InfoBlobForm) ->
         .map_err(|err| err.into())
 }
 
-pub fn update_blob(
+pub(crate) fn update_blob(
     conn: &PgConnection,
     series_id: i32,
     blob_update: InfoBlobForm,
@@ -243,21 +248,23 @@ pub fn update_blob(
         info_blob::dsl::info_blob
             .filter(info_blob::id.eq(blob_id))
             .filter(info_blob::series_id.eq(series_id)),
-    ).set((
+    )
+    .set((
         info_blob::blob.eq(blob_update.blob),
         info_blob::info_type.eq(blob_update.info_type),
-    )).returning(info_blob::all_columns)
+    ))
+    .returning(info_blob::all_columns)
     .get_result(&*conn)
     .map_err(|e| e.into())
 }
 
 pub fn routes() -> Router {
     router!(
-        all: get "/:series_id" => all,
-        select_types: get "/:series_id/types/:types" => select_types,
-        select: get "/:series_id/:blob_id" => select,
-        update: put "/:series_id/:blob_id" => update_api,
-        delete: delete "/:series_id/:blob_id" => delete_api,
-        create: post "/:series_id/new" => new,
-        )
+    all: get "/:series_id" => all,
+    select_types: get "/:series_id/types/:types" => select_types,
+    select: get "/:series_id/:blob_id" => select,
+    update: put "/:series_id/:blob_id" => update_api,
+    delete: delete "/:series_id/:blob_id" => delete_api,
+    create: post "/:series_id/new" => new,
+    )
 }
