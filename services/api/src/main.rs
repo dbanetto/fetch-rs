@@ -1,31 +1,19 @@
 #![recursion_limit = "128"]
 
-extern crate chrono;
 #[macro_use]
 extern crate diesel;
 #[macro_use]
 extern crate diesel_derives;
-extern crate dotenv;
 #[macro_use]
 extern crate error_chain;
-extern crate filetime;
-extern crate handlebars_iron as hbs;
-extern crate hyper;
-extern crate iron;
-extern crate mount;
-extern crate r2d2;
 #[macro_use]
 extern crate router;
-extern crate serde;
 #[macro_use]
 extern crate serde_derive;
 #[macro_use]
 extern crate serde_json;
-extern crate structopt;
 #[macro_use]
 extern crate structopt_derive;
-extern crate time;
-extern crate toml;
 
 #[cfg(test)]
 extern crate iron_test;
@@ -53,7 +41,7 @@ fn main() {
         }
     };
 
-    let addr = { format!("{}:{}", config.bind, config.port) };
+    let addr = format!("{}:{}", config.bind, config.port);
 
     let mut chain = Chain::new(routes::routes());
 

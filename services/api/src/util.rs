@@ -55,7 +55,8 @@ pub fn api_error<E: 'static + Error + Send>(error: E, status: Status) -> IronErr
     let bytes = serde_json::to_vec(&ApiResult::<String, String>::err(format!(
         "{}",
         description
-    ))).unwrap();
+    )))
+    .unwrap();
     IronError::new(
         error,
         (

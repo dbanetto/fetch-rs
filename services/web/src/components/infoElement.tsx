@@ -34,8 +34,12 @@ export default class InfoElement extends React.PureComponent<IInfoProps> {
             <div className="columns">
                 <div className="column">{builtHandler} </div>
 
-                <div className="column is-one-fifth">
-                    <button className="button is-danger" type="button" onClick={this.props.handleDelete}>
+                <div className="column is-one-fifth is-flex">
+                    <button
+                        className="button is-danger is-flex-align-end"
+                        type="button"
+                        onClick={this.props.handleDelete}
+                    >
                         x
                     </button>
                 </div>

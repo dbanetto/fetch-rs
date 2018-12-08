@@ -1,5 +1,5 @@
-use models::Series;
-use schema::*;
+use crate::models::Series;
+use crate::schema::*;
 use serde_json::Value;
 
 #[derive(Identifiable, Queryable, Associations, Serialize, Deserialize, Debug, Default)]

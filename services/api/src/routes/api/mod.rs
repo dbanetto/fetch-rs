@@ -1,9 +1,9 @@
 pub mod info_blob;
 pub mod series;
 
+use crate::util::api_success;
 use iron::prelude::*;
 use mount::Mount;
-use util::api_success;
 
 fn index(_: &mut Request) -> IronResult<Response> {
     Ok(api_success("API available"))

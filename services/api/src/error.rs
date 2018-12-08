@@ -13,7 +13,7 @@ error_chain! {
            display("the model for {0} is invalid due to: {1}", model, reason)
        }
 
-       SettingsIncomplete(config: ::config::Config) {
+       SettingsIncomplete(config: crate::config::Config) {
            description("Not enough settings are set to start")
            display("Not enough settings are set: {:?}", config)
        }
