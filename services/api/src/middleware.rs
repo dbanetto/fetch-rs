@@ -1,5 +1,4 @@
-use hbs::handlebars::Handlebars;
-use hbs::HandlebarsEngine;
+use handlebars_iron::{ HandlebarsEngine, handlebars::Handlebars };
 use iron::middleware::{AfterMiddleware, BeforeMiddleware};
 use iron::prelude::*;
 use iron::typemap;
