@@ -12,7 +12,7 @@ fn index(_: &mut Request) -> IronResult<Response> {
 pub fn routes() -> Mount {
     let mut mount = Mount::new();
 
-    let router = router!(
+    let router = router::router!(
         index: get "/"  => index,
     );
 

@@ -217,7 +217,7 @@ fn delete_series(req: &mut Request) -> IronResult<Response> {
 }
 
 pub fn routes() -> Router {
-    router!(
+    router::router!(
     series_index: get "/" => all,
     series_select: get "/:id" => select,
     series_update: put "/:id" => update_series,

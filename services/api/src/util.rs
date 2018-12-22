@@ -1,4 +1,4 @@
-use hyper::mime::{Attr, Mime, SubLevel, TopLevel, Value as MimeValue};
+use iron::mime::{Attr, Mime, SubLevel, TopLevel, Value as MimeValue};
 use iron::prelude::*;
 use iron::status::Status;
 use serde::Serialize;

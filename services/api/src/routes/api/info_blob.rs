@@ -259,7 +259,7 @@ pub(crate) fn update_blob(
 }
 
 pub fn routes() -> Router {
-    router!(
+    router::router!(
     all: get "/:series_id" => all,
     select_types: get "/:series_id/types/:types" => select_types,
     select: get "/:series_id/:blob_id" => select,

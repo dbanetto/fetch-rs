@@ -1,4 +1,4 @@
-table! {
+diesel::table! {
     series {
         id -> Integer,
         title -> VarChar,
@@ -6,7 +6,7 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
     info_blob {
        id -> Integer,
        series_id -> Integer,
@@ -15,4 +15,4 @@ table! {
     }
 }
 
-joinable!(info_blob -> series (series_id));
+diesel::joinable!(info_blob -> series (series_id));

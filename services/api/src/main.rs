@@ -5,13 +5,7 @@ extern crate diesel;
 #[macro_use]
 extern crate diesel_derives;
 #[macro_use]
-extern crate error_chain;
-#[macro_use]
-extern crate router;
-#[macro_use]
 extern crate serde_derive;
-#[macro_use]
-extern crate serde_json;
 #[macro_use]
 extern crate structopt_derive;
 
@@ -47,9 +41,7 @@ fn main() {
 
     chain.link_before(middleware::Timer);
     chain.link_before(db::get_pool(&config.database_url));
-    chain.link_before(config);
 
-    chain.link_after(middleware::handlebars());
     chain.link_after(middleware::ErrorLog);
 
     println!("Starting server on {}", addr);

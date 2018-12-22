@@ -1,11 +1,8 @@
-use handlebars_iron::{handlebars::Handlebars, HandlebarsEngine};
 use iron::middleware::{AfterMiddleware, BeforeMiddleware};
 use iron::prelude::*;
 use iron::typemap;
-use serde_json::Value;
 use std::time::Instant;
 
-use crate::config::Config;
 use crate::db::DbConnection;
 
 pub struct ErrorLog;
@@ -72,17 +69,6 @@ impl BeforeMiddleware for DbConnection {
     }
 }
 
-impl typemap::Key for Config {
-    type Value = Value;
-}
-
-impl BeforeMiddleware for Config {
-    fn before(&self, req: &mut Request) -> IronResult<()> {
-        req.extensions.insert::<Config>(self.template_config());
-        Ok(())
-    }
-}
-
 pub struct Timer;
 
 impl BeforeMiddleware for Timer {
@@ -94,13 +80,4 @@ impl BeforeMiddleware for Timer {
 
 impl typemap::Key for Timer {
     type Value = Instant;
-}
-
-pub fn handlebars() -> HandlebarsEngine {
-    let mut hb = Handlebars::new();
-
-    hb.register_template_string("index", include_str!("templates/index.hbs"))
-        .unwrap();
-
-    HandlebarsEngine::from(hb)
 }

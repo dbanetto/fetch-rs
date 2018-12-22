@@ -101,10 +101,6 @@ impl Config {
             database_url: database_url,
         }
     }
-
-    pub fn template_config(&self) -> Value {
-        json!({})
-    }
 }
 
 /// Merges the CLI and configuration file settings together
