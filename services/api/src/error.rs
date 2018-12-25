@@ -1,12 +1,12 @@
 use error_chain::*;
 
-error_chain! {
+error_chain::error_chain! {
 
     foreign_links {
-        Fmt(::std::fmt::Error);
-        Io(::std::io::Error) #[cfg(unix)];
-        TomlDe(::toml::de::Error);
-        Diesel(::diesel::result::Error);
+        Fmt(std::fmt::Error);
+        Io(std::io::Error) #[cfg(unix)];
+        TomlDe(toml::de::Error);
+        Diesel(diesel::result::Error);
     }
 
     errors {

@@ -1,6 +1,10 @@
-use crate::error::*;
-use crate::models::InfoBlobForm;
+use crate::error::{Error, Result};
+use crate::models::{InfoBlob, InfoBlobForm, NewInfoBlob};
 use crate::schema::*;
+
+use diesel::dsl::*;
+use diesel::prelude::*;
+use diesel::{delete, insert_into, update};
 
 #[derive(Queryable, Associations, Identifiable, Serialize, Deserialize, Debug, Default)]
 #[table_name = "series"]
@@ -22,6 +26,107 @@ pub struct SeriesForm {
     pub title: String,
     pub poster_url: Option<String>,
     pub info: Option<Vec<InfoBlobForm>>,
+}
+
+impl Series {
+    pub fn all(conn: &PgConnection) -> Result<Vec<Self>> {
+        series::dsl::series
+            .load::<Series>(conn)
+            .map_err(|err| err.into())
+    }
+
+    pub fn get(conn: &PgConnection, id: i32) -> Result<Self> {
+        series::dsl::series
+            .filter(series::id.eq(id))
+            .select(series::all_columns)
+            .first(&*conn)
+            .map_err(|err| err.into())
+    }
+
+    pub fn delete(conn: &PgConnection, id: i32) -> Result<Self> {
+        diesel::delete(series::dsl::series.filter(series::id.eq(id)))
+            .returning(series::all_columns)
+            .get_result(&*conn)
+            .map_err(|err| err.into())
+    }
+
+    pub fn update(conn: &PgConnection, id: i32, form: SeriesForm) -> Result<(Self, Vec<InfoBlob>)> {
+        let (series_put, blobs_put) = form.into_new();
+
+        let _ = series_put.validate()?;
+
+        conn.transaction::<_, Error, _>(|| {
+            let series = update(series::dsl::series.filter(series::id.eq(id)))
+                .set((
+                    series::title.eq(series_put.title),
+                    series::poster_url.eq(series_put.poster_url),
+                ))
+                .returning(series::all_columns)
+                .get_result(&*conn)
+                .map_err::<Error, _>(|err| err.into())?;
+
+            let mut blobs = vec![];
+            if let Some(blobs_put) = blobs_put {
+                // list of blobs to NOT delete
+
+                for blob in blobs_put {
+                    if blob.id.is_some() {
+                        // update
+                        blobs.push(InfoBlob::update(conn, id, blob)?)
+                    } else {
+                        // create
+                        blobs.push(InfoBlob::new(conn, id, blob)?)
+                    }
+                }
+
+                // delete info_blobs that were not apart of the PUT
+                delete(
+                    info_blob::dsl::info_blob
+                        .filter(not(
+                            info_blob::id.eq(any(blobs.iter().map(|b| b.id).collect::<Vec<i32>>()))
+                        ))
+                        .filter(info_blob::series_id.eq(id)),
+                )
+                .execute(&*conn)
+                .map_err::<Error, _>(|err| err.into())?;
+            }
+
+            Ok((series, blobs))
+        })
+    }
+
+    pub fn new(conn: &PgConnection, form: SeriesForm) -> Result<(Self, Vec<InfoBlob>)> {
+        let (new_series, blobs) = form.into_new();
+
+        let _ = new_series.validate()?;
+
+        conn.transaction::<_, Error, _>(|| {
+            let series = insert_into(series::table)
+                .values(&new_series)
+                .returning(series::all_columns)
+                .get_result(&*conn)
+                .map_err::<Error, _>(|err| err.into())?;
+
+            let blobs = if let Some(blobs) = blobs {
+                let insertable_blobs = blobs
+                    .into_iter()
+                    .map(|i| i.into_insertable(&series))
+                    .collect::<Vec<NewInfoBlob>>();
+
+                let inserted_blobs = insert_into(info_blob::table)
+                    .values(&insertable_blobs)
+                    .returning(info_blob::all_columns)
+                    .get_results(&*conn)
+                    .map_err::<Error, _>(|err| err.into())?;
+
+                inserted_blobs
+            } else {
+                Vec::new()
+            };
+
+            Ok((series, blobs))
+        })
+    }
 }
 
 impl NewSeries {
