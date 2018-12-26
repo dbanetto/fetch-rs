@@ -1,6 +1,5 @@
 use crate::error::{Result, Error};
-use crate::models::Series;
-use crate::schema::*;
+use crate::models::{Series, schema::* };
 use serde_json::Value;
 
 use diesel::dsl::*;
@@ -110,4 +109,33 @@ impl InfoBlobForm {
             info_type: self.info_type,
         }
     }
+}
+
+#[cfg(test)]
+mod test {
+    use serde_json::json;
+    use crate::models::{ InfoBlobForm, Series };
+
+    #[test]
+    fn form_to_insertable() {
+
+        let form = InfoBlobForm {
+            id: None,
+            blob: json!({}),
+            info_type: "test".to_owned()
+        };
+
+        let series = Series {
+            id: 1,
+            title: "".to_owned(),
+            poster_url: None
+        };
+
+        let insertable = form.into_insertable(&series);
+
+        assert_eq!(series.id, insertable.series_id);
+        assert_eq!(json!({}), insertable.blob);
+        assert_eq!("test".to_owned(), insertable.info_type);
+    }
+
 }

@@ -5,8 +5,10 @@ error_chain::error_chain! {
     foreign_links {
         Fmt(std::fmt::Error);
         Io(std::io::Error) #[cfg(unix)];
+        AddrParseError(std::net::AddrParseError);
         TomlDe(toml::de::Error);
         Diesel(diesel::result::Error);
+        R2D2(r2d2::Error);
     }
 
     errors {
