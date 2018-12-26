@@ -62,33 +62,34 @@ class Fetch extends React.PureComponent<IFetchProps> {
     }
 
     private renderResults() {
-      const shows = this.props.series;
-      return this.props.results.map((result, n) => {
-        const show = this.props.series.find((s) => s.id === result.id);
-        const success = result.success ? "success" : "failed";
-        const found = result.found ? `found new, now up to ${result.count}` : "nothing new";
-        return [
-          (<hr key={n} />),
-          (<div
-            key={`${result.id}-${n}`}
-            className="is-flex"
-          >
-            <Link to={`/series/${ show.id }`} >
-              <div className="poster">
-                <img className="image" src={show.poster_url} />
-              </div>
-            </Link>
-            <div>
-              <div>
-                <h2 className="title">{show.title}</h2>
-              </div>
-              <div>
-                {success} - {found}
-              </div>
-            </div>
-          </div>
-          ),
-        ]});
+        const shows = this.props.series;
+        return this.props.results.map((result, n) => {
+            const show = this.props.series.find((s) => s.id === result.id);
+            const success = result.success ? "success" : "failed";
+            const found = result.found ? `found new, now up to ${result.count}` : "nothing new";
+            return [
+                (<hr key={n} />),
+                (<div
+                    key={`${result.id}-${n}`}
+                    className="is-flex"
+                >
+                    <Link to={`/series/${ show.id }`} >
+                        <div className="poster">
+                            <img className="image" src={show.poster_url} />
+                        </div>
+                    </Link>
+                    <div>
+                        <div>
+                            <h2 className="title">{show.title}</h2>
+                        </div>
+                        <div>
+                            {success} - {found}
+                        </div>
+                    </div>
+                </div>
+                ),
+            ];
+            });
     }
 
     private renderStatus() {
