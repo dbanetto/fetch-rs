@@ -1,18 +1,34 @@
 use crate::error::Result;
-use crate::db::PooledConn;
+use crate::db::{PooledConnFilter, PooledConn};
+use crate::util::api_response;
+use crate::models;
+
 use diesel::prelude::*;
+use warp::{Filter, Reply};
 
-// pub mod api;
+mod api;
 
-// pub fn routes() -> Mount {
-//     let mut mount = Mount::new();
+pub fn routes(db_filter: PooledConnFilter) -> impl Filter<Extract=(impl Reply,)> {
 
-//     // endpoints
-//     mount.mount("/healthcheck", healthcheck);
-//     mount.mount("/", api::routes());
+    let healthcheck = warp::filters::method::get2()
+        .and(path!("healthcheck"))
+        .and(db_filter.clone())
+        .map(healthcheck)
+        .map(api_response);
 
-//     mount
-// }
+    let select = warp::filters::method::get2()
+        .and(path!("api" / "series" / i32))
+        .and(db_filter.clone())
+        .map(|id: i32, pool: PooledConn| models::Series::get(&*pool, id))
+        .map(api_response);
+
+    warp::any()
+        .and(
+            healthcheck
+            .or(select)
+        )
+        .with(warp::log("api"))
+}
 
 pub fn healthcheck(conn: PooledConn) -> Result<bool> {
     (&*conn).execute("SELECT 1;")
