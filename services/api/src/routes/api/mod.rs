@@ -1,28 +1,31 @@
+use crate::db::PooledConnFilter;
 use crate::error::Result;
 use crate::util::api_response;
-use crate::db::PooledConnFilter;
 
-use warp::{Filter, Reply};
+use warp::{filters::path, filters::BoxedFilter, Filter, Reply};
 
-// pub mod info_blob;
+pub mod info_blob;
 pub mod series;
-
 
 fn index() -> Result<String> {
     Ok("API available".to_owned())
 }
 
-pub fn routes(db_filter: PooledConnFilter) -> impl Filter<Extract=(impl Reply,)> {
+pub fn routes(db_filter: PooledConnFilter) -> BoxedFilter<(impl Reply,)> {
     let index_route = warp::filters::method::get2()
         .and(path!("api"))
+        .and(path::end())
         .map(index)
         .map(api_response);
 
     warp::any()
         .and(
-            series::routes(db_filter)
+            index_route
+                .or(series::routes(db_filter.clone()))
+                .or(info_blob::routes(db_filter.clone())),
         )
         .with(warp::log("api"))
+        .boxed()
 }
 
 // #[cfg(test)]

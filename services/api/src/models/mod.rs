@@ -1,6 +1,6 @@
 mod info_blob;
-mod series;
 pub mod schema;
+mod series;
 
 pub(crate) use self::info_blob::*;
 pub(crate) use self::series::*;

@@ -1,5 +1,5 @@
 use crate::error::{Error, Result};
-use crate::models::{InfoBlob, InfoBlobForm, NewInfoBlob, schema::* };
+use crate::models::{schema::*, InfoBlob, InfoBlobForm, NewInfoBlob};
 
 use diesel::dsl::*;
 use diesel::prelude::*;
@@ -148,15 +148,14 @@ impl SeriesForm {
 
 #[cfg(test)]
 mod test {
-    use crate::models::{ SeriesForm };
+    use crate::models::SeriesForm;
 
     #[test]
     fn form_to_insertable() {
-
         let form = SeriesForm {
             title: "test".to_owned(),
             poster_url: None,
-            info: None
+            info: None,
         };
 
         let (series, blobs) = form.into_new();

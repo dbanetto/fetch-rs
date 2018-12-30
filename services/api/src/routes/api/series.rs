@@ -1,10 +1,10 @@
+use crate::db::{PooledConn, PooledConnFilter};
 use crate::error::Result;
-use crate::util::api_response;
 use crate::models::*;
-use crate::db::{ PooledConn ,PooledConnFilter };
+use crate::util::api_response;
 
 use serde_json;
-use warp::{Filter, Reply};
+use warp::{filters::path, filters::BoxedFilter, Filter, Reply};
 
 fn all(conn: PooledConn) -> Result<Vec<Series>> {
     Series::all(&*conn)
@@ -85,30 +85,30 @@ fn delete(id: i32, conn: PooledConn) -> Result<Series> {
     Series::delete(&*conn, id)
 }
 
-pub fn routes(db_filter: PooledConnFilter) -> impl Filter<Extract=(impl Reply,)> {
+pub fn routes(db_filter: PooledConnFilter) -> BoxedFilter<(impl Reply,)> {
     let all = warp::filters::method::get2()
         .and(path!("api" / "series"))
+        .and(path::end())
         .and(db_filter.clone())
         .map(all)
         .map(api_response);
 
     let select = warp::filters::method::get2()
         .and(path!("api" / "series" / i32))
+        .and(path::end())
         .and(db_filter.clone())
         .map(select)
         .map(api_response);
 
     let delete = warp::filters::method::delete2()
         .and(path!("api" / "series" / i32))
+        .and(path::end())
         .and(db_filter.clone())
         .map(delete)
         .map(api_response);
 
     warp::any()
-        .and(
-            all
-            .or(select)
-            .or(delete)
-        )
+        .and(all.or(select).or(delete))
         .with(warp::log("api::series"))
+        .boxed()
 }

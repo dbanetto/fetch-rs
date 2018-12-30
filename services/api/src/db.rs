@@ -1,6 +1,6 @@
-use crate::error::{Result, Error};
-use std::error::Error as StdError;
+use crate::error::{Error, Result};
 use std::env;
+use std::error::Error as StdError;
 
 use warp::Filter;
 
@@ -18,13 +18,12 @@ pub fn get_pool(database_url: &Option<String>) -> Result<PooledConnFilter> {
     };
     let manager = ConnectionManager::new(database_url.to_owned());
 
-    let pool = Pool::new(manager)
-        .map_err::<Error, _>(|err| err.into())?;
+    let pool = Pool::new(manager).map_err::<Error, _>(|err| err.into())?;
 
-    Ok(warp::any().and_then(move || {
-        pool
-            .get()
-            .map_err(|err| warp::reject::custom(err.description()))
-    })
-    .boxed())
+    Ok(warp::any()
+        .and_then(move || {
+            pool.get()
+                .map_err(|err| warp::reject::custom(err.description()))
+        })
+        .boxed())
 }

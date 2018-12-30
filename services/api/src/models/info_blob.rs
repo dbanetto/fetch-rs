@@ -1,5 +1,5 @@
-use crate::error::{Result, Error};
-use crate::models::{Series, schema::* };
+use crate::error::{Error, Result};
+use crate::models::{schema::*, Series};
 use serde_json::Value;
 
 use diesel::dsl::*;
@@ -93,11 +93,11 @@ impl InfoBlob {
     }
 
     pub fn get_types(conn: &PgConnection, series_id: i32, types: Vec<&str>) -> Result<Vec<Self>> {
-    info_blob::dsl::info_blob
-        .filter(info_blob::series_id.eq(series_id))
-        .filter(info_blob::info_type.eq_any(types))
-        .get_results(&*conn)
-        .map_err(|err| err.into())
+        info_blob::dsl::info_blob
+            .filter(info_blob::series_id.eq(series_id))
+            .filter(info_blob::info_type.eq_any(types))
+            .get_results(&*conn)
+            .map_err(|err| err.into())
     }
 }
 
@@ -113,22 +113,21 @@ impl InfoBlobForm {
 
 #[cfg(test)]
 mod test {
+    use crate::models::{InfoBlobForm, Series};
     use serde_json::json;
-    use crate::models::{ InfoBlobForm, Series };
 
     #[test]
     fn form_to_insertable() {
-
         let form = InfoBlobForm {
             id: None,
             blob: json!({}),
-            info_type: "test".to_owned()
+            info_type: "test".to_owned(),
         };
 
         let series = Series {
             id: 1,
             title: "".to_owned(),
-            poster_url: None
+            poster_url: None,
         };
 
         let insertable = form.into_insertable(&series);
