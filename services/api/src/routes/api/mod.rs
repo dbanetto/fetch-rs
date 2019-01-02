@@ -13,7 +13,6 @@ fn index() -> Result<String> {
 
 pub fn routes(db_filter: PooledConnFilter) -> BoxedFilter<(impl Reply,)> {
     let index_route = warp::filters::method::get2()
-        .and(path!("api"))
         .and(path::end())
         .map(index)
         .map(api_response);

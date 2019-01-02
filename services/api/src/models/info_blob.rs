@@ -62,12 +62,7 @@ impl InfoBlob {
             .map_err(|err| err.into())
     }
 
-    pub fn update(conn: &PgConnection, series_id: i32, form: InfoBlobForm) -> Result<Self> {
-        let blob_id = match form.id {
-            Some(id) => id,
-            None => return Err("id not given".into()),
-        };
-
+    pub fn update(conn: &PgConnection, series_id: i32, blob_id: i32, form: InfoBlobForm) -> Result<Self> {
         update(
             info_blob::dsl::info_blob
                 .filter(info_blob::id.eq(blob_id))

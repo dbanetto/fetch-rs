@@ -69,9 +69,9 @@ impl Series {
                 // list of blobs to NOT delete
 
                 for blob in blobs_put {
-                    if blob.id.is_some() {
+                    if let Some(blob_id) = blob.id {
                         // update
-                        blobs.push(InfoBlob::update(conn, id, blob)?)
+                        blobs.push(InfoBlob::update(conn, id, blob_id, blob)?)
                     } else {
                         // create
                         blobs.push(InfoBlob::new(conn, id, blob)?)

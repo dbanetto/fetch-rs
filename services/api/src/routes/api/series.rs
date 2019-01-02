@@ -1,10 +1,11 @@
 use crate::db::{PooledConn, PooledConnFilter};
-use crate::error::Result;
+use crate::error::{Error, Result};
 use crate::models::*;
 use crate::util::api_response;
 
 use serde_json;
-use warp::{filters::path, filters::BoxedFilter, Filter, Reply};
+use serde_json::Value;
+use warp::{filters::path, filters::body, filters::BoxedFilter, Filter, Reply};
 
 fn all(conn: PooledConn) -> Result<Vec<Series>> {
     Series::all(&*conn)
@@ -14,72 +15,35 @@ fn select(id: i32, conn: PooledConn) -> Result<Series> {
     Series::get(&*conn, id)
 }
 
-// fn new(req: &mut Request) -> IronResult<Response> {
-//     let mut buf = vec![];
-//     match req.body.read_to_end(&mut buf) {
-//         Ok(_) => (),
-//         Err(err) => return Err(api_error(err, Status::BadRequest)),
-//     };
+fn new(form: SeriesForm, conn: PooledConn) -> Result<Value> {
 
-//     let series_form: SeriesForm = match serde_json::from_slice(&buf) {
-//         Ok(form) => form,
-//         Err(err) => return Err(api_error(err, Status::BadRequest)),
-//     };
+    let (series, blobs) =
+        Series::new(&*conn, form).map_err::<Error, _>(|err| err.into())?;
 
-//     let conn = req
-//         .extensions
-//         .get::<DbConnection>()
-//         .unwrap()
-//         .get()
-//         .map_err(|err| api_error(err, Status::RequestTimeout))?;
+    let result = serde_json::to_value(series)
+        .unwrap()
+        .as_object_mut()
+        .unwrap()
+        .insert("blob".to_owned(), serde_json::to_value(blobs).unwrap())
+        .unwrap();
 
-//     let (series, blobs) =
-//         Series::new(&*conn, series_form).map_err(|err| api_error(err, Status::BadRequest))?;
+    Ok(result)
+}
 
-//     let result = serde_json::to_value(series)
-//         .unwrap()
-//         .as_object_mut()
-//         .unwrap()
-//         .insert("blob".to_owned(), serde_json::to_value(blobs).unwrap());
+fn update(id: i32, form: SeriesForm, conn: PooledConn) -> Result<Value> {
 
-//     Ok(api_success(result))
-// }
+    let (series, blobs) = Series::update(&*conn, id, form)
+        .map_err::<Error, _>(|err| err.into())?;
 
-// fn update_series(req: &mut Request) -> IronResult<Response> {
-//     let series_id = match req.extensions.get::<Router>().unwrap().find("id") {
-//         Some(id) => i32::from_str(id).map_err(|err| api_error(err, Status::BadRequest))?,
-//         None => unreachable!(),
-//     };
+    let result = serde_json::to_value(series)
+        .unwrap()
+        .as_object_mut()
+        .unwrap()
+        .insert("blob".to_owned(), serde_json::to_value(blobs).unwrap())
+        .unwrap();
 
-//     let conn = req
-//         .extensions
-//         .get::<DbConnection>()
-//         .unwrap()
-//         .get()
-//         .map_err(|err| api_error(err, Status::RequestTimeout))?;
-
-//     let mut buf = vec![];
-//     match req.body.read_to_end(&mut buf) {
-//         Ok(_) => (),
-//         Err(err) => return Err(api_error(err, Status::BadRequest)),
-//     };
-
-//     let series_form: SeriesForm = match serde_json::from_slice(&buf) {
-//         Ok(form) => form,
-//         Err(err) => return Err(api_error(err, Status::BadRequest)),
-//     };
-
-//     let (series, blobs) = Series::update(&*conn, series_id, series_form)
-//         .map_err(|err| api_error(err, Status::BadRequest))?;
-
-//     let result = serde_json::to_value(series)
-//         .unwrap()
-//         .as_object_mut()
-//         .unwrap()
-//         .insert("blob".to_owned(), serde_json::to_value(blobs).unwrap());
-
-//     Ok(api_success(result))
-// }
+    Ok(result)
+}
 
 fn delete(id: i32, conn: PooledConn) -> Result<Series> {
     Series::delete(&*conn, id)
@@ -87,28 +51,46 @@ fn delete(id: i32, conn: PooledConn) -> Result<Series> {
 
 pub fn routes(db_filter: PooledConnFilter) -> BoxedFilter<(impl Reply,)> {
     let all = warp::filters::method::get2()
-        .and(path!("api" / "series"))
+        .and(path!("series"))
         .and(path::end())
         .and(db_filter.clone())
         .map(all)
         .map(api_response);
 
+    let new = warp::filters::method::post2()
+        .and(path!("series"))
+        .and(path::end())
+        .and(body::json::<SeriesForm>())
+        .and(db_filter.clone())
+        .map(new)
+        .map(api_response);
+
+
     let select = warp::filters::method::get2()
-        .and(path!("api" / "series" / i32))
+        .and(path!("series" / i32))
         .and(path::end())
         .and(db_filter.clone())
         .map(select)
         .map(api_response);
 
+    let update = warp::filters::method::put2()
+        .and(path!("series" / i32))
+        .and(path::end())
+        .and(body::content_length_limit(1024 * 64))
+        .and(body::json::<SeriesForm>())
+        .and(db_filter.clone())
+        .map(update)
+        .map(api_response);
+
     let delete = warp::filters::method::delete2()
-        .and(path!("api" / "series" / i32))
+        .and(path!("series" / i32))
         .and(path::end())
         .and(db_filter.clone())
         .map(delete)
         .map(api_response);
 
     warp::any()
-        .and(all.or(select).or(delete))
+        .and(all.or(select).or(new).or(update).or(delete))
         .with(warp::log("api::series"))
         .boxed()
 }
