@@ -31,7 +31,7 @@ export function upsertSeries(series: ISeries): Promise<ISeries> {
   if (series.id) {
     return api_put(`/api/series/${ series.id }`, series);
   } else {
-    return api_post("/api/series/new", series);
+    return api_post("/api/series/", series);
   }
 }
 
