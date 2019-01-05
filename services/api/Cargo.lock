@@ -298,6 +298,7 @@ dependencies = [
  "structopt 0.2.14 (registry+https://github.com/rust-lang/crates.io-index)",
  "structopt-derive 0.2.14 (registry+https://github.com/rust-lang/crates.io-index)",
  "toml 0.4.10 (registry+https://github.com/rust-lang/crates.io-index)",
+ "url 1.7.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "warp 0.1.10 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 

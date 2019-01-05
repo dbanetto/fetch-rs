@@ -21,6 +21,7 @@ warp = "^0.1"
 log = "0.4.6"
 env_logger = "0.6.0"
 r2d2 = "0.8.3"
+url = "1.7.2"
 
 [dependencies.chrono]
 features = ["serde"]

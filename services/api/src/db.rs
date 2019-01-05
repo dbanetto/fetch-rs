@@ -8,7 +8,6 @@ use diesel::pg::PgConnection;
 use diesel::r2d2::{ConnectionManager, Pool, PooledConnection};
 
 pub type PooledConn = PooledConnection<ConnectionManager<PgConnection>>;
-pub type ConnPool = Pool<ConnectionManager<PgConnection>>;
 pub type PooledConnFilter = warp::filters::BoxedFilter<(PooledConn,)>;
 
 pub fn get_pool(database_url: &Option<String>) -> Result<PooledConnFilter> {

@@ -1,6 +1,5 @@
-mod info_blob;
-pub mod schema;
-mod series;
+pub mod info_blob;
+pub mod series;
 
-pub(crate) use self::info_blob::*;
-pub(crate) use self::series::*;
+pub use self::info_blob::*;
+pub use self::series::*;

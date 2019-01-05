@@ -4,7 +4,7 @@ use crate::models::*;
 use crate::util::api_response;
 
 use serde_json;
-use warp::{filters::path, filters::body, filters::BoxedFilter, Filter, Reply};
+use warp::{filters::body, filters::path, filters::BoxedFilter, Filter, Reply};
 
 fn all(series_id: i32, conn: PooledConn) -> Result<Vec<InfoBlob>> {
     InfoBlob::all(&*conn, series_id)
@@ -77,7 +77,13 @@ pub fn routes(db_filter: PooledConnFilter) -> BoxedFilter<(impl Reply,)> {
         .map(api_response);
 
     warp::any()
-        .and(all.or(new).or(update).or(select).or(delete).or(select_types))
+        .and(
+            all.or(new)
+                .or(update)
+                .or(select)
+                .or(delete)
+                .or(select_types),
+        )
         .with(warp::log("api::info"))
         .boxed()
 }

@@ -1,10 +1,13 @@
 use crate::error::{Error, Result};
-use crate::models::{schema::*, InfoBlob, InfoBlobForm, NewInfoBlob};
+use crate::models::{InfoBlob, InfoBlobForm, NewInfoBlob};
+use crate::schema::*;
 
 use diesel::dsl::*;
 use diesel::prelude::*;
 use diesel::{delete, insert_into, update};
+use url::Url;
 
+/// Series object from database
 #[derive(Queryable, Associations, Identifiable, Serialize, Deserialize, Debug, Default)]
 #[table_name = "series"]
 pub struct Series {
@@ -13,6 +16,7 @@ pub struct Series {
     pub poster_url: Option<String>,
 }
 
+/// Series object to be insert into database
 #[derive(Insertable, Serialize, Deserialize, Debug, Default)]
 #[table_name = "series"]
 pub struct NewSeries {
@@ -20,6 +24,7 @@ pub struct NewSeries {
     pub poster_url: Option<String>,
 }
 
+/// Form to create or update a series with many info blobs associated to that new series
 #[derive(Serialize, Deserialize, Debug, Default)]
 pub struct SeriesForm {
     pub title: String,
@@ -28,12 +33,14 @@ pub struct SeriesForm {
 }
 
 impl Series {
+    /// Retrieve all series in the database
     pub fn all(conn: &PgConnection) -> Result<Vec<Self>> {
         series::dsl::series
             .load::<Series>(conn)
             .map_err(|err| err.into())
     }
 
+    /// Get a series by id
     pub fn get(conn: &PgConnection, id: i32) -> Result<Self> {
         series::dsl::series
             .filter(series::id.eq(id))
@@ -42,6 +49,7 @@ impl Series {
             .map_err(|err| err.into())
     }
 
+    /// Delete a series by id
     pub fn delete(conn: &PgConnection, id: i32) -> Result<Self> {
         diesel::delete(series::dsl::series.filter(series::id.eq(id)))
             .returning(series::all_columns)
@@ -49,6 +57,7 @@ impl Series {
             .map_err(|err| err.into())
     }
 
+    /// Update a series and associated info blobs
     pub fn update(conn: &PgConnection, id: i32, form: SeriesForm) -> Result<(Self, Vec<InfoBlob>)> {
         let (series_put, blobs_put) = form.into_new();
 
@@ -94,6 +103,7 @@ impl Series {
         })
     }
 
+    /// Create a series and associated info blobs
     pub fn new(conn: &PgConnection, form: SeriesForm) -> Result<(Self, Vec<InfoBlob>)> {
         let (new_series, blobs) = form.into_new();
 
@@ -129,12 +139,18 @@ impl Series {
 }
 
 impl NewSeries {
+    /// Validate
     pub fn validate(&self) -> Result<()> {
+        if let Some(ref poster_url) = &self.poster_url {
+            let _ = Url::parse(poster_url).map_err::<Error, _>(|err| err.into())?;
+        }
+
         Ok(())
     }
 }
 
 impl SeriesForm {
+    /// Transforms form into insertable objects
     pub fn into_new(self) -> (NewSeries, Option<Vec<InfoBlobForm>>) {
         (
             NewSeries {

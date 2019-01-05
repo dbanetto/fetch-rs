@@ -1,9 +1,10 @@
 use crate::error::{Error, Result};
-use crate::models::{schema::*, Series};
-use serde_json::Value;
+use crate::models::Series;
+use crate::schema::*;
 
 use diesel::dsl::*;
 use diesel::prelude::*;
+use serde_json::Value;
 
 #[derive(Identifiable, Queryable, Associations, Serialize, Deserialize, Debug, Default)]
 #[table_name = "info_blob"]
@@ -62,7 +63,12 @@ impl InfoBlob {
             .map_err(|err| err.into())
     }
 
-    pub fn update(conn: &PgConnection, series_id: i32, blob_id: i32, form: InfoBlobForm) -> Result<Self> {
+    pub fn update(
+        conn: &PgConnection,
+        series_id: i32,
+        blob_id: i32,
+        form: InfoBlobForm,
+    ) -> Result<Self> {
         update(
             info_blob::dsl::info_blob
                 .filter(info_blob::id.eq(blob_id))

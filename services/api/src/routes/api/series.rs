@@ -5,7 +5,7 @@ use crate::util::api_response;
 
 use serde_json;
 use serde_json::Value;
-use warp::{filters::path, filters::body, filters::BoxedFilter, Filter, Reply};
+use warp::{filters::body, filters::path, filters::BoxedFilter, Filter, Reply};
 
 fn all(conn: PooledConn) -> Result<Vec<Series>> {
     Series::all(&*conn)
@@ -16,9 +16,7 @@ fn select(id: i32, conn: PooledConn) -> Result<Series> {
 }
 
 fn new(form: SeriesForm, conn: PooledConn) -> Result<Value> {
-
-    let (series, blobs) =
-        Series::new(&*conn, form).map_err::<Error, _>(|err| err.into())?;
+    let (series, blobs) = Series::new(&*conn, form).map_err::<Error, _>(|err| err.into())?;
 
     let result = serde_json::to_value(series)
         .unwrap()
@@ -31,9 +29,7 @@ fn new(form: SeriesForm, conn: PooledConn) -> Result<Value> {
 }
 
 fn update(id: i32, form: SeriesForm, conn: PooledConn) -> Result<Value> {
-
-    let (series, blobs) = Series::update(&*conn, id, form)
-        .map_err::<Error, _>(|err| err.into())?;
+    let (series, blobs) = Series::update(&*conn, id, form).map_err::<Error, _>(|err| err.into())?;
 
     let result = serde_json::to_value(series)
         .unwrap()
@@ -64,7 +60,6 @@ pub fn routes(db_filter: PooledConnFilter) -> BoxedFilter<(impl Reply,)> {
         .and(db_filter.clone())
         .map(new)
         .map(api_response);
-
 
     let select = warp::filters::method::get2()
         .and(path!("series" / i32))

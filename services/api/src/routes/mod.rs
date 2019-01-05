@@ -5,7 +5,7 @@ use crate::util::api_response;
 use diesel::prelude::*;
 use warp::{filters::path, Filter, Reply};
 
-mod api;
+pub mod api;
 
 pub fn routes(db_filter: PooledConnFilter) -> impl Filter<Extract = (impl Reply,)> {
     let healthcheck = warp::filters::method::get2()

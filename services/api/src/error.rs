@@ -1,4 +1,5 @@
 use error_chain::*;
+use url::ParseError;
 
 error_chain::error_chain! {
 
@@ -9,6 +10,7 @@ error_chain::error_chain! {
         TomlDe(toml::de::Error);
         Diesel(diesel::result::Error);
         R2D2(r2d2::Error);
+        Url(ParseError);
     }
 
     errors {
