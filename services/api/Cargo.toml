@@ -8,6 +8,10 @@ edition = "2018"
 name = "fetch-api"
 path = "src/main.rs"
 
+[lib]
+name = "fetch"
+path = "src/lib.rs"
+
 [dependencies]
 dotenv = "^0.13.0"
 error-chain = "^0.12"

@@ -23,7 +23,6 @@ pub fn routes(db_filter: PooledConnFilter) -> BoxedFilter<(impl Reply,)> {
                 .or(series::routes(db_filter.clone()))
                 .or(info_blob::routes(db_filter.clone())),
         )
-        .with(warp::log("api"))
         .boxed()
 }
 

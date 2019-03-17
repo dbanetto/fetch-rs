@@ -86,6 +86,5 @@ pub fn routes(db_filter: PooledConnFilter) -> BoxedFilter<(impl Reply,)> {
 
     warp::any()
         .and(all.or(select).or(new).or(update).or(delete))
-        .with(warp::log("api::series"))
         .boxed()
 }
