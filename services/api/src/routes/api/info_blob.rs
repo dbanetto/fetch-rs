@@ -13,7 +13,12 @@ fn select(series_id: SeriesId, blob_id: InfoBlobId, conn: PooledConn) -> Result<
     InfoBlob::get(&*conn, series_id, blob_id)
 }
 
-fn update(series_id: SeriesId, blob_id: InfoBlobId, form: InfoBlobForm, conn: PooledConn) -> Result<InfoBlob> {
+fn update(
+    series_id: SeriesId,
+    blob_id: InfoBlobId,
+    form: InfoBlobForm,
+    conn: PooledConn,
+) -> Result<InfoBlob> {
     InfoBlob::update(&*conn, series_id, blob_id, form)
 }
 

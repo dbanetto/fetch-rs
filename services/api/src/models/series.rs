@@ -1,5 +1,5 @@
 use crate::error::{Error, Result};
-use crate::models::{InfoBlob, InfoBlobForm, NewInfoBlob, InfoBlobId};
+use crate::models::{InfoBlob, InfoBlobForm, InfoBlobId, NewInfoBlob};
 use crate::schema::*;
 
 use diesel::dsl::*;
@@ -100,9 +100,10 @@ impl Series {
                 // delete info_blobs that were not apart of the PUT
                 delete(
                     info_blob::dsl::info_blob
-                        .filter(not(
-                            info_blob::id.eq(any(blobs.iter().map(|b| b.id).collect::<Vec<InfoBlobId>>()))
-                        ))
+                        .filter(not(info_blob::id.eq(any(blobs
+                            .iter()
+                            .map(|b| b.id)
+                            .collect::<Vec<InfoBlobId>>()))))
                         .filter(info_blob::series_id.eq(id)),
                 )
                 .execute(&*conn)
@@ -162,11 +163,12 @@ impl NewSeries {
     /// Validate
     pub fn validate(&self) -> Result<()> {
         if let Some(ref poster_url) = &self.poster_url {
-            let url = Url::parse(poster_url).map_err::<Error, _>(|_| "Invalid poster url".into())?;
+            let url =
+                Url::parse(poster_url).map_err::<Error, _>(|_| "Invalid poster url".into())?;
 
             match url.scheme() {
                 "http" | "https" => (),
-                _ => return Err("Invalid poster url".into())
+                _ => return Err("Invalid poster url".into()),
             }
         }
 
@@ -189,7 +191,7 @@ impl SeriesForm {
 
 #[cfg(test)]
 mod test {
-    use crate::models::{SeriesForm, NewSeries};
+    use crate::models::{NewSeries, SeriesForm};
 
     #[test]
     fn form_to_insertable() {

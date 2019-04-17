@@ -95,7 +95,11 @@ impl InfoBlob {
         .map_err(|err| err.into())
     }
 
-    pub fn get_types(conn: &PgConnection, series_id: SeriesId, types: Vec<&str>) -> Result<Vec<Self>> {
+    pub fn get_types(
+        conn: &PgConnection,
+        series_id: SeriesId,
+        types: Vec<&str>,
+    ) -> Result<Vec<Self>> {
         info_blob::dsl::info_blob
             .filter(info_blob::series_id.eq(series_id))
             .filter(info_blob::info_type.eq_any(types))
