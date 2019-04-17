@@ -13,8 +13,6 @@ api:
     POSTGRES_DB: fetch_test
     POSTGRES_USER: userr
     POSTGRES_PASSWORD: ""
-    RUST_LOG: info
-    DATABASE_URL: postgres://userr@postgres/fetch_test
   except:
     - master
   before_script:
@@ -25,7 +23,11 @@ api:
     - du -hs target || true
     - du -hs cargo || true
     - echo "$CARGO_HOME" && rustc --version && cargo --version && rustup --version
+    - cargo install diesel_cli --no-default-features --features postgres --version '1.2.0'
+    - /usr/local/cargo/bin/disel migration run
     - cargo build --verbose
+    - echo "DATABASE_URL=postgres://${POSTGRES_USER}@postgres/${POSTGRES_DB}" > .env
+    - echo "RUST_LOG=info" >> .env
     - cargo test --verbose --jobs 1
   cache:
     paths:
