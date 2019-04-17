@@ -32,6 +32,14 @@ pub struct SeriesForm {
     pub info: Option<Vec<InfoBlobForm>>,
 }
 
+#[derive(Serialize, Deserialize, Debug, Default)]
+pub struct SeriesBlob {
+    pub id: i32,
+    pub title: String,
+    pub poster_url: Option<String>,
+    pub blob: Vec<InfoBlob>,
+}
+
 impl Series {
     /// Retrieve all series in the database
     pub fn all(conn: &PgConnection) -> Result<Vec<Self>> {
@@ -58,13 +66,13 @@ impl Series {
     }
 
     /// Update a series and associated info blobs
-    pub fn update(conn: &PgConnection, id: i32, form: SeriesForm) -> Result<(Self, Vec<InfoBlob>)> {
+    pub fn update(conn: &PgConnection, id: i32, form: SeriesForm) -> Result<SeriesBlob> {
         let (series_put, blobs_put) = form.into_new();
 
         let _ = series_put.validate()?;
 
         conn.transaction::<_, Error, _>(|| {
-            let series = update(series::dsl::series.filter(series::id.eq(id)))
+            let series: Series = update(series::dsl::series.filter(series::id.eq(id)))
                 .set((
                     series::title.eq(series_put.title),
                     series::poster_url.eq(series_put.poster_url),
@@ -99,12 +107,17 @@ impl Series {
                 .map_err::<Error, _>(|err| err.into())?;
             }
 
-            Ok((series, blobs))
+            Ok(SeriesBlob {
+                id: series.id,
+                title: series.title,
+                poster_url: series.poster_url,
+                blob: blobs,
+            })
         })
     }
 
     /// Create a series and associated info blobs
-    pub fn new(conn: &PgConnection, form: SeriesForm) -> Result<(Self, Vec<InfoBlob>)> {
+    pub fn new(conn: &PgConnection, form: SeriesForm) -> Result<SeriesBlob> {
         let (new_series, blobs) = form.into_new();
 
         let _ = new_series.validate()?;
@@ -133,7 +146,12 @@ impl Series {
                 Vec::new()
             };
 
-            Ok((series, blobs))
+            Ok(SeriesBlob {
+                id: series.id,
+                title: series.title,
+                poster_url: series.poster_url,
+                blob: blobs,
+            })
         })
     }
 }

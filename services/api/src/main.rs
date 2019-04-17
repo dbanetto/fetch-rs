@@ -1,6 +1,6 @@
-use fetch::error::{Error, Result};
-use fetch::{config, routes, db};
 use dotenv::dotenv;
+use fetch::error::{Error, Result};
+use fetch::{config, db, routes};
 
 use std::net::{IpAddr, SocketAddr};
 use std::str::FromStr;
