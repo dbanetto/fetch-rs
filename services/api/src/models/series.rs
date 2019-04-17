@@ -162,7 +162,12 @@ impl NewSeries {
     /// Validate
     pub fn validate(&self) -> Result<()> {
         if let Some(ref poster_url) = &self.poster_url {
-            let _ = Url::parse(poster_url).map_err::<Error, _>(|err| err.into())?;
+            let url = Url::parse(poster_url).map_err::<Error, _>(|_| "Invalid poster url".into())?;
+
+            match url.scheme() {
+                "http" | "https" => (),
+                _ => return Err("Invalid poster url".into())
+            }
         }
 
         Ok(())
@@ -184,7 +189,7 @@ impl SeriesForm {
 
 #[cfg(test)]
 mod test {
-    use crate::models::SeriesForm;
+    use crate::models::{SeriesForm, NewSeries};
 
     #[test]
     fn form_to_insertable() {
@@ -199,6 +204,66 @@ mod test {
         assert_eq!("test".to_owned(), series.title);
         assert_eq!(None, series.poster_url);
         assert!(blobs.is_none());
+    }
+
+    #[test]
+    fn new_series_validate_url_ok_none() {
+        let form = NewSeries {
+            title: "test".to_owned(),
+            poster_url: None,
+        };
+
+        assert!(form.validate().is_ok());
+    }
+
+    #[test]
+    fn new_series_validate_url_err_empty() {
+        let form = NewSeries {
+            title: "test".to_owned(),
+            poster_url: Some("".to_owned()),
+        };
+
+        assert!(form.validate().is_err());
+    }
+
+    #[test]
+    fn new_series_validate_url_ok_http() {
+        let form = NewSeries {
+            title: "test".to_owned(),
+            poster_url: Some("http://a".to_owned()),
+        };
+
+        assert!(form.validate().is_ok());
+    }
+
+    #[test]
+    fn new_series_validate_url_ok_https() {
+        let form = NewSeries {
+            title: "test".to_owned(),
+            poster_url: Some("https://a".to_owned()),
+        };
+
+        assert!(form.validate().is_ok());
+    }
+
+    #[test]
+    fn new_series_validate_url_err_file() {
+        let form = NewSeries {
+            title: "test".to_owned(),
+            poster_url: Some("file://a".to_owned()),
+        };
+
+        assert!(form.validate().is_err());
+    }
+
+    #[test]
+    fn new_series_validate_url_err_custom() {
+        let form = NewSeries {
+            title: "test".to_owned(),
+            poster_url: Some("customprotocl://a".to_owned()),
+        };
+
+        assert!(form.validate().is_err());
     }
 
 }
