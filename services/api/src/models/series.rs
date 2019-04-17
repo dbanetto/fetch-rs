@@ -1,5 +1,5 @@
 use crate::error::{Error, Result};
-use crate::models::{InfoBlob, InfoBlobForm, NewInfoBlob};
+use crate::models::{InfoBlob, InfoBlobForm, NewInfoBlob, InfoBlobId};
 use crate::schema::*;
 
 use diesel::dsl::*;
@@ -11,7 +11,7 @@ use url::Url;
 #[derive(Queryable, Associations, Identifiable, Serialize, Deserialize, Debug, Default)]
 #[table_name = "series"]
 pub struct Series {
-    pub id: i32,
+    pub id: SeriesId,
     pub title: String,
     pub poster_url: Option<String>,
 }
@@ -34,11 +34,13 @@ pub struct SeriesForm {
 
 #[derive(Serialize, Deserialize, Debug, Default)]
 pub struct SeriesBlob {
-    pub id: i32,
+    pub id: SeriesId,
     pub title: String,
     pub poster_url: Option<String>,
     pub blob: Vec<InfoBlob>,
 }
+
+pub type SeriesId = i32;
 
 impl Series {
     /// Retrieve all series in the database
@@ -49,7 +51,7 @@ impl Series {
     }
 
     /// Get a series by id
-    pub fn get(conn: &PgConnection, id: i32) -> Result<Self> {
+    pub fn get(conn: &PgConnection, id: SeriesId) -> Result<Self> {
         series::dsl::series
             .filter(series::id.eq(id))
             .select(series::all_columns)
@@ -58,7 +60,7 @@ impl Series {
     }
 
     /// Delete a series by id
-    pub fn delete(conn: &PgConnection, id: i32) -> Result<Self> {
+    pub fn delete(conn: &PgConnection, id: SeriesId) -> Result<Self> {
         diesel::delete(series::dsl::series.filter(series::id.eq(id)))
             .returning(series::all_columns)
             .get_result(&*conn)
@@ -66,7 +68,7 @@ impl Series {
     }
 
     /// Update a series and associated info blobs
-    pub fn update(conn: &PgConnection, id: i32, form: SeriesForm) -> Result<SeriesBlob> {
+    pub fn update(conn: &PgConnection, id: SeriesId, form: SeriesForm) -> Result<SeriesBlob> {
         let (series_put, blobs_put) = form.into_new();
 
         let _ = series_put.validate()?;
@@ -99,7 +101,7 @@ impl Series {
                 delete(
                     info_blob::dsl::info_blob
                         .filter(not(
-                            info_blob::id.eq(any(blobs.iter().map(|b| b.id).collect::<Vec<i32>>()))
+                            info_blob::id.eq(any(blobs.iter().map(|b| b.id).collect::<Vec<InfoBlobId>>()))
                         ))
                         .filter(info_blob::series_id.eq(id)),
                 )

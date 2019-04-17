@@ -1,17 +1,19 @@
 use crate::error::{Error, Result};
-use crate::models::Series;
+use crate::models::{Series, SeriesId};
 use crate::schema::*;
 
 use diesel::dsl::*;
 use diesel::prelude::*;
 use serde_json::Value;
 
+pub type InfoBlobId = i32;
+
 #[derive(Identifiable, Queryable, Associations, Serialize, Deserialize, Debug, Default)]
 #[table_name = "info_blob"]
 #[belongs_to(Series, foreign_key = "series_id")]
 pub struct InfoBlob {
-    pub id: i32,
-    pub series_id: i32,
+    pub id: InfoBlobId,
+    pub series_id: SeriesId,
     pub blob: Value,
     pub info_type: String,
 }
@@ -19,27 +21,27 @@ pub struct InfoBlob {
 #[derive(Insertable, Serialize, Deserialize, Debug, Default)]
 #[table_name = "info_blob"]
 pub struct NewInfoBlob {
-    pub series_id: i32,
+    pub series_id: SeriesId,
     pub blob: Value,
     pub info_type: String,
 }
 
 #[derive(Serialize, Deserialize, Debug, Default)]
 pub struct InfoBlobForm {
-    pub id: Option<i32>,
+    pub id: Option<InfoBlobId>,
     pub blob: Value,
     pub info_type: String,
 }
 
 impl InfoBlob {
-    pub fn all(conn: &PgConnection, series_id: i32) -> Result<Vec<Self>> {
+    pub fn all(conn: &PgConnection, series_id: SeriesId) -> Result<Vec<Self>> {
         info_blob::dsl::info_blob
             .filter(info_blob::series_id.eq(series_id))
             .get_results(&*conn)
             .map_err(|err| err.into())
     }
 
-    pub fn get(conn: &PgConnection, series_id: i32, id: i32) -> Result<Self> {
+    pub fn get(conn: &PgConnection, series_id: SeriesId, id: InfoBlobId) -> Result<Self> {
         info_blob::dsl::info_blob
             .filter(info_blob::series_id.eq(series_id))
             .filter(info_blob::id.eq(id))
@@ -47,7 +49,7 @@ impl InfoBlob {
             .map_err(|err| err.into())
     }
 
-    pub fn new(conn: &PgConnection, series_id: i32, form: InfoBlobForm) -> Result<Self> {
+    pub fn new(conn: &PgConnection, series_id: SeriesId, form: InfoBlobForm) -> Result<Self> {
         let series = series::dsl::series
             .filter(series::id.eq(series_id))
             .select(series::all_columns)
@@ -65,8 +67,8 @@ impl InfoBlob {
 
     pub fn update(
         conn: &PgConnection,
-        series_id: i32,
-        blob_id: i32,
+        series_id: SeriesId,
+        blob_id: InfoBlobId,
         form: InfoBlobForm,
     ) -> Result<Self> {
         update(
@@ -83,7 +85,7 @@ impl InfoBlob {
         .map_err(|e| e.into())
     }
 
-    pub fn delete(conn: &PgConnection, series_id: i32, id: i32) -> Result<Self> {
+    pub fn delete(conn: &PgConnection, series_id: SeriesId, id: InfoBlobId) -> Result<Self> {
         delete(
             info_blob::dsl::info_blob
                 .filter(info_blob::id.eq(id))
@@ -93,7 +95,7 @@ impl InfoBlob {
         .map_err(|err| err.into())
     }
 
-    pub fn get_types(conn: &PgConnection, series_id: i32, types: Vec<&str>) -> Result<Vec<Self>> {
+    pub fn get_types(conn: &PgConnection, series_id: SeriesId, types: Vec<&str>) -> Result<Vec<Self>> {
         info_blob::dsl::info_blob
             .filter(info_blob::series_id.eq(series_id))
             .filter(info_blob::info_type.eq_any(types))
