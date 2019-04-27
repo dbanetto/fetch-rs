@@ -83,27 +83,25 @@ impl Series {
                 .get_result(&*conn)
                 .map_err::<Error, _>(|err| err.into())?;
 
-            let mut blobs = vec![];
             if let Some(blobs_put) = blobs_put {
-                // list of blobs to NOT delete
+                let mut blobs_ids: Vec<InfoBlobId> = vec![];
 
+                // list of blobs to NOT delete
                 for blob in blobs_put {
-                    if let Some(blob_id) = blob.id {
+                    let result = if let Some(blob_id) = blob.id {
                         // update
-                        blobs.push(InfoBlob::update(conn, id, blob_id, blob)?)
+                        InfoBlob::update(conn, id, blob_id, blob)?
                     } else {
                         // create
-                        blobs.push(InfoBlob::new(conn, id, blob)?)
-                    }
+                        InfoBlob::new(conn, id, blob)?
+                    };
+                    blobs_ids.push(result.id)
                 }
 
                 // delete info_blobs that were not apart of the PUT
                 delete(
                     info_blob::dsl::info_blob
-                        .filter(not(info_blob::id.eq(any(blobs
-                            .iter()
-                            .map(|b| b.id)
-                            .collect::<Vec<InfoBlobId>>()))))
+                        .filter(not(info_blob::id.eq(any(blobs_ids))))
                         .filter(info_blob::series_id.eq(id)),
                 )
                 .execute(&*conn)
@@ -114,7 +112,7 @@ impl Series {
                 id: series.id,
                 title: series.title,
                 poster_url: series.poster_url,
-                blob: blobs,
+                blob: InfoBlob::all(conn, series.id)?,
             })
         })
     }
