@@ -24,10 +24,10 @@ api:
     - du -hs cargo || true
     - echo "$CARGO_HOME" && rustc --version && cargo --version && rustup --version
     - cargo install diesel_cli --no-default-features --features postgres --version '1.2.0'
-    - /usr/local/cargo/bin/disel migration run
-    - cargo build --verbose
     - echo "DATABASE_URL=postgres://${POSTGRES_USER}@postgres/${POSTGRES_DB}" > .env
     - echo "RUST_LOG=info" >> .env
+    - $CARGO_HOME/bin/diesel migration run
+    - cargo build --verbose
     - cargo test --verbose --jobs 1
   cache:
     paths:
