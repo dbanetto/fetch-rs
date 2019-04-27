@@ -23,11 +23,10 @@ api:
     - du -hs target || true
     - du -hs cargo || true
     - echo "$CARGO_HOME" && rustc --version && cargo --version && rustup --version
-    - cargo install diesel_cli --no-default-features --features postgres --version '1.2.0'
+    - which "$CARGO_HOME/bin/diesel" || cargo install diesel_cli --no-default-features --features postgres --version '1.4.0'
     - echo "DATABASE_URL=postgres://${POSTGRES_USER}@postgres/${POSTGRES_DB}" > .env
     - echo "RUST_LOG=info" >> .env
     - $CARGO_HOME/bin/diesel migration run
-    - cargo build --verbose
     - cargo test --verbose --jobs 1
   cache:
     paths:
@@ -88,7 +87,7 @@ api-rustfmt:
     - cd services/api
     - rustc --version && cargo --version && rustup --version
     - rustup component add rustfmt-preview
-    - rustfmt --check services/api/src/**.rs
+    - cargo fmt -- --check
 
 web-tslint:
   stage: style

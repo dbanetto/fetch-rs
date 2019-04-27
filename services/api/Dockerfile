@@ -15,9 +15,6 @@ RUN cargo build --release --verbose
 # Create final slim image
 FROM debian:stretch-slim
 
-ENV RUST_LOG info
-ENV RUST_BACKTRACE 1
-
 RUN apt-get update && \
     apt-get install -y --no-install-recommends libpq5 wget
 

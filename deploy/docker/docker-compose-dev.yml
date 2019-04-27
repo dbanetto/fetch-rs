@@ -19,6 +19,8 @@ services:
       - migrate
     environment:
       DATABASE_URL: postgres://postgres@db/postgres
+      RUST_LOG: debug
+      RUST_BACKTRACE: 1
 
   get:
     build:
