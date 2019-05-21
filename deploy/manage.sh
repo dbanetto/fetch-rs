@@ -27,7 +27,7 @@ function print_help {
     echo ""
     echo "Utility"
     echo "manage.sh backup <url>         - dump database to JSON"
-    echo "manage.sh restore <url> <file> - re-creates resources from a backup"
+    echo "manage.sh restore <file> <url> - re-creates resources from a backup"
 }
 
 case $OPTION in

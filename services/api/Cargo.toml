@@ -1,31 +1,31 @@
 [package]
 authors = ["David Barnett <david@barnett.net.nz>"]
 name = "fetch-api"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2018"
 
 [[bin]]
 name = "fetch-api"
 path = "src/main.rs"
 
+[lib]
+name = "fetch"
+path = "src/lib.rs"
+
 [dependencies]
-dotenv = "^0.8.0"
-error-chain = "^0.8.1"
-filetime = "^0.1.14"
-handlebars-iron = "^0.27.0"
-hyper = "^0.10.13"
-iron = "^0.6.0"
-iron-test = "^0.6.0"
-mount = "^0.4.0"
-r2d2 = "^0.8.0"
-router = "^0.6.0"
+dotenv = "^0.13.0"
+error-chain = "^0.12"
 serde = "^1.0"
 serde_derive = "^1.0"
 serde_json = "^1.0"
-structopt = "0.1.6"
-structopt-derive = "0.1.6"
-time = "^0.1.39"
-toml = "0.4.5"
+structopt = "^0.2"
+structopt-derive = "^0.2"
+toml = "^0.4"
+warp = "^0.1"
+log = "0.4.6"
+env_logger = "0.6.0"
+r2d2 = "0.8.3"
+url = "1.7.2"
 
 [dependencies.chrono]
 features = ["serde"]
@@ -43,7 +43,3 @@ version = "^1.1.0"
 [dependencies.diesel_derives]
 features = ["postgres"]
 version = "^1.1.0"
-
-[dependencies.staticfile]
-features = ["cache"]
-version = "0.5.0"

@@ -19,6 +19,8 @@ services:
       - migrate
     environment:
       DATABASE_URL: postgres://postgres@db/postgres
+      RUST_LOG: debug
+      RUST_BACKTRACE: 1
 
   get:
     build:
@@ -80,7 +82,7 @@ services:
       DATABASE_URL: postgres://postgres@db/postgres
       
   db:
-    image: postgres:10-alpine
+    image: postgres:11-alpine
     ports:
       - 5432:5432
     volumes:

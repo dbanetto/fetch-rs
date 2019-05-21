@@ -51,7 +51,7 @@ def backup(fetch_url, filename):
             blob.pop('id')
             blob.pop('series_id')
 
-        # attach it to series in POST /api/series/new form
+        # attach it to series in POST /api/series/ form
         obj['info'] = blobs['data']
 
         backup.append(obj)
@@ -73,7 +73,7 @@ def restore(fetch_url, filename):
 
         for series in backup:
             # create new entry based off backup file
-            res = requests.post("{0}/api/series/new"
+            res = requests.post("{0}/api/series/"
                                 .format(fetch_url),
                                 json=series)
 

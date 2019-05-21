@@ -1,30 +1,28 @@
-use crate::db::DbConnection;
-use crate::util::{api_error, api_success};
+use crate::db::{PooledConn, PooledConnFilter};
+use crate::error::Result;
+use crate::util::api_response;
+
 use diesel::prelude::*;
-use iron::prelude::*;
-use iron::status::Status;
-use mount::Mount;
+use warp::{filters::path, Filter, Reply};
 
 pub mod api;
 
-pub fn routes() -> Mount {
-    let mut mount = Mount::new();
+pub fn routes(db_filter: PooledConnFilter) -> impl Filter<Extract = (impl Reply,)> {
+    let healthcheck = warp::filters::method::get2()
+        .and(path!("healthcheck"))
+        .and(path::end())
+        .and(db_filter.clone())
+        .map(healthcheck)
+        .map(api_response);
 
-    // endpoints
-    mount.mount("/healthcheck", healthcheck);
-    mount.mount("/", api::routes());
-
-    mount
+    warp::any()
+        .and(healthcheck.or(api::routes(db_filter)))
+        .with(warp::log("api"))
 }
 
-fn healthcheck(req: &mut Request) -> IronResult<Response> {
-    let conn = match req.extensions.get::<DbConnection>().unwrap().get() {
-        Ok(conn) => conn,
-        Err(err) => return Err(api_error(err, Status::BadRequest)),
-    };
-
-    match (&*conn).execute("SELECT 1;") {
-        Ok(_) => Ok(api_success("healthy")),
-        Err(err) => Err(api_error(err, Status::InternalServerError)),
-    }
+pub fn healthcheck(conn: PooledConn) -> Result<bool> {
+    (&*conn)
+        .execute("SELECT 1;")
+        .map(|_| true)
+        .map_err(|err| err.into())
 }

@@ -1,8 +1,10 @@
-FROM rust:1.31 AS build
+FROM rust:1.34 AS build
 
-RUN cargo install diesel_cli --no-default-features --features postgres --version '1.2.0'
+RUN cargo install diesel_cli --no-default-features --features postgres
 
 FROM debian:stretch-slim
+
+ENV RUST_LOG info
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends libpq5

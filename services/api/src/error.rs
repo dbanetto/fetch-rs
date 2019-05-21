@@ -1,10 +1,16 @@
-error_chain! {
+use error_chain::*;
+use url::ParseError;
+
+error_chain::error_chain! {
 
     foreign_links {
-        Fmt(::std::fmt::Error);
-        Io(::std::io::Error) #[cfg(unix)];
-        TomlDe(::toml::de::Error);
-        Diesel(::diesel::result::Error);
+        Fmt(std::fmt::Error);
+        Io(std::io::Error) #[cfg(unix)];
+        AddrParseError(std::net::AddrParseError);
+        TomlDe(toml::de::Error);
+        Diesel(diesel::result::Error);
+        R2D2(r2d2::Error);
+        Url(ParseError);
     }
 
     errors {

@@ -1,5 +1,4 @@
 use crate::error::*;
-use serde_json::Value;
 use std::env;
 use std::fs::File;
 use std::io::prelude::*;
@@ -100,10 +99,6 @@ impl Config {
             config_path: config_path,
             database_url: database_url,
         }
-    }
-
-    pub fn template_config(&self) -> Value {
-        json!({})
     }
 }
 
