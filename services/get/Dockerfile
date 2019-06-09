@@ -8,7 +8,7 @@ COPY . .
 
 RUN make docker
 
-FROM alpine:3.7
+FROM alpine:3.9
 
 COPY --from=build /code/bin/fetch /usr/local/bin/fetch
 
