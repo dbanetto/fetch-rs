@@ -227,10 +227,11 @@ mod test {
 
         // Action
         let series = data.new_series(SeriesForm::default()).unwrap();
-        let result = data.new_infoblob(series.id, InfoBlobForm::default()).unwrap();
+        let result = data
+            .new_infoblob(series.id, InfoBlobForm::default())
+            .unwrap();
 
         // Assert
         assert!(data.get_infoblob(series.id, result.id).is_ok());
     }
-
 }

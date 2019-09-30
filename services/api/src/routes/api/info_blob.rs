@@ -26,7 +26,11 @@ fn new(series_id: SeriesId, form: InfoBlobForm, mut source: DatabaseFiltered) ->
     source.new_infoblob(series_id, form)
 }
 
-fn delete(series_id: SeriesId, blob_id: InfoBlobId, mut source: DatabaseFiltered) -> Result<InfoBlob> {
+fn delete(
+    series_id: SeriesId,
+    blob_id: InfoBlobId,
+    mut source: DatabaseFiltered,
+) -> Result<InfoBlob> {
     source.delete_infoblob(series_id, blob_id)
 }
 

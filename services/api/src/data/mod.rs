@@ -1,5 +1,5 @@
-pub mod pgsql;
 pub mod memory;
+pub mod pgsql;
 
 use crate::error::Result;
 use crate::models::{InfoBlob, InfoBlobForm, InfoBlobId, Series, SeriesBlob, SeriesForm, SeriesId};

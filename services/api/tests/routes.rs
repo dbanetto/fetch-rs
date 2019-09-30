@@ -1,5 +1,5 @@
+use fetch::data::{memory::MemoryDatabase, DataSource};
 use fetch::routes::routes;
-use fetch::data::{DataSource, memory::MemoryDatabase};
 
 use serde_json::{json, Value};
 use warp::{Filter, Reply};

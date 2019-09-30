@@ -1,6 +1,6 @@
 use dotenv::dotenv;
 use fetch::error::{Error, Result};
-use fetch::{config, data,  routes};
+use fetch::{config, data, routes};
 
 use std::net::{IpAddr, SocketAddr};
 use std::str::FromStr;
@@ -21,7 +21,7 @@ fn main() -> Result<()> {
     let addr = SocketAddr::from((ip, config.port));
     let db_conn = match config.database_url {
         Some(conntion_string) => data::pgsql::Connection::new(conntion_string)?,
-        None => data::pgsql::Connection::new_environment()?
+        None => data::pgsql::Connection::new_environment()?,
     };
 
     println!("Starting server on {}", addr);

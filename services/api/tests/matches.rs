@@ -1,5 +1,5 @@
+use fetch::data::{memory::MemoryDatabase, DataSource};
 use fetch::models::{InfoBlobForm, SeriesForm};
-use fetch::data::{DataSource, memory::MemoryDatabase};
 use fetch::routes::routes;
 
 use std::default::Default;
@@ -38,7 +38,6 @@ macro_rules! route_matches {
 }
 
 fn make_router() -> impl Filter<Extract = (impl Reply,)> {
-
     let data = MemoryDatabase::default();
     let data_filter = warp::any()
         .map(move || Box::new(data.clone()) as Box<dyn DataSource + Send>)

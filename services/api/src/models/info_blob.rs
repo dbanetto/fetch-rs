@@ -31,7 +31,6 @@ pub struct InfoBlobForm {
 }
 
 impl InfoBlobForm {
-
     pub fn into_insertable(self, series_id: SeriesId) -> NewInfoBlob {
         NewInfoBlob {
             series_id: series_id,
