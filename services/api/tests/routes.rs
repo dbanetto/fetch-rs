@@ -58,5 +58,5 @@ route_get_tests!(
     "GET",
     "/info/1", // FIXME: this is fragile test
     404,
-    json!({ "success": false, "error": "Not found" })
+    json!({ "success": false, "error": "Not Found" })
 );

@@ -1,116 +1,184 @@
-use crate::data::{DataSource, DatabaseFilter};
+use crate::data::DataSource;
 use crate::error::{Error, Result};
-use crate::models::{
-    InfoBlob, InfoBlobForm, InfoBlobId, NewInfoBlob, Series, SeriesBlob, SeriesForm, SeriesId,
-};
-
-use std::collections::HashMap;
+use crate::models::{InfoBlob, InfoBlobForm, InfoBlobId, Series, SeriesBlob, SeriesForm, SeriesId};
 
 #[derive(Serialize, Deserialize, Clone, Default)]
 pub struct MemoryDatabase {
-    series: HashMap<SeriesId, Series>,
-    info_blobs: HashMap<SeriesId, HashMap<InfoBlobId, InfoBlob>>
+    series_id_counter: SeriesId,
+    info_blob_id_counter: InfoBlobId,
+    series: Vec<Series>,
+    info_blobs: Vec<InfoBlob>,
 }
 
 impl DataSource for MemoryDatabase {
     fn all_infoblobs(&self, series_id: SeriesId) -> Result<Vec<InfoBlob>> {
-        match self.info_blobs.get(&series_id) {
-            Some(_blobs) => Ok(vec![]),
-            None => Err("Not found".into()),
-        }
+        let _ = self.get_series(series_id)?;
+
+        let results = self
+            .info_blobs
+            .clone()
+            .into_iter()
+            .filter(|blob| blob.series_id == series_id)
+            .collect();
+
+        Ok(results)
     }
 
     fn get_infoblob(&self, series_id: SeriesId, id: InfoBlobId) -> Result<InfoBlob> {
-        match self.info_blobs.get(&series_id).and_then(|blobs| { blobs.get(&id) }) {
-            Some(blob) => Ok(blob.clone()),
-            None => Err("Not found".into()),
-        }
+        self.info_blobs
+            .iter()
+            .find(|blob| blob.series_id == series_id && blob.id == id)
+            .map(|blob| blob.clone())
+            .ok_or::<Error>("Not Found".into())
     }
 
-    fn new_infoblob(&self, series_id: SeriesId, form: InfoBlobForm) -> Result<InfoBlob> {
-        let id: InfoBlobId = 10;
+    fn new_infoblob(&mut self, series_id: SeriesId, form: InfoBlobForm) -> Result<InfoBlob> {
+        // Check if the series exists
+        let _ = self.get_series(series_id)?;
+
+        // Allocate an id
+        let blob_id = self.info_blob_id_counter;
+        self.info_blob_id_counter += 1;
+
         let blob = InfoBlob {
-            id: id,
-            series_id: series_id, 
+            id: blob_id,
+            series_id: series_id,
             blob: form.blob,
             info_type: form.info_type,
         };
 
-        // TODO: insert into map
+        self.info_blobs.push(blob.clone());
 
         Ok(blob)
     }
 
     fn update_infoblob(
-        &self,
+        &mut self,
         series_id: SeriesId,
         blob_id: InfoBlobId,
         form: InfoBlobForm,
     ) -> Result<InfoBlob> {
+        let _ = self.delete_infoblob(series_id, blob_id)?;
 
         let blob = InfoBlob {
             id: blob_id,
-            series_id: series_id, 
+            series_id: series_id,
             blob: form.blob,
             info_type: form.info_type,
         };
-        
-        // TODO: insert into map
+
+        self.info_blobs.push(blob.clone());
+
         Ok(blob)
     }
 
-    fn delete_infoblob(&self, series_id: SeriesId, id: InfoBlobId) -> Result<InfoBlob> {
-        // TODO
-        Ok(InfoBlob::default())
+    fn delete_infoblob(&mut self, _series_id: SeriesId, id: InfoBlobId) -> Result<InfoBlob> {
+        let (mut deleted, kept) = self
+            .info_blobs
+            .iter()
+            .cloned()
+            .partition(|blob| blob.id == id);
+
+        self.info_blobs = kept;
+
+        deleted.pop().ok_or::<Error>("Not Found".into())
     }
 
     fn get_info_types(&self, series_id: SeriesId, types: Vec<&str>) -> Result<Vec<InfoBlob>> {
-        // TODO
-        Ok(vec![])
+        Ok(self
+            .info_blobs
+            .iter()
+            .cloned()
+            .filter(|blob| blob.series_id == series_id)
+            .filter(|blob| types.contains(&blob.info_type.as_str()))
+            .collect())
     }
 
     /// Retrieve all series in the database
     fn all_series(&self) -> Result<Vec<Series>> {
-        Ok(vec![])
+        Ok(self.series.clone())
     }
 
     /// Get a series by id
-    fn get_series(&self, id: SeriesId) -> Result<Series>{
-        match self.series.get(&id) {
-            Some(series) => Ok(series.clone()),
-            None => Err("Not found".into()),
-        }
+    fn get_series(&self, id: SeriesId) -> Result<Series> {
+        self.series
+            .iter()
+            .find(|s| s.id == id)
+            .map(|s| s.clone())
+            .ok_or::<Error>("Not Found".into())
     }
 
     /// Delete a series by id
-    fn delete_series(&self, id: SeriesId) -> Result<Series>{
-        Ok(Series::default())
-}
+    fn delete_series(&mut self, id: SeriesId) -> Result<Series> {
+        // remove blobs with series
+        for blob in self.all_infoblobs(id)? {
+            let _ = self.delete_infoblob(id, blob.id)?;
+        }
+
+        let (mut deleted, kept) = self.series.iter().cloned().partition(|s| s.id == id);
+
+        self.series = kept;
+
+        deleted.pop().ok_or::<Error>("Not Found".into())
+    }
 
     /// Update a series and associated info blobs
-    fn update_series(&self, id: SeriesId, form: SeriesForm) -> Result<SeriesBlob>{
-        let series = Series::default();
+    fn update_series(&mut self, id: SeriesId, form: SeriesForm) -> Result<SeriesBlob> {
+        let mut series = self.delete_series(id)?;
+
+        series.poster_url = form.poster_url;
+        series.title = form.title;
+
+        let mut saved = vec![];
+        if let Some(blobs) = form.info {
+            for blob in blobs {
+                if let Some(blob_id) = blob.id {
+                    saved.push(self.update_infoblob(id, blob_id, blob)?);
+                } else {
+                    saved.push(self.new_infoblob(id, blob)?);
+                }
+            }
+        }
+
+        self.series.push(series.clone());
+
         Ok(SeriesBlob {
             id: id,
             title: series.title,
             poster_url: series.poster_url,
-            blob: vec![],
+            blob: saved,
         })
     }
 
     /// Create a series and associated info blobs
-    fn new_series(&self, form: SeriesForm) -> Result<SeriesBlob>{
-        let id: SeriesId = 1;
-        Ok(SeriesBlob {
+    fn new_series(&mut self, form: SeriesForm) -> Result<SeriesBlob> {
+        let id = self.series_id_counter;
+        self.series_id_counter += 1;
+
+        let series = Series {
             id: id,
             title: form.title,
             poster_url: form.poster_url,
-            blob: vec![],
-        })
+        };
 
+        let mut saved = vec![];
+        if let Some(blobs) = form.info {
+            for blob in blobs {
+                saved.push(self.new_infoblob(id, blob)?);
+            }
+        }
+
+        self.series.push(series.clone());
+
+        Ok(SeriesBlob {
+            id: id,
+            title: series.title,
+            poster_url: series.poster_url,
+            blob: saved,
+        })
     }
 
-    fn healthcheck(&self) -> Result<bool>{
+    fn healthcheck(&self) -> Result<bool> {
         Ok(true)
     }
 }
