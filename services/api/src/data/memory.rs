@@ -182,3 +182,55 @@ impl DataSource for MemoryDatabase {
         Ok(true)
     }
 }
+
+#[cfg(test)]
+mod test {
+
+    use super::*;
+
+    #[test]
+    fn not_found_series() {
+        // Arrange
+        let data = MemoryDatabase::default();
+
+        // Action
+        // Assert
+        assert!(data.get_series(0).is_err());
+    }
+
+    #[test]
+    fn not_found_infoblob() {
+        // Arrange
+        let data = MemoryDatabase::default();
+
+        // Action
+        // Assert
+        assert!(data.get_infoblob(0, 0).is_err());
+    }
+
+    #[test]
+    fn stores_series_data() {
+        // Arrange
+        let mut data = MemoryDatabase::default();
+
+        // Action
+        let result = data.new_series(SeriesForm::default()).unwrap();
+
+        // Assert
+        assert!(data.get_series(result.id).is_ok());
+    }
+
+    #[test]
+    fn stores_info_data() {
+        // Arrange
+        let mut data = MemoryDatabase::default();
+
+        // Action
+        let series = data.new_series(SeriesForm::default()).unwrap();
+        let result = data.new_infoblob(series.id, InfoBlobForm::default()).unwrap();
+
+        // Assert
+        assert!(data.get_infoblob(series.id, result.id).is_ok());
+    }
+
+}
