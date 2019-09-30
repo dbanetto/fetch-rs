@@ -12,16 +12,16 @@ pub trait DataSource {
 
     fn get_infoblob(&self, series_id: SeriesId, id: InfoBlobId) -> Result<InfoBlob>;
 
-    fn new_infoblob(&self, series_id: SeriesId, form: InfoBlobForm) -> Result<InfoBlob>;
+    fn new_infoblob(&mut self, series_id: SeriesId, form: InfoBlobForm) -> Result<InfoBlob>;
 
     fn update_infoblob(
-        &self,
+        &mut self,
         series_id: SeriesId,
         blob_id: InfoBlobId,
         form: InfoBlobForm,
     ) -> Result<InfoBlob>;
 
-    fn delete_infoblob(&self, series_id: SeriesId, id: InfoBlobId) -> Result<InfoBlob>;
+    fn delete_infoblob(&mut self, series_id: SeriesId, id: InfoBlobId) -> Result<InfoBlob>;
 
     fn get_info_types(&self, series_id: SeriesId, types: Vec<&str>) -> Result<Vec<InfoBlob>>;
 
@@ -32,13 +32,13 @@ pub trait DataSource {
     fn get_series(&self, id: SeriesId) -> Result<Series>;
 
     /// Delete a series by id
-    fn delete_series(&self, id: SeriesId) -> Result<Series>;
+    fn delete_series(&mut self, id: SeriesId) -> Result<Series>;
 
     /// Update a series and associated info blobs
-    fn update_series(&self, id: SeriesId, form: SeriesForm) -> Result<SeriesBlob>;
+    fn update_series(&mut self, id: SeriesId, form: SeriesForm) -> Result<SeriesBlob>;
 
     /// Create a series and associated info blobs
-    fn new_series(&self, form: SeriesForm) -> Result<SeriesBlob>;
+    fn new_series(&mut self, form: SeriesForm) -> Result<SeriesBlob>;
 
     fn healthcheck(&self) -> Result<bool>;
 }

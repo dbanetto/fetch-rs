@@ -13,15 +13,15 @@ fn select(id: SeriesId, source: DatabaseFiltered) -> Result<Series> {
     source.get_series(id)
 }
 
-fn new(form: SeriesForm, source: DatabaseFiltered) -> Result<SeriesBlob> {
+fn new(form: SeriesForm, mut source: DatabaseFiltered) -> Result<SeriesBlob> {
     source.new_series(form)
 }
 
-fn update(id: SeriesId, form: SeriesForm, source: DatabaseFiltered) -> Result<SeriesBlob> {
+fn update(id: SeriesId, form: SeriesForm, mut source: DatabaseFiltered) -> Result<SeriesBlob> {
     source.update_series(id, form)
 }
 
-fn delete(id: SeriesId, source: DatabaseFiltered) -> Result<Series> {
+fn delete(id: SeriesId, mut source: DatabaseFiltered) -> Result<Series> {
     source.delete_series(id)
 }
 

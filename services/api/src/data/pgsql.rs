@@ -264,13 +264,13 @@ impl DataSource for Connection {
         Self::pg_get_infoblob(conn, series_id, id)
     }
 
-    fn new_infoblob(&self, series_id: SeriesId, form: InfoBlobForm) -> Result<InfoBlob> {
+    fn new_infoblob(&mut self, series_id: SeriesId, form: InfoBlobForm) -> Result<InfoBlob> {
         let conn = &*self.get_connection()?;
         Self::pg_new_infoblob(conn, series_id, form)
     }
 
     fn update_infoblob(
-        &self,
+        &mut self,
         series_id: SeriesId,
         blob_id: InfoBlobId,
         form: InfoBlobForm,
@@ -279,7 +279,7 @@ impl DataSource for Connection {
         Self::pg_update_infoblob(conn, series_id, blob_id, form)
     }
 
-    fn delete_infoblob(&self, series_id: SeriesId, id: InfoBlobId) -> Result<InfoBlob> {
+    fn delete_infoblob(&mut self, series_id: SeriesId, id: InfoBlobId) -> Result<InfoBlob> {
         let conn = &*self.get_connection()?;
         Self::pg_delete_infoblob(conn, series_id, id)
     }
@@ -302,19 +302,19 @@ impl DataSource for Connection {
     }
 
     /// Delete a series by id
-    fn delete_series(&self, id: SeriesId) -> Result<Series> {
+    fn delete_series(&mut self, id: SeriesId) -> Result<Series> {
         let conn = &*self.get_connection()?;
         Self::pg_delete_series(conn, id)
     }
 
     /// Update a series and associated info blobs
-    fn update_series(&self, id: SeriesId, form: SeriesForm) -> Result<SeriesBlob> {
+    fn update_series(&mut self, id: SeriesId, form: SeriesForm) -> Result<SeriesBlob> {
         let conn = &*self.get_connection()?;
         Self::pg_update_series(conn, id, form)
     }
 
     /// Create a series and associated info blobs
-    fn new_series(&self, form: SeriesForm) -> Result<SeriesBlob> {
+    fn new_series(&mut self, form: SeriesForm) -> Result<SeriesBlob> {
         let conn = &*self.get_connection()?;
         Self::pg_new_series(conn, form)
     }
