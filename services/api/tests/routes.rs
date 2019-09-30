@@ -1,6 +1,5 @@
-use fetch::config::get_config;
-use fetch::db::get_pool;
 use fetch::routes::routes;
+use fetch::data::{DataSource, memory::MemoryDatabase};
 
 use serde_json::{json, Value};
 use warp::{Filter, Reply};
@@ -25,17 +24,12 @@ macro_rules! route_get_tests {
 }
 
 fn make_router() -> impl Filter<Extract = (impl Reply,)> {
-    dotenv::dotenv().ok();
-    let _ = env_logger::try_init();
+    let data = MemoryDatabase::default();
+    let data_filter = warp::any()
+        .map(move || Box::new(data.clone()) as Box<dyn DataSource + Send>)
+        .boxed();
 
-    let config = match get_config() {
-        Ok(config) => config,
-        Err(err) => {
-            panic!("Config error: {}", err);
-        }
-    };
-
-    routes(get_pool(&config.database_url).unwrap())
+    routes(data_filter)
 }
 
 route_get_tests!(
@@ -52,17 +46,17 @@ route_get_tests!(
     200,
     json!({ "success": true, "data": true })
 );
-// route_get_tests!(
-//     get_series_all,
-//     "GET",
-//     "/series", //FIXME: this is fragile test
-//     200,
-//     json!({ "success": true, "data": [] })
-// );
-// route_get_tests!(
-//     get_info_all,
-//     "GET",
-//     "/info/1", // FIXME: this is fragile test
-//     200,
-//     json!({ "success": true, "data": [] })
-// );
+route_get_tests!(
+    get_series_all,
+    "GET",
+    "/series", //FIXME: this is fragile test
+    200,
+    json!({ "success": true, "data": [] })
+);
+route_get_tests!(
+    get_info_all,
+    "GET",
+    "/info/1", // FIXME: this is fragile test
+    404,
+    json!({ "success": false, "error": "Not found" })
+);
