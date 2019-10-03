@@ -5,7 +5,7 @@ stages:
 
 api:
   stage: test
-  image: rust:1.35
+  image: rust:1.38
   services:
     - postgres:11
   variables:

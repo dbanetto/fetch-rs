@@ -1,5 +1,4 @@
-use fetch::config::get_config;
-use fetch::db::get_pool;
+use fetch::data::{memory::MemoryDatabase, DataSource};
 use fetch::models::{InfoBlobForm, SeriesForm};
 use fetch::routes::routes;
 
@@ -39,17 +38,12 @@ macro_rules! route_matches {
 }
 
 fn make_router() -> impl Filter<Extract = (impl Reply,)> {
-    dotenv::dotenv().ok();
-    let _ = env_logger::try_init();
+    let data = MemoryDatabase::default();
+    let data_filter = warp::any()
+        .map(move || Box::new(data.clone()) as Box<dyn DataSource + Send>)
+        .boxed();
 
-    let config = match get_config() {
-        Ok(config) => config,
-        Err(err) => {
-            panic!("Config error: {}", err);
-        }
-    };
-
-    routes(get_pool(&config.database_url).unwrap())
+    routes(data_filter)
 }
 
 //

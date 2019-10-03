@@ -1,4 +1,3 @@
-use error_chain::*;
 use url::ParseError;
 
 error_chain::error_chain! {

@@ -1,14 +1,11 @@
 use crate::error::{Error, Result};
-use crate::models::{InfoBlob, InfoBlobForm, InfoBlobId, NewInfoBlob};
+use crate::models::{InfoBlob, InfoBlobForm};
 use crate::schema::*;
 
-use diesel::dsl::*;
-use diesel::prelude::*;
-use diesel::{delete, insert_into, update};
 use url::Url;
 
 /// Series object from database
-#[derive(Queryable, Associations, Identifiable, Serialize, Deserialize, Debug, Default)]
+#[derive(Queryable, Associations, Identifiable, Serialize, Deserialize, Debug, Default, Clone)]
 #[table_name = "series"]
 pub struct Series {
     pub id: SeriesId,
@@ -17,7 +14,7 @@ pub struct Series {
 }
 
 /// Series object to be insert into database
-#[derive(Insertable, Serialize, Deserialize, Debug, Default)]
+#[derive(Insertable, Serialize, Deserialize, Debug, Default, Clone)]
 #[table_name = "series"]
 pub struct NewSeries {
     pub title: String,
@@ -25,14 +22,14 @@ pub struct NewSeries {
 }
 
 /// Form to create or update a series with many info blobs associated to that new series
-#[derive(Serialize, Deserialize, Debug, Default)]
+#[derive(Serialize, Deserialize, Debug, Default, Clone)]
 pub struct SeriesForm {
     pub title: String,
     pub poster_url: Option<String>,
     pub info: Option<Vec<InfoBlobForm>>,
 }
 
-#[derive(Serialize, Deserialize, Debug, Default)]
+#[derive(Serialize, Deserialize, Debug, Default, Clone)]
 pub struct SeriesBlob {
     pub id: SeriesId,
     pub title: String,
@@ -41,121 +38,6 @@ pub struct SeriesBlob {
 }
 
 pub type SeriesId = i32;
-
-impl Series {
-    /// Retrieve all series in the database
-    pub fn all(conn: &PgConnection) -> Result<Vec<Self>> {
-        series::dsl::series
-            .load::<Series>(conn)
-            .map_err(|err| err.into())
-    }
-
-    /// Get a series by id
-    pub fn get(conn: &PgConnection, id: SeriesId) -> Result<Self> {
-        series::dsl::series
-            .filter(series::id.eq(id))
-            .select(series::all_columns)
-            .first(&*conn)
-            .map_err(|err| err.into())
-    }
-
-    /// Delete a series by id
-    pub fn delete(conn: &PgConnection, id: SeriesId) -> Result<Self> {
-        diesel::delete(series::dsl::series.filter(series::id.eq(id)))
-            .returning(series::all_columns)
-            .get_result(&*conn)
-            .map_err(|err| err.into())
-    }
-
-    /// Update a series and associated info blobs
-    pub fn update(conn: &PgConnection, id: SeriesId, form: SeriesForm) -> Result<SeriesBlob> {
-        let (series_put, blobs_put) = form.into_new();
-
-        let _ = series_put.validate()?;
-
-        conn.transaction::<_, Error, _>(|| {
-            let series: Series = update(series::dsl::series.filter(series::id.eq(id)))
-                .set((
-                    series::title.eq(series_put.title),
-                    series::poster_url.eq(series_put.poster_url),
-                ))
-                .returning(series::all_columns)
-                .get_result(&*conn)
-                .map_err::<Error, _>(|err| err.into())?;
-
-            if let Some(blobs_put) = blobs_put {
-                let mut blobs_ids: Vec<InfoBlobId> = vec![];
-
-                // list of blobs to NOT delete
-                for blob in blobs_put {
-                    let result = if let Some(blob_id) = blob.id {
-                        // update
-                        InfoBlob::update(conn, id, blob_id, blob)?
-                    } else {
-                        // create
-                        InfoBlob::new(conn, id, blob)?
-                    };
-                    blobs_ids.push(result.id)
-                }
-
-                // delete info_blobs that were not apart of the PUT
-                delete(
-                    info_blob::dsl::info_blob
-                        .filter(not(info_blob::id.eq(any(blobs_ids))))
-                        .filter(info_blob::series_id.eq(id)),
-                )
-                .execute(&*conn)
-                .map_err::<Error, _>(|err| err.into())?;
-            }
-
-            Ok(SeriesBlob {
-                id: series.id,
-                title: series.title,
-                poster_url: series.poster_url,
-                blob: InfoBlob::all(conn, series.id)?,
-            })
-        })
-    }
-
-    /// Create a series and associated info blobs
-    pub fn new(conn: &PgConnection, form: SeriesForm) -> Result<SeriesBlob> {
-        let (new_series, blobs) = form.into_new();
-
-        let _ = new_series.validate()?;
-
-        conn.transaction::<_, Error, _>(|| {
-            let series = insert_into(series::table)
-                .values(&new_series)
-                .returning(series::all_columns)
-                .get_result(&*conn)
-                .map_err::<Error, _>(|err| err.into())?;
-
-            let blobs = if let Some(blobs) = blobs {
-                let insertable_blobs = blobs
-                    .into_iter()
-                    .map(|i| i.into_insertable(&series))
-                    .collect::<Vec<NewInfoBlob>>();
-
-                let inserted_blobs = insert_into(info_blob::table)
-                    .values(&insertable_blobs)
-                    .returning(info_blob::all_columns)
-                    .get_results(&*conn)
-                    .map_err::<Error, _>(|err| err.into())?;
-
-                inserted_blobs
-            } else {
-                Vec::new()
-            };
-
-            Ok(SeriesBlob {
-                id: series.id,
-                title: series.title,
-                poster_url: series.poster_url,
-                blob: blobs,
-            })
-        })
-    }
-}
 
 impl NewSeries {
     /// Validate
@@ -265,5 +147,4 @@ mod test {
 
         assert!(form.validate().is_err());
     }
-
 }

@@ -11,7 +11,7 @@ extern crate serde_derive;
 extern crate warp;
 
 pub mod config;
-pub mod db;
+pub mod data;
 pub mod error;
 pub mod models;
 pub mod routes;
